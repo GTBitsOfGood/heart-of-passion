@@ -32,10 +32,6 @@ This repository aims to support teen volunteers in their retreat planning and bu
 - [tRPC](https://trpc.io)
 - [NextAuth.js](https://next-auth.js.org)
 
-## Setup
-
-**TODO**
-
 ## Learn More
 
 - [T3 Stack Documentation](https://create.t3.gg/)
