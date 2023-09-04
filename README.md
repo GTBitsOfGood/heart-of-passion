@@ -27,10 +27,10 @@ This repository aims to support teen volunteers in their retreat planning and bu
 
 - [MongoDB](https://www.mongodb.com/)
 - [Next.js](https://nextjs.org)
-- [Prisma](https://prisma.io)
 - [Tailwind CSS](https://tailwindcss.com)
 - [tRPC](https://trpc.io)
-- [NextAuth.js](https://next-auth.js.org)
+- Chakra UI
+- Mongoose
 
 ## Learn More
 
