@@ -2,7 +2,11 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
-const UserSchema = new Schema({
+export interface IUser {
+  role: "student" | "mentor" | "admin";
+}
+
+const UserSchema = new Schema<IUser>({
   role: {
     type: String,
     enum: ["student", "mentor", "admin"],
@@ -10,4 +14,6 @@ const UserSchema = new Schema({
   },
 });
 
-export default mongoose.models.User ?? mongoose.model("User", UserSchema);
+export const Model =
+  (mongoose.models.User as mongoose.Model<IUser>) ??
+  mongoose.model("User", UserSchema);
