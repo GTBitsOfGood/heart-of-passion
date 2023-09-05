@@ -13,16 +13,6 @@ This repository aims to support teen volunteers in their retreat planning and bu
 - `npm install`
 - `npm start`
 
-## Tour of the Codebase
-
-- `/public` static assets
-- `/prisma` database schema
-- `/src` source folder
-  - `/src/pages` next.js pages directory, can create new frontend routes here
-  - `/src/server` trpc router definitions
-  - `/src/styles` css entrypoint (shouldn't need to mess with here much)
-  - `/src/utils` miscellaneous functions
-
 ## Major Technologies
 
 - [MongoDB](https://www.mongodb.com/)
@@ -31,7 +21,3 @@ This repository aims to support teen volunteers in their retreat planning and bu
 - [tRPC](https://trpc.io)
 - Chakra UI
 - Mongoose
-
-## Learn More
-
-- [T3 Stack Documentation](https://create.t3.gg/)
