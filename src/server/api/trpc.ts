@@ -109,4 +109,6 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
  *
  * @see https://trpc.io/docs/procedures
  */
-export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
+export const studentProcedure = t.procedure.use(enforceUserIsAuthed);
+export const mentorProcedure = t.procedure.use(enforceUserIsAuthed); // TODO
+export const adminProcedure = t.procedure.use(enforceUserIsAuthed); // TODO
