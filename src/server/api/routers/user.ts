@@ -47,5 +47,16 @@ export const userRouter = createTRPCRouter({
             return {
                 message: `user ${user?.email} updated`
             }
+        }),
+    getUser: publicProcedure
+        .input(z.string())
+        .query(async (opts) => {
+            const user = await Model.findOne({ email: opts.input });
+            return user;
+        }),
+    getUsers: publicProcedure
+        .query(async (opts) => {
+            const users = await Model.find();
+            return users;
         })
 });
