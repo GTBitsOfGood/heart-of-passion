@@ -20,7 +20,18 @@ export const userRouter = createTRPCRouter({
             const user = new Model(input)
             await user.save();
             return {
-                success: `User created`,
+                message: `User created`,
             };
-        })
+        }),
+    deleteUser: publicProcedure
+        .input(z.string())
+        .mutation(async (opts) => {
+            await dbConnect();
+            console.log(opts.input)
+            const user = await Model.findOneAndDelete({ email: opts.input })
+            return {
+                message: `user ${user?.email} deleted`
+            }
+        }),
+    
 });
