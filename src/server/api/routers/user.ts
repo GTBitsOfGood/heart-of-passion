@@ -33,5 +33,19 @@ export const userRouter = createTRPCRouter({
                 message: `user ${user?.email} deleted`
             }
         }),
-    
+    updateUser: publicProcedure
+        .input(z.object({
+            email: z.string(),
+            updateData: z.object({
+                name: z.string().optional(), email: z.string().optional(),
+                role: z.string().optional(), chapter: z.string().optional()
+            })
+        }
+        ))
+        .mutation(async (opts) => {
+            const user = await Model.findOneAndUpdate({ email: opts.input.email }, opts.input.updateData)
+            return {
+                message: `user ${user?.email} updated`
+            }
+        })
 });
