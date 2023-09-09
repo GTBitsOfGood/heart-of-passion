@@ -16,9 +16,7 @@ export const chapterRouter = createTRPCRouter({
             await dbConnect();
             const chapter = new Model({ name: opts.input })
             await chapter.save();
-            return {
-                message: `Chapter created`,
-            };
+            return chapter;
         }),
     getChapter: publicProcedure
         .input(z.string())

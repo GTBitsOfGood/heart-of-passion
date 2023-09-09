@@ -19,9 +19,7 @@ export const userRouter = createTRPCRouter({
             await dbConnect();
             const user = new Model(input)
             await user.save();
-            return {
-                message: `User created`,
-            };
+            return user;
         }),
     deleteUser: publicProcedure
         .input(z.string())
@@ -29,9 +27,7 @@ export const userRouter = createTRPCRouter({
             await dbConnect();
             console.log(opts.input)
             const user = await Model.findOneAndDelete({ email: opts.input })
-            return {
-                message: `user ${user?.email} deleted`
-            }
+            return user;
         }),
     updateUser: publicProcedure
         .input(z.object({
@@ -44,9 +40,7 @@ export const userRouter = createTRPCRouter({
         ))
         .mutation(async (opts) => {
             const user = await Model.findOneAndUpdate({ email: opts.input.email }, opts.input.updateData)
-            return {
-                message: `user ${user?.email} updated`
-            }
+            return user;
         }),
     getUser: publicProcedure
         .input(z.string())
