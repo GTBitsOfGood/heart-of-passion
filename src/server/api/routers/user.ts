@@ -24,10 +24,20 @@ export const userRouter = createTRPCRouter({
     deleteUser: publicProcedure
         .input(z.string())
         .mutation(async (opts) => {
-            await dbConnect();
-            console.log(opts.input)
-            const user = await Model.findOneAndDelete({ email: opts.input })
-            return user;
+            try {
+                await dbConnect();
+                console.log(opts.input)
+                const user = await Model.findOneAndDelete({ email: opts.input })
+                return {
+                    success: true,
+                    message: user
+                }
+            } catch (e) {
+                return {
+                    success: false,
+                    message: e
+                }
+            }
         }),
     updateUser: publicProcedure
         .input(z.object({
@@ -39,18 +49,48 @@ export const userRouter = createTRPCRouter({
         }
         ))
         .mutation(async (opts) => {
-            const user = await Model.findOneAndUpdate({ email: opts.input.email }, opts.input.updateData)
-            return user;
+            try {
+                const user = await Model.findOneAndUpdate({ email: opts.input.email }, opts.input.updateData)
+                return {
+                    success: true,
+                    message: user
+                };
+            } catch (e) {
+                return {
+                    success: false,
+                    message: e
+                }
+            }
         }),
     getUser: publicProcedure
         .input(z.string())
         .query(async (opts) => {
-            const user = await Model.findOne({ email: opts.input });
-            return user;
+            try {
+                const user = await Model.findOne({ email: opts.input });
+                return {
+                    success: true,
+                    message: user
+                };
+            } catch (e) {
+                return {
+                    success: false,
+                    message: e
+                }
+            }
         }),
     getUsers: publicProcedure
         .query(async (opts) => {
-            const users = await Model.find();
-            return users;
+            try {
+                const users = await Model.find();
+                return {
+                    success: true,
+                    message: users
+                };
+            } catch (e) {
+                return {
+                    success: false,
+                    message: e
+                }
+            }
         })
 });
