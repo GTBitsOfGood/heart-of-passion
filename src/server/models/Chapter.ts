@@ -12,7 +12,7 @@ const ChapterSchema = new Schema<IChapter>({
     required: true,
     unique: true,
   },
-});w
+});
 
 export const Model =
   (mongoose.models.Chapter as mongoose.Model<IChapter>) ??
