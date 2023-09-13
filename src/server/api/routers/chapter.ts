@@ -7,14 +7,12 @@ import {
 } from "~/server/api/trpc";
 
 import { getGlobalCount, incrementGlobalCount } from "~/server/actions/Count";
-import dbConnect from "~/server/db";
 import { Model } from '~/server/models/Chapter'
 export const chapterRouter = createTRPCRouter({
     createChapter: publicProcedure
         .input(z.string())
         .mutation(async (opts) => {
             try {
-                await dbConnect();
                 const chapter = new Model({ name: opts.input })
                 await chapter.save();
                 return {
