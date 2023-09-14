@@ -8,7 +8,8 @@ This repository aims to support teen volunteers in their retreat planning and bu
 
 ## Development Setup
 
-- Get a locally running MongoDB instance 
+- Get a locally running MongoDB instance
+   - If you have docker installed I believe `docker run --name mongodb -d -p 27017:27017 mongo` will work
 - Create a `.env` file in the root of the repository with the content: `DATABASE_URL=YOUR-URL-HERE`
    - This is generally `DATABASE_URL=mongodb://localhost:27017/heartofpassion`
 - `npm install`
