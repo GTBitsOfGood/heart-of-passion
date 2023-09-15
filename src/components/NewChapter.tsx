@@ -4,7 +4,6 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  HStack,
   Input,
   Modal,
   ModalBody,
@@ -26,31 +25,24 @@ type NewChapterProps = {
 
 export const NewChapter = ({ focusRef, isOpen, onClose }: NewChapterProps) => {
   const [chapter, setChapter] = useState("");
-  const [year, setYear] = useState("");
 
   const [chapterError, setChapterError] = useState(false);
-  const [yearError, setYearError] = useState(false);
 
   const onCloseModal = () => {
     setChapter("");
-    setYear("")
     setChapterError(false);
-    setYearError(false);
     onClose();
   };
 
   const handleChapterChange = (event: React.FormEvent<HTMLInputElement>) =>
     setChapter(event.currentTarget.value);
 
-  const handleYearChange = (event: React.FormEvent<HTMLInputElement>) =>
-    setYear(event.currentTarget.value);
-
   const handleSave = () => {
     if (!validateFields()) {
       return false;
     }
     onCloseModal();
-    const chapterObj: Chapter = {name: chapter, year: year}
+    const chapterObj: Chapter = {name: chapter}
     console.log(chapterObj);
     return true;
   };
@@ -63,12 +55,6 @@ export const NewChapter = ({ focusRef, isOpen, onClose }: NewChapterProps) => {
       valid = false;
     } else {
       setChapterError(false);
-    }
-    if (year === "") {
-      setYearError(true);
-      valid = false;
-    } else {
-      setYearError(false);
     }
     return valid;
   };
@@ -84,6 +70,7 @@ export const NewChapter = ({ focusRef, isOpen, onClose }: NewChapterProps) => {
       <ModalContent
         width="327px"
         maxWidth="327px"
+        height="195px"
         borderRadius="none"
         boxShadow={"0px 4px 29px 0px #00000040"}
       >
@@ -101,7 +88,6 @@ export const NewChapter = ({ focusRef, isOpen, onClose }: NewChapterProps) => {
             fontWeight="light"
             alignItems="start"
             spacing="5px"
-            mt="24px"
           >
             <FormControl isInvalid={chapterError}>
               <FormLabel textColor="black" fontWeight="600" mb="4px">
@@ -120,27 +106,6 @@ export const NewChapter = ({ focusRef, isOpen, onClose }: NewChapterProps) => {
               />
               <Box minHeight="20px" mt={2}>
                 <FormErrorMessage mt={0}>Chapter is required</FormErrorMessage>
-              </Box>
-            </FormControl>
-            <FormControl isInvalid={yearError}>
-              <FormLabel textColor="black" fontWeight="600" mb="4px">
-                Year
-              </FormLabel>
-              <Input
-                placeholder="2022"
-                type="number"
-                pattern="[0-9]*"
-                color="#666666"
-                _placeholder={{ color: "#666666" }}
-                border="1px solid #D9D9D9"
-                borderRadius="0px"
-                width="240px"
-                height="30px"
-                value={year}
-                onChange={handleYearChange}
-              />
-              <Box minHeight="20px" mt={2}>
-                <FormErrorMessage mt={0}>Year is required</FormErrorMessage>
               </Box>
             </FormControl>
           </VStack>

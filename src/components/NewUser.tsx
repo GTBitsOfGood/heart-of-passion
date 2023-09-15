@@ -18,7 +18,6 @@ import {
 import { useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
 import { z } from "zod";
-import { appendFileSync } from "fs";
 import { User } from "~/common/types/types";
 
 type NewUserProps = {

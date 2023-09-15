@@ -1,8 +1,5 @@
-import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
   Button,
-  FormControl,
-  FormLabel,
   Menu,
   MenuButton,
   MenuList,
