@@ -148,7 +148,7 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
                 </FormLabel>
                 <Input
                   placeholder="Jane Doe"
-                  color="#666666"
+                  color="black"
                   _placeholder={{ color: "#666666" }}
                   border="1px solid #D9D9D9"
                   borderRadius="0px"
@@ -188,7 +188,7 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
                 </FormLabel>
                 <Input
                   placeholder="jdoe@gmail.com"
-                  color="#666666"
+                  color="#black"
                   _placeholder={{ color: "#666666" }}
                   border="1px solid #D9D9D9"
                   borderRadius="0px"
@@ -232,6 +232,7 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
         <ModalFooter pr="14px" pb="30px" pt="0px">
           <Button
             colorScheme="twitter"
+            bg="hop_blue.500"
             mr="30px"
             onClick={handleSave}
             borderRadius="none"
@@ -246,6 +247,7 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
             fontSize="20px"
             fontWeight="400"
             colorScheme="red"
+            color="hop_red.500"
             variant="outline"
             borderRadius="none"
           >

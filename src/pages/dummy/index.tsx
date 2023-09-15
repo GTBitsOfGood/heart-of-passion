@@ -27,6 +27,7 @@ export default function DummyPage() {
       >
         <Button
           colorScheme="twitter"
+          bg="hop_blue.500"
           borderRadius="none"
           onClick={onOpenAddUserModal}
           fontFamily="heading"
@@ -43,6 +44,7 @@ export default function DummyPage() {
 
         <Button
           colorScheme="twitter"
+          bg="hop_blue.500"
           borderRadius="none"
           onClick={onOpenAddChapterModal}
           fontFamily="heading"

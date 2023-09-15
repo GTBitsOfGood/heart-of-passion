@@ -114,6 +114,7 @@ export const NewChapter = ({ focusRef, isOpen, onClose }: NewChapterProps) => {
         <ModalFooter pr="54px" pb="26px" pt="0px">
           <Button
             colorScheme="twitter"
+            bg="hop_blue.500"
             onClick={handleSave}
             borderRadius="none"
             fontFamily="heading"
