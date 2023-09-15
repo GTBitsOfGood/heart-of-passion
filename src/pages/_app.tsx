@@ -2,10 +2,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { type AppType } from "next/app";
 
 import { api } from "~/utils/api";
-import { theme } from "./theme";
-
-// Supports weights 200-900
-import '@fontsource/nunito';
+import { theme } from "../theme";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
