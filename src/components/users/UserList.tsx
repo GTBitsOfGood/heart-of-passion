@@ -3,8 +3,9 @@ import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import UserEntry from "./UserEntry";
 
-export default function Users() {
-  const [open, setOpen] = useState(false);
+export default function UserList({title, users}) {
+  const [open, setOpen] = useState(true);
+  const usersRendered = users.map((user:any) => <UserEntry {...user}/>)
   return (
     <>
       <Stack w={{ base: "67%", "2xl": "68%" }}>
@@ -14,36 +15,17 @@ export default function Users() {
           borderBottom="1px lightgrey solid"
           p=".5em"
         >
-          <Heading size="md">Atlanta</Heading>
+          <Heading size="md">{title}</Heading>
           {open ? <TriangleUpIcon /> : <TriangleDownIcon />}
         </Flex>
         <Stack gap="1em">
-          {open ? (
-            <>
-              <UserEntry
-                name="Yiwen Zhao"
-                email="yiwen.zhao@gatech.edu"
-                role="Admin"
-                chapter="Atlanta"
-              ></UserEntry>
-              <UserEntry
-                name="Yiwen Zhao"
-                email="yiwen.zhao@gatech.edu"
-                role="Student"
-                chapter="Atlanta"
-              ></UserEntry>
-              <UserEntry
-                name="Yiwen Zhao"
-                email="yiwen.zhao@gatech.edu"
-                role="Admin"
-                chapter="Atlanta"
-              ></UserEntry>
-            </>
+          {open ? ( usersRendered
           ) : (
             <></>
           )}
         </Stack>
       </Stack>
+      
     </>
   );
 }

@@ -19,7 +19,7 @@ import logo from "public/hoplogo.png";
 import fonts from "common/theme/fonts";
 
 export default function Users() {
-  const [filter, setFilter] = useState("chapter");
+  const [filter, setFilter] = useState("chapter"); // value decides grouping behavior
 
   const {
     isOpen: isOpenFilterPopover,
@@ -31,6 +31,44 @@ export default function Users() {
     setFilter(filter);
     onCloseFilterPopeover();
   }
+
+  // dummy data
+  const users = [
+    {
+      name: "Yiwen Zhao",
+      email: "yiwen.zhao@gatech.edu",
+      role: "Admin",
+      chapter: "Atlanta",
+    },
+    {
+      name: "Nabeel Zhao",
+      email: "yiwen.zhao@gatech.edu",
+      role: "Admin",
+      chapter: "Georgia",
+    },
+    {
+      name: "Ricky Zhao",
+      email: "yiwen.zhao@gatech.edu",
+      role: "Student",
+      chapter: "Atlanta",
+    },
+    {
+      name: "Jay Zhao",
+      email: "yiwen.zhao@gatech.edu",
+      role: "Student",
+      chapter: "Georgia",
+    },
+  ];
+
+  // uses value of filter variable to group users by a text property in their class
+  const groups = function () {
+    const uniques = [...new Set(users.map((u: any) => u[filter]))]; // array of unique vals
+    // group users by groupBy name into dictionary
+    const umap = new Map(uniques.map((u: any) => [u, new Array()])); // map of val to empty array
+    users.forEach((u: any) => umap.get(u[filter])?.push(u));
+    return uniques.map((u:string) => ({title: u, users: umap.get(u)}));
+  }();
+  const groupsRendered = groups.map((gr:any) => <UserList {...gr} />);
 
   return (
     <>
@@ -73,7 +111,7 @@ export default function Users() {
                     <Box onClick={() => handleFilterClick("chapter")}>
                       <Text align="right">View by Chapter</Text>
                     </Box>
-                    <Box onClick={() => handleFilterClick("permission")}>
+                    <Box onClick={() => handleFilterClick("role")}>
                       <Text align="right">View by Permission</Text>
                     </Box>
                   </Stack>
@@ -96,9 +134,7 @@ export default function Users() {
             top={{ base: "5.6em", "2xl": "6em" }}
           />
         </Flex>
-        <UserList />
-        <UserList />
-        <UserList />
+        {groupsRendered}
       </Stack>
     </>
   );
