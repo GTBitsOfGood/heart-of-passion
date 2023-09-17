@@ -41,10 +41,34 @@ export default function Users() {
       chapter: "Atlanta",
     },
     {
+      name: "Yiwen Zhao",
+      email: "yiwen.zhao@gatech.edu",
+      role: "Student",
+      chapter: "Atlanta",
+    },
+    {
+      name: "Yiwen Zhao",
+      email: "yiwen.zhao@gatech.edu",
+      role: "Mentor",
+      chapter: "Atlanta",
+    },
+    {
       name: "Nabeel Zhao",
       email: "yiwen.zhao@gatech.edu",
       role: "Admin",
       chapter: "Georgia",
+    },
+    {
+      name: "Ricky Zhao",
+      email: "yiwen.zhao@gatech.edu",
+      role: "Student",
+      chapter: "Atlanta",
+    },
+    {
+      name: "Ricky Zhao",
+      email: "yiwen.zhao@gatech.edu",
+      role: "Admin",
+      chapter: "New Orleans",
     },
     {
       name: "Ricky Zhao",
@@ -61,14 +85,14 @@ export default function Users() {
   ];
 
   // uses value of filter variable to group users by a text property in their class
-  const groups = function () {
+  const groups = (function () {
     const uniques = [...new Set(users.map((u: any) => u[filter]))]; // array of unique vals
     // group users by groupBy name into dictionary
     const umap = new Map(uniques.map((u: any) => [u, new Array()])); // map of val to empty array
     users.forEach((u: any) => umap.get(u[filter])?.push(u));
-    return uniques.map((u:string) => ({title: u, users: umap.get(u)}));
-  }();
-  const groupsRendered = groups.map((gr:any) => <UserList {...gr} />);
+    return uniques.map((u: string) => ({ title: u, users: umap.get(u) }));
+  })();
+  const groupsRendered = groups.map((gr: any) => <UserList {...gr} />);
 
   return (
     <>
@@ -86,7 +110,7 @@ export default function Users() {
           borderBottom="solid 1px black"
           paddingTop={{ base: "7%", "2xl": "4%" }}
         >
-          <Heading size="lg" fontFamily={fonts.oswald}>
+          <Heading size="lg" fontFamily={fonts.oswald} fontWeight="extrabold">
             USERS
           </Heading>
           <Box>
@@ -97,7 +121,7 @@ export default function Users() {
                   variant="ghost"
                   gap="0.5em"
                 >
-                  <Text align="right">
+                  <Text align="right" fontFamily={fonts.nunito} fontSize="sm">
                     {filter == "chapter"
                       ? "View by Chapter"
                       : "View by Permission"}
@@ -105,26 +129,40 @@ export default function Users() {
                   <TriangleDownIcon />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent w="13em">
-                <PopoverBody w="11em">
+              <PopoverContent w="11.7em">
+                <PopoverBody w="10em">
                   <Stack>
                     <Box onClick={() => handleFilterClick("chapter")}>
-                      <Text align="right">View by Chapter</Text>
+                      <Text
+                        align="right"
+                        fontFamily={fonts.nunito}
+                        fontSize="sm"
+                      >
+                        View by Chapter
+                      </Text>
                     </Box>
                     <Box onClick={() => handleFilterClick("role")}>
-                      <Text align="right">View by Permission</Text>
+                      <Text
+                        align="right"
+                        fontFamily={fonts.nunito}
+                        fontSize="sm"
+                      >
+                        View by Permission
+                      </Text>
                     </Box>
                   </Stack>
                 </PopoverBody>
               </PopoverContent>
             </Popover>
             <Button
-              backgroundColor="skyblue"
-              color="white"
+              backgroundColor="#26ACE2"
               borderRadius="0"
-              size="sm"
+              h="80%"
+              w="4.5em"
             >
-              ADD USER
+              <Text color="white" fontFamily={fonts.oswald} fontWeight="light">
+                ADD USER
+              </Text>
             </Button>
           </Box>
           <SettingsIcon

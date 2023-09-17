@@ -4,3 +4,8 @@ export type User = {
   role: string;
   chapter: string;
 };
+
+export type UserList = {
+  title: string;
+  users: User[];
+};
