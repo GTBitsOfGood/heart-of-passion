@@ -114,7 +114,7 @@ export default function Users() {
             USERS
           </Heading>
           <Box>
-            <Popover placement="bottom-end" isOpen={isOpenFilterPopover}>
+            <Popover placement="bottom-end" isOpen={isOpenFilterPopover} onClose={onCloseFilterPopeover}>
               <PopoverTrigger>
                 <Button
                   onClick={onOpenFilterPopover}
