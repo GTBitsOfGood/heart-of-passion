@@ -2,11 +2,13 @@ import { Heading, Stack, Flex } from "@chakra-ui/react";
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import UserEntry from "./UserEntry";
-import { UserList } from "common/types/types";
+import { User, UserList } from "common/types/types";
 
 export default function UserList({ title, users }: UserList) {
   const [open, setOpen] = useState(true);
-  const usersRendered = users.map((user: any) => <UserEntry {...user} />);
+  const usersRendered = users.map((user: User) => (
+    <UserEntry key={user.email} {...user} />
+  ));
   return (
     <>
       <Stack w={{ base: "67%", "2xl": "68%" }} py="0.5em">
