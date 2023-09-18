@@ -135,6 +135,7 @@ export default function Users() {
                     <Box onClick={() => handleFilterClick("chapter")}>
                       <Text
                         align="right"
+			cursor="pointer"
                         fontFamily={fonts.nunito}
                         fontSize="sm"
                       >
@@ -144,6 +145,7 @@ export default function Users() {
                     <Box onClick={() => handleFilterClick("role")}>
                       <Text
                         align="right"
+			cursor="pointer"
                         fontFamily={fonts.nunito}
                         fontSize="sm"
                       >
