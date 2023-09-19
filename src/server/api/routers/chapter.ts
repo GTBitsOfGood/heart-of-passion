@@ -11,7 +11,7 @@ import { Model } from '~/server/models/Chapter'
 export const chapterRouter = createTRPCRouter({
     createChapter: publicProcedure
         .input(z.string())
-        .mutation(async (opts) => {
+        .mutation(async (opts: any) => {
             try {
                 const chapter = new Model({ name: opts.input })
                 await chapter.save();
@@ -28,7 +28,7 @@ export const chapterRouter = createTRPCRouter({
         }),
     getChapter: publicProcedure
         .input(z.string())
-        .query(async (opts) => {
+        .query(async (opts: any) => {
             try {
                 const chapter = await Model.findOne({ name: opts.input });
                 return {
@@ -43,7 +43,7 @@ export const chapterRouter = createTRPCRouter({
             }
         }),
     getChapters: publicProcedure
-        .query(async (opts) => {
+        .query(async (opts: any) => {
             try {
                 const chapters = await Model.find();
                 return {
