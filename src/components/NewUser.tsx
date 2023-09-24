@@ -19,6 +19,7 @@ import { useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
 import { z } from "zod";
 import { User } from "~/common/types/types";
+import { api } from "~/utils/api";
 
 type NewUserProps = {
   focusRef: React.MutableRefObject<null>;
@@ -46,6 +47,8 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
   // 2 - invalid email
   const [emailError, setEmailError] = useState(0);
 
+  const createUser = api.user.createUser.useMutation();
+
   const onCloseModal = () => {
     setSelectedPermission(permissionOptions[0]);
     setSelectedChapter(chapterOptions[0]);
@@ -60,13 +63,14 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
     if (!validateFields()) {
       return false;
     }
-    onCloseModal();
     const userObj: User = {
       name: name,
       email: email,
       role: selectedPermission?.toLowerCase() ?? "student",
-      ...(selectedPermission!=="Admin" && {chapter: selectedChapter})
+      ...(selectedPermission !== "Admin" && { chapter: selectedChapter }),
     };
+    createUser.mutate(userObj);
+    onCloseModal();
     console.log(userObj);
     return true;
   };

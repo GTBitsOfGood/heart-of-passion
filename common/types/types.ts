@@ -9,3 +9,11 @@ export type UserList = {
   title: string;
   users: User[];
 };
+
+export type Chapter = {
+  name: string;
+  year: string;
+  totalCost: number;
+  fundExpected: number;
+  fundActual: number;
+};

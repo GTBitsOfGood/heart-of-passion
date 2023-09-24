@@ -2,7 +2,6 @@ import {
   Text,
   Grid,
   GridItem,
-  Progress,
   Flex,
   Spacer,
   Box,
@@ -14,11 +13,13 @@ import ProgressBar from "@ramonak/react-progress-bar";
 
 const ChapterCard = ({
   name,
+  year,
   totalCost,
   fundExpected,
   fundActual,
 }: {
   name: string;
+  year: string;
   totalCost: number;
   fundExpected: number;
   fundActual: number;
@@ -49,7 +50,7 @@ const ChapterCard = ({
         fontWeight="bold"
         fontFamily="oswald"
       >
-        {name}
+        {name + " " + year}
       </Text>
 
       <ProgressBar

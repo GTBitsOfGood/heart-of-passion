@@ -3,8 +3,9 @@ export type User = {
   email: string;
   role: string;
   chapter?: string;
-}
+};
 
 export type Chapter = {
   name: string;
-}
+  year: string;
+};

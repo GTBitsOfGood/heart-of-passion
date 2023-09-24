@@ -5,7 +5,7 @@ const { Schema } = mongoose;
 export interface IUser {
   name: string;
   email: string;
-  chapter: mongoose.Types.ObjectId;
+  chapter: String;
   role: "student" | "mentor" | "admin";
 }
 
@@ -24,8 +24,8 @@ const UserSchema = new Schema<IUser>({
     required: true,
   },
   chapter: {
-    ref: "Chapter",
-    type: Schema.Types.ObjectId,
+    // ref: "Chapter",
+    type: String,
   },
 });
 
