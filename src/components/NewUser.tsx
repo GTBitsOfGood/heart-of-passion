@@ -25,7 +25,7 @@ type NewUserProps = {
   focusRef: React.MutableRefObject<null>;
   isOpen: boolean;
   onClose: () => void;
-  updateUsers: (user: User) => void;
+  updateUsers: (user: any) => void;
 };
 
 export const NewUser = ({
@@ -75,9 +75,17 @@ export const NewUser = ({
       role: selectedPermission?.toLowerCase() ?? "student",
       ...(selectedPermission !== "Admin" && { chapter: selectedChapter }),
     };
-    createUser.mutate(userObj, {
+    const temp = {
+      name: name,
+      email: email,
+      role: selectedPermission?.toLowerCase() ?? "student",
+      ...(selectedPermission !== "Admin" && {
+        chapter: { name: selectedChapter },
+      }),
+    };
+    const user = createUser.mutate(userObj, {
       onSuccess: (newData) => {
-        updateUsers(newData);
+        updateUsers(temp);
       },
     });
     onCloseModal();

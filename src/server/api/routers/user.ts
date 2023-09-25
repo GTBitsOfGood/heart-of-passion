@@ -8,6 +8,8 @@ import {
 
 import { getGlobalCount, incrementGlobalCount } from "~/server/actions/Count";
 import { Model } from "~/server/models/User";
+import { ChapterModel } from "~/server/models/Chapter";
+import { ObjectId } from "mongoose";
 export const userRouter = createTRPCRouter({
   createUser: publicProcedure
     .input(
@@ -19,13 +21,23 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input }) => {
-      const user = new Model(input);
+      let chapter: any;
+      await ChapterModel.findOne({ name: input.chapter })
+        .then((data) => data?.toJSON())
+        .then((chap) => {
+          chapter = chap;
+        });
+      const user = new Model({
+        name: input.name,
+        chapter: chapter?._id as ObjectId,
+        email: input.email,
+        role: input.role,
+      });
       await user.save();
       return user as any;
     }),
   deleteUser: publicProcedure.input(z.string()).mutation(async (opts) => {
     try {
-      console.log(opts.input);
       const user = await Model.findOneAndDelete({ email: opts.input });
       return {
         success: true,
@@ -83,7 +95,7 @@ export const userRouter = createTRPCRouter({
   }),
   getUsers: publicProcedure.query(async (opts) => {
     try {
-      const users = await Model.find();
+      const users = await Model.find().populate("chapter");
       return {
         success: true,
         message: users,
