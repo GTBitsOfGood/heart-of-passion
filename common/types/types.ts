@@ -5,15 +5,11 @@ export type User = {
   chapter: string;
 };
 
-export type UserList = {
+export type UList = {
   title: string;
   users: User[];
 };
 
 export type Chapter = {
   name: string;
-  year: string;
-  totalCost: number;
-  fundExpected: number;
-  fundActual: number;
 };

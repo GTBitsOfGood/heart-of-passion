@@ -22,39 +22,41 @@ type NewChapterProps = {
   focusRef: React.MutableRefObject<null>;
   isOpen: boolean;
   onClose: () => void;
+  updateChapters: (data: Chapter) => void;
 };
 
-export const NewChapter = ({ focusRef, isOpen, onClose }: NewChapterProps) => {
+export const NewChapter = ({
+  focusRef,
+  isOpen,
+  onClose,
+  updateChapters,
+}: NewChapterProps) => {
   const [chapter, setChapter] = useState("");
-  const [year, setYear] = useState("");
 
   const [chapterError, setChapterError] = useState(false);
-  const [yearError, setYearError] = useState(false);
 
   const createChapter = api.chapter.createChapter.useMutation();
 
   const onCloseModal = () => {
     setChapter("");
-    setYear("");
     setChapterError(false);
-    setYearError(false);
     onClose();
   };
 
   const handleChapterChange = (event: React.FormEvent<HTMLInputElement>) =>
     setChapter(event.currentTarget.value);
 
-  const handleYearChange = (event: React.FormEvent<HTMLInputElement>) =>
-    setYear(event.currentTarget.value);
-
   const handleSave = async () => {
     if (!validateFields()) {
       return false;
     }
-    const chapterObj = { name: chapter, year: year };
-    const result = await createChapter.mutateAsync(chapterObj);
+    const chapterObj = { name: chapter };
+    await createChapter.mutate(chapterObj, {
+      onSuccess: (newData) => {
+        updateChapters(newData.message as Chapter);
+      },
+    });
     onCloseModal();
-    console.log(chapterObj);
     return true;
   };
 
@@ -66,12 +68,6 @@ export const NewChapter = ({ focusRef, isOpen, onClose }: NewChapterProps) => {
       valid = false;
     } else {
       setChapterError(false);
-    }
-    if (year === "") {
-      setYearError(true);
-      valid = false;
-    } else {
-      setYearError(false);
     }
     return valid;
   };
@@ -120,23 +116,6 @@ export const NewChapter = ({ focusRef, isOpen, onClose }: NewChapterProps) => {
                 onChange={handleChapterChange}
               />
               <FormErrorMessage>Chapter is required</FormErrorMessage>
-            </FormControl>
-            <FormControl isInvalid={yearError}>
-              <FormLabel textColor="black" fontWeight="600" mb="4px">
-                Year
-              </FormLabel>
-              <Input
-                placeholder="2023"
-                color="#666666"
-                _placeholder={{ color: "#666666" }}
-                border="1px solid #D9D9D9"
-                borderRadius="0px"
-                width="240px"
-                height="30px"
-                value={year}
-                onChange={handleYearChange}
-              />
-              <FormErrorMessage>Year is required</FormErrorMessage>
             </FormControl>
           </VStack>
         </ModalBody>

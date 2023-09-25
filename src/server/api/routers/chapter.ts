@@ -13,17 +13,12 @@ export const chapterRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string(),
-        year: z.string(),
       }),
     )
     .mutation(async (opts: any) => {
       try {
         const chapter = new Model({
           name: opts.input.name,
-          year: opts.input.year,
-          totalCost: 100,
-          fundExpected: 100,
-          fundActual: 0,
         });
         await chapter.save();
         return {
@@ -57,9 +52,6 @@ export const chapterRouter = createTRPCRouter({
       return {
         success: true,
         message: chapters,
-      } as {
-        success: boolean;
-        message: Chapter[];
       };
     } catch (e) {
       return {

@@ -21,7 +21,7 @@ export const userRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       const user = new Model(input);
       await user.save();
-      return user;
+      return user as any;
     }),
   deleteUser: publicProcedure.input(z.string()).mutation(async (opts) => {
     try {

@@ -20,6 +20,7 @@ export default function Users({ name, email, role, chapter }: User) {
           justifySelf="center"
           py=".1em"
           px=".5em"
+          textTransform="capitalize"
         >
           {role}
         </Box>

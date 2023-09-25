@@ -2,6 +2,7 @@ import {
   Text,
   Grid,
   GridItem,
+  Progress,
   Flex,
   Spacer,
   Box,
@@ -11,19 +12,10 @@ import { BiSolidEdit } from "react-icons/bi";
 import "@fontsource/oswald/600.css";
 import ProgressBar from "@ramonak/react-progress-bar";
 
-const ChapterCard = ({
-  name,
-  year,
-  totalCost,
-  fundExpected,
-  fundActual,
-}: {
-  name: string;
-  year: string;
-  totalCost: number;
-  fundExpected: number;
-  fundActual: number;
-}) => {
+const ChapterCard = ({ name }: { name: string }) => {
+  const totalCost = 100;
+  const fundExpected = 100;
+  const fundActual = 50;
   const progress = Math.floor((fundActual / fundExpected) * 100);
   return (
     <Box
@@ -50,7 +42,7 @@ const ChapterCard = ({
         fontWeight="bold"
         fontFamily="oswald"
       >
-        {name + " " + year}
+        {name}
       </Text>
 
       <ProgressBar

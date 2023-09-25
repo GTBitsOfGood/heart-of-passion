@@ -25,9 +25,15 @@ type NewUserProps = {
   focusRef: React.MutableRefObject<null>;
   isOpen: boolean;
   onClose: () => void;
+  updateUsers: (user: User) => void;
 };
 
-export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
+export const NewUser = ({
+  focusRef,
+  isOpen,
+  onClose,
+  updateUsers,
+}: NewUserProps) => {
   const permissionOptions = ["Student", "Mentor", "Admin"];
   const [selectedPermission, setSelectedPermission] = useState(
     permissionOptions[0],
@@ -69,7 +75,11 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
       role: selectedPermission?.toLowerCase() ?? "student",
       ...(selectedPermission !== "Admin" && { chapter: selectedChapter }),
     };
-    createUser.mutate(userObj);
+    createUser.mutate(userObj, {
+      onSuccess: (newData) => {
+        updateUsers(newData);
+      },
+    });
     onCloseModal();
     console.log(userObj);
     return true;

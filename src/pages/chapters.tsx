@@ -24,13 +24,18 @@ export default function Home() {
   } = useDisclosure();
   const finalRef = useRef(null);
 
-  const chapter = api.chapter.getChapters.useQuery();
+  let chapter = api.chapter.getChapters.useQuery().data?.message;
 
-  const [chapters, setChapters] = useState(chapter.data?.message);
+  const [chapters, setChapters] = useState([] as Chapter[]);
 
   useEffect(() => {
-    setChapters(chapter.data?.message);
+    setChapters(chapter as Chapter[]);
   }, [chapter]);
+
+  function updateChapters(data: Chapter): void {
+    const newChapters = [...chapters, data];
+    setChapters(newChapters);
+  }
 
   return (
     <Box m="2%">
@@ -56,6 +61,7 @@ export default function Home() {
             focusRef={finalRef}
             isOpen={isOpenAddChapterModal}
             onClose={onCloseAddChapterModal}
+            updateChapters={updateChapters}
           />
         </GridItem>
         <GridItem alignSelf="flex-end">
@@ -72,13 +78,7 @@ export default function Home() {
       <Grid templateColumns="repeat(3, 1fr)" gap={6} ml="10%" mr="10%">
         {chapters?.map((chapter: Chapter) => (
           <GridItem>
-            <ChapterCard
-              name={chapter.name.toUpperCase()}
-              year={chapter.year}
-              totalCost={chapter.totalCost}
-              fundExpected={chapter.fundExpected}
-              fundActual={chapter.fundActual}
-            />
+            <ChapterCard name={chapter.name.toUpperCase()} />
           </GridItem>
         ))}
       </Grid>

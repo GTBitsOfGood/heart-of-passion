@@ -4,10 +4,6 @@ const { Schema } = mongoose;
 
 export interface IChapter {
   name: string;
-  year: string;
-  totalCost: number;
-  fundExpected: number;
-  fundActual: number;
 }
 
 const ChapterSchema = new Schema<IChapter>({
@@ -15,19 +11,6 @@ const ChapterSchema = new Schema<IChapter>({
     type: String,
     required: true,
     unique: true,
-  },
-  year: {
-    type: String,
-    required: true,
-  },
-  totalCost: {
-    type: Number,
-  },
-  fundExpected: {
-    type: Number,
-  },
-  fundActual: {
-    type: Number,
   },
 });
 

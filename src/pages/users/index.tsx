@@ -15,6 +15,7 @@ import Image from "next/image";
 import { TriangleDownIcon, SettingsIcon } from "@chakra-ui/icons";
 import { useEffect, useRef, useState } from "react";
 import UserList from "~/components/users/UserList";
+import { User } from "~/common/types/types";
 import logo from "public/hoplogo.png";
 import fonts from "common/theme/fonts";
 import { NewUser } from "~/components/NewUser";
@@ -42,22 +43,30 @@ export default function Users() {
 
   const finalRef = useRef(null);
 
-  const user = api.user.getUsers.useQuery();
-  const [users, setUsers] = useState(user.data?.message);
+  const userData = api.user.getUsers.useQuery().data?.message;
+  const [users, setUsers] = useState([] as User[]);
 
   useEffect(() => {
-    setUsers(user.data?.message);
-  }, [user]);
+    setUsers(userData as User[]);
+  }, [userData]);
+
+  function updateUsers(user: User) {
+    const newUsers = [...users, user];
+    setUsers(newUsers);
+  }
 
   // uses value of filter variable to group users by a text property in their class
   const groups = (function () {
+    console.log(users);
     const uniques = [...new Set(users?.map((u: any) => u[filter]))]; // array of unique vals
     // group users by groupBy name into dictionary
     const umap = new Map(uniques.map((u: any) => [u, new Array()])); // map of val to empty array
     users?.forEach((u: any) => umap.get(u[filter])?.push(u));
     return uniques.map((u: string) => ({ title: u, users: umap.get(u) }));
   })();
-  const groupsRendered = groups.map((gr: any) => <UserList {...gr} />);
+  const groupsRendered = groups.map((gr: any) => (
+    <UserList key={gr.title} {...gr} />
+  ));
 
   return (
     <>
@@ -140,6 +149,7 @@ export default function Users() {
               focusRef={finalRef}
               isOpen={isOpenAddUserModal}
               onClose={onCloseAddUserModal}
+              updateUsers={updateUsers}
             />
           </Box>
           <SettingsIcon
