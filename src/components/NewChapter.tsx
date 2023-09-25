@@ -50,8 +50,7 @@ export const NewChapter = ({
     if (!validateFields()) {
       return false;
     }
-    const chapterObj = { name: chapter };
-    await createChapter.mutate(chapterObj, {
+    await createChapter.mutate(chapter, {
       onSuccess: (newData) => {
         updateChapters(newData.message as Chapter);
       },

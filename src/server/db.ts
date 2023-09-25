@@ -17,13 +17,9 @@ async function dbConnect() {
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose
-      .connect(env.DATABASE_URL, {
-        dbName: env.DB_NAME,
-      })
-      .then((mongoose) => {
-        return mongoose;
-      });
+    cached.promise = mongoose.connect(env.DATABASE_URL).then((mongoose) => {
+      return mongoose;
+    });
   }
   cached.conn = await cached.promise;
   return cached.conn;

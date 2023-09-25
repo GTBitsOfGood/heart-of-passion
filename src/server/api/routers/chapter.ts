@@ -10,11 +10,7 @@ import {
 import { Model } from "~/server/models/Chapter";
 export const chapterRouter = createTRPCRouter({
   createChapter: publicProcedure
-    .input(
-      z.object({
-        name: z.string(),
-      }),
-    )
+    .input(z.string())
     .mutation(async (opts: any) => {
       try {
         const chapter = new Model({
