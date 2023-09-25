@@ -82,6 +82,7 @@ export const NewChapter = ({
       <ModalContent
         width="327px"
         maxWidth="327px"
+        height="195px"
         borderRadius="none"
         boxShadow={"0px 4px 29px 0px #00000040"}
       >
@@ -98,6 +99,7 @@ export const NewChapter = ({
             fontSize="16px"
             fontWeight="light"
             alignItems="start"
+            spacing="5px"
           >
             <FormControl isInvalid={chapterError}>
               <FormLabel textColor="black" fontWeight="600" mb="4px">
@@ -114,7 +116,9 @@ export const NewChapter = ({
                 value={chapter}
                 onChange={handleChapterChange}
               />
-              <FormErrorMessage>Chapter is required</FormErrorMessage>
+              <Box minHeight="20px" mt={2}>
+                <FormErrorMessage mt={0}>Chapter is required</FormErrorMessage>
+              </Box>
             </FormControl>
           </VStack>
         </ModalBody>
