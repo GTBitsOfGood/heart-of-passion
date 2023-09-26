@@ -114,7 +114,11 @@ export default function Users() {
             USERS
           </Heading>
           <Box>
-            <Popover placement="bottom-end" isOpen={isOpenFilterPopover} onClose={onCloseFilterPopeover}>
+            <Popover
+              placement="bottom-end"
+              isOpen={isOpenFilterPopover}
+              onClose={onCloseFilterPopeover}
+            >
               <PopoverTrigger>
                 <Button
                   onClick={onOpenFilterPopover}
@@ -135,7 +139,7 @@ export default function Users() {
                     <Box onClick={() => handleFilterClick("chapter")}>
                       <Text
                         align="right"
-			cursor="pointer"
+                        cursor="pointer"
                         fontFamily={fonts.nunito}
                         fontSize="sm"
                       >
@@ -145,7 +149,7 @@ export default function Users() {
                     <Box onClick={() => handleFilterClick("role")}>
                       <Text
                         align="right"
-			cursor="pointer"
+                        cursor="pointer"
                         fontFamily={fonts.nunito}
                         fontSize="sm"
                       >

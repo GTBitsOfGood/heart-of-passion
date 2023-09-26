@@ -1,0 +1,11 @@
+{
+    "[typescript]": {
+        "editor.formatOnPaste": true,
+        "editor.formatOnSave": true
+    },
+    "prettier.configPath": "prettier.config.mjs",
+    "prettier.prettierPath": "node_modules/prettier",
+    "prettier.requireConfig": true,
+    "prettier.useEditorConfig": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
