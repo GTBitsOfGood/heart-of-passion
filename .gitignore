@@ -129,5 +129,8 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# MacOS files
+.DS_STORE
+
 # IDE
 .vscode/
