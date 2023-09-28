@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { Box, Flex, Text } from "@chakra-ui/react";
-import Card from "./card";
+// import Card from "./card";
+import CalendarCard from "src/components/Calendar/CalendarCard";
 import "@fontsource/oswald/700.css";
 
 const sampleData = [
@@ -121,7 +122,7 @@ export default function Calendar() {
         <Box display={"flex"} gap={"34px"}>
           {sampleData.map((day, index) => {
             return (
-              <Box>
+              <Box key={index}>
                 <Text
                   width={"158px"}
                   height={"81px"}
@@ -135,7 +136,7 @@ export default function Calendar() {
                 <Box display={"flex"}>
                   <Box marginRight={"34px"}>
                     {day.map((event) => {
-                      return <Card event={event} key={index} />;
+                      return <CalendarCard event={event} key={index} />;
                     })}
                   </Box>
                   <Box width={"1px"} background={"#989898"} height={"788px"} />
