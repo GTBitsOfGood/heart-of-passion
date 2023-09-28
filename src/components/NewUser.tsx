@@ -65,7 +65,7 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
       name: name,
       email: email,
       role: selectedPermission?.toLowerCase() ?? "student",
-      ...(selectedPermission!=="Admin" && {chapter: selectedChapter})
+      ...(selectedPermission !== "Admin" && { chapter: selectedChapter }),
     };
     console.log(userObj);
     return true;

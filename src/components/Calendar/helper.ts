@@ -32,6 +32,6 @@ export const computeTime = (startTime: string, endTime: string): number => {
     }
     end += parseInt(endMins || "0");
   }
-  console.log((end - start) / 1440);
+  // console.log((end - start) / 1440);
   return Math.round(((end - start) / 1440) * 100);
 };

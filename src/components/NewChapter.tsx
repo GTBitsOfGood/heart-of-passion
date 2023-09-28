@@ -42,7 +42,7 @@ export const NewChapter = ({ focusRef, isOpen, onClose }: NewChapterProps) => {
       return false;
     }
     onCloseModal();
-    const chapterObj: Chapter = {name: chapter}
+    const chapterObj: Chapter = { name: chapter };
     console.log(chapterObj);
     return true;
   };

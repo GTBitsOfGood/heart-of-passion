@@ -1,5 +1,6 @@
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Text, useDisclosure } from "@chakra-ui/react";
 import { computeTime } from "./helper";
+import CalendarCardModal from "./CalendarCardModal";
 
 type Event = {
   startTime: string;
@@ -11,6 +12,7 @@ type Event = {
 };
 
 export default function CalendarCard({ event }: { event: Event }) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <Box
       width={"207px"}
@@ -18,6 +20,8 @@ export default function CalendarCard({ event }: { event: Event }) {
       display={"flex"}
       border="1px solid #D9D9D9"
       marginBottom={10}
+      onClick={onOpen}
+      cursor="pointer"
     >
       <Box width={"100%"} padding={"7px"}>
         <Text color={"#C32127"}>{event.startTime}</Text>
@@ -37,6 +41,7 @@ export default function CalendarCard({ event }: { event: Event }) {
       >
         {event.priority}
       </Box>
+      <CalendarCardModal isOpen={isOpen} onClose={onClose} />
     </Box>
   );
 }

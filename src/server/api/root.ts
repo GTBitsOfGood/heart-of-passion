@@ -11,7 +11,7 @@ import { chapterRouter } from "./routers/chapter";
 export const appRouter = createTRPCRouter({
   example: exampleRouter,
   user: userRouter,
-  chapter: chapterRouter
+  chapter: chapterRouter,
 });
 
 // export type definition of API
