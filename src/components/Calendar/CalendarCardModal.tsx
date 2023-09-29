@@ -14,6 +14,7 @@ import {
 } from "@chakra-ui/react";
 import TimesList from "./TimesList";
 import ExpensesList from "./ExpensesList";
+import { useState } from "react";
 
 function ButtonLabelRow({ labelText, buttonText }: any) {
   return <Flex direction="row" justify="space-between" align="center">
@@ -22,38 +23,47 @@ function ButtonLabelRow({ labelText, buttonText }: any) {
   </Flex>
 }
 
+
 export default function CalendarCardModal({ isOpen, onClose }: any) {
+  const [showSide, setShowSide] = useState(true);
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>
-          <Input />
-        </ModalHeader>
-        <ModalCloseButton />
         <ModalBody>
-          Energy Level
-          <Select>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </Select>
-          Location
-          <Input />
-          
-          <ButtonLabelRow buttonText="ADD TIME" labelText="Dates"/>
-          <TimesList />
+          <Flex>
+            <Box flex="1">
+              <ModalHeader>
+                <Input />
+              </ModalHeader>
+              <ModalCloseButton />
+              Energy Level
+              <Select>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </Select>
+              Location
+              <Input />
 
-          <ButtonLabelRow buttonText="ADD EXPENSE" labelText="Expenses"/>
-          <ExpensesList />
+              <ButtonLabelRow buttonText="ADD TIME" labelText="Dates" />
+              <TimesList />
 
-        </ModalBody>
-        <ModalFooter>
+              <ButtonLabelRow buttonText="ADD EXPENSE" labelText="Expenses" />
+              <ExpensesList />
+
+              {/* <ModalFooter>
           <Button colorScheme="blue" mr={3} onClick={onClose}>
-            Close
+          Close
           </Button>
           <Button variant="ghost">Secondary Action</Button>
-        </ModalFooter>
+        </ModalFooter> */}
+            </Box>
+            {showSide && <Box flexBasis="300px">
+              Bruh
+            </Box>}
+          </Flex>
+        </ModalBody>
       </ModalContent>
     </Modal>
   );
