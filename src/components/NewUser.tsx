@@ -42,7 +42,7 @@ export const NewUser = ({
   // Get the possible chapter to select for the chapter dropdown
   let chapter: any = api.chapter.getChapters.useQuery().data?.message;
 
-  const [chapterOptions, setChapterOptions] = useState([]);
+  const [chapterOptions, setChapterOptions] = useState([] as string[]);
 
   const [selectedChapter, setSelectedChapter] = useState("");
 

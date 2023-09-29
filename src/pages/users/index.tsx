@@ -60,36 +60,39 @@ export default function Users() {
   // uses value of filter variable to group users by a text property in their class
   const groups = (function () {
     let uniques;
-    console.log(users);
-    if (filter == "chapter") {
-      uniques = [...new Set(users?.map((u: any) => u[filter]["name"]))];
+    if (users) {
+      if (filter == "chapter") {
+        uniques = [...new Set(users?.map((u: any) => u[filter]["name"]))];
+      } else {
+        uniques = [...new Set(users?.map((u: any) => u[filter]))]; // array of unique vals}
+      }
+      // group users by groupBy name into dictionary
+      const umap = new Map(uniques.map((u: any) => [u, new Array()])); // map of val to empty array
+      if (filter === "chapter") {
+        users?.forEach(
+          (u: any) =>
+            umap.get(u[filter]["name"])?.push({
+              email: u["email"],
+              name: u["name"],
+              role: u["role"],
+              chapter: u["chapter"]["name"],
+            }),
+        );
+      } else {
+        users?.forEach(
+          (u: any) =>
+            umap.get(u[filter])?.push({
+              email: u["email"],
+              name: u["name"],
+              role: u["role"],
+              chapter: u["chapter"]["name"],
+            }),
+        );
+      }
+      return uniques.map((u: string) => ({ title: u, users: umap.get(u) }));
     } else {
-      uniques = [...new Set(users?.map((u: any) => u[filter]))]; // array of unique vals}
+      return [];
     }
-    // group users by groupBy name into dictionary
-    const umap = new Map(uniques.map((u: any) => [u, new Array()])); // map of val to empty array
-    if (filter === "chapter") {
-      users?.forEach(
-        (u: any) =>
-          umap.get(u[filter]["name"])?.push({
-            email: u["email"],
-            name: u["name"],
-            role: u["role"],
-            chapter: u["chapter"]["name"],
-          }),
-      );
-    } else {
-      users?.forEach(
-        (u: any) =>
-          umap.get(u[filter])?.push({
-            email: u["email"],
-            name: u["name"],
-            role: u["role"],
-            chapter: u["chapter"]["name"],
-          }),
-      );
-    }
-    return uniques.map((u: string) => ({ title: u, users: umap.get(u) }));
   })();
   const groupsRendered = groups.map((gr: any) => (
     <UserList key={gr.title} {...gr} />
