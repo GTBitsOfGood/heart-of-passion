@@ -3,6 +3,7 @@ import mongoose, { mongo } from "mongoose";
 const { Schema } = mongoose;
 
 export interface IEvent {
+    retreatId: mongoose.Types.ObjectId;
     name: string;
     location: string; //optional
     energyLevel: "low" | "medium" | "high"; //optoional
@@ -12,6 +13,11 @@ export interface IEvent {
 }
 
 const EventSchema = new Schema<IEvent>({
+    retreatId: {
+        ref: "Retreat",
+        type: Schema.Types.ObjectId,
+        required: true,
+    },
     name: {
         type: String,
     },
@@ -60,4 +66,4 @@ const EventSchema = new Schema<IEvent>({
 
 export const Model =
     (mongoose.models.Event as mongoose.Model<IEvent>) ??
-    mongoose.model("User", EventSchema);
+    mongoose.model("Event", EventSchema);
