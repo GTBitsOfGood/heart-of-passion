@@ -42,14 +42,19 @@ export const NewUser = ({
   // Get the possible chapter to select for the chapter dropdown
   let chapter: any = api.chapter.getChapters.useQuery().data?.message;
 
-  const [chapterOptions, setChapterOptions] = useState(["temp"]);
+  const [chapterOptions, setChapterOptions] = useState([]);
 
   const [selectedChapter, setSelectedChapter] = useState("");
 
   useEffect(() => {
     setChapterOptions(chapter?.map((chap: Chapter) => chap.name));
-    setSelectedChapter(chapter?.at(0).name);
   }, [chapter]);
+
+  useEffect(() => {
+    if (chapterOptions) {
+      setSelectedChapter(chapter?.at(0).name);
+    }
+  }, [chapterOptions]);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -66,7 +71,9 @@ export const NewUser = ({
 
   const onCloseModal = () => {
     setSelectedPermission(permissionOptions[0]);
-    setSelectedChapter(chapter?.at(0).name);
+    if (chapterOptions) {
+      setSelectedChapter(chapter?.at(0).name);
+    }
     setName("");
     setEmail("");
     setNameError(false);
