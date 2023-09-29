@@ -14,7 +14,7 @@ export const chapterRouter = createTRPCRouter({
     .mutation(async (opts: any) => {
       try {
         const chapter = new ChapterModel({
-          name: opts.input.name,
+          name: opts.input,
         });
         await chapter.save();
         return {

@@ -24,10 +24,12 @@ export default function Home() {
   } = useDisclosure();
   const finalRef = useRef(null);
 
+  // Get all the chapters from the backend and populate the frontend afterwards
   let chapter = api.chapter.getChapters.useQuery().data?.message;
 
   const [chapters, setChapters] = useState([] as Chapter[]);
 
+  // Wait for the backend call and then update chapter afterwards
   useEffect(() => {
     setChapters(chapter as Chapter[]);
   }, [chapter]);

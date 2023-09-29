@@ -7,5 +7,4 @@ export type User = {
 
 export type Chapter = {
   name: string;
-  year: string;
 };

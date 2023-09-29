@@ -43,9 +43,11 @@ export default function Users() {
 
   const finalRef = useRef(null);
 
+  // Get user data from the backend and populate the frontend afterwards
   const userData = api.user.getUsers.useQuery().data?.message;
   const [users, setUsers] = useState([] as User[]);
 
+  // Wait for the data to get fetched and then update users list
   useEffect(() => {
     setUsers(userData as User[]);
   }, [userData]);

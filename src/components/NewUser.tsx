@@ -15,10 +15,10 @@ import {
   ModalOverlay,
   VStack,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
 import { z } from "zod";
-import { User } from "~/common/types/types";
+import { User, Chapter } from "~/common/types/types";
 import { api } from "~/utils/api";
 
 type NewUserProps = {
@@ -39,8 +39,17 @@ export const NewUser = ({
     permissionOptions[0],
   );
 
-  const chapterOptions = ["Atlanta", "Charlotte"];
-  const [selectedChapter, setSelectedChapter] = useState(chapterOptions[0]);
+  // Get the possible chapter to select for the chapter dropdown
+  let chapter: any = api.chapter.getChapters.useQuery().data?.message;
+
+  const [chapterOptions, setChapterOptions] = useState(["temp"]);
+
+  const [selectedChapter, setSelectedChapter] = useState("");
+
+  useEffect(() => {
+    setChapterOptions(chapter?.map((chap: Chapter) => chap.name));
+    setSelectedChapter(chapter?.at(0).name);
+  }, [chapter]);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -57,7 +66,7 @@ export const NewUser = ({
 
   const onCloseModal = () => {
     setSelectedPermission(permissionOptions[0]);
-    setSelectedChapter(chapterOptions[0]);
+    setSelectedChapter(chapter?.at(0).name);
     setName("");
     setEmail("");
     setNameError(false);
@@ -65,6 +74,7 @@ export const NewUser = ({
     onClose();
   };
 
+  // Create the user in the backend and update the frontend with dummy data temporarily on success
   const handleSave = () => {
     if (!validateFields()) {
       return false;
@@ -83,13 +93,12 @@ export const NewUser = ({
         chapter: { name: selectedChapter },
       }),
     };
-    const user = createUser.mutate(userObj, {
-      onSuccess: (newData) => {
+    createUser.mutate(userObj, {
+      onSuccess: () => {
         updateUsers(temp);
       },
     });
     onCloseModal();
-    console.log(userObj);
     return true;
   };
 
@@ -239,9 +248,7 @@ export const NewUser = ({
                 </FormLabel>
                 <RadioDropdown
                   options={chapterOptions}
-                  selectedOption={
-                    selectedChapter ?? (chapterOptions[0] as string)
-                  }
+                  selectedOption={selectedChapter}
                   setSelectedOption={handleChapterChange}
                   isDisabled={selectedPermission === "Admin"}
                 />

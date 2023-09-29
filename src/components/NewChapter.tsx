@@ -46,6 +46,7 @@ export const NewChapter = ({
   const handleChapterChange = (event: React.FormEvent<HTMLInputElement>) =>
     setChapter(event.currentTarget.value);
 
+  // Create the new chapter in the backend and update the frontend afterwards
   const handleSave = async () => {
     if (!validateFields()) {
       return false;
