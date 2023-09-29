@@ -48,7 +48,6 @@ export const NewUser = ({
 
   useEffect(() => {
     if (chapter && chapter.length > 0) {
-      console.log(chapter);
       setChapterOptions(chapter?.map((chap: Chapter) => chap.name));
       setSelectedChapter(chapter?.at(0).name);
     }
@@ -69,7 +68,7 @@ export const NewUser = ({
 
   const onCloseModal = () => {
     setSelectedPermission(permissionOptions[0]);
-    if (chapter) {
+    if (chapter && chapter.length > 0) {
       setSelectedChapter(chapter.at(0).name);
     }
     setName("");
