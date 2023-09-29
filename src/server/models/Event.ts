@@ -5,7 +5,6 @@ const { Schema } = mongoose;
 
 export interface IEvent {
     retreatId: mongoose.Types.ObjectId;
-    cost: number;
     name: string;
     location: string; //optional
     energyLevel: "low" | "medium" | "high"; //optoional
@@ -19,9 +18,6 @@ const EventSchema = new Schema<IEvent>({
         ref: "Retreat",
         type: Schema.Types.ObjectId,
         required: true,
-    },
-    cost: {
-        type: Number
     },
     name: {
         type: String,
@@ -46,6 +42,9 @@ const EventSchema = new Schema<IEvent>({
             name: {
                 type: String,
                 required: true
+            },
+            cost: {
+                type: Number
             },
             type: {
                 type: String,

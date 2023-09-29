@@ -10,6 +10,7 @@ import { Model } from '~/server/models/Event'
 export const eventRouter = createTRPCRouter({
     createEvent: publicProcedure
         .input(z.object({
+            retreatId: z.string(),
             name: z.string(),
             location: z.string().optional(),
             energyLevel: z.string().optional(),
