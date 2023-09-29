@@ -47,7 +47,7 @@ export const NewUser = ({
   const [selectedChapter, setSelectedChapter] = useState("");
 
   useEffect(() => {
-    if (chapter) {
+    if (chapter && chapter.length > 0) {
       console.log(chapter);
       setChapterOptions(chapter?.map((chap: Chapter) => chap.name));
       setSelectedChapter(chapter?.at(0).name);

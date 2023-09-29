@@ -60,7 +60,8 @@ export default function Users() {
   // uses value of filter variable to group users by a text property in their class
   const groups = (function () {
     let uniques;
-    if (users) {
+    if (users && users.length > 0) {
+      console.log(users);
       if (filter == "chapter") {
         uniques = [...new Set(users?.map((u: any) => u[filter]["name"]))];
       } else {
