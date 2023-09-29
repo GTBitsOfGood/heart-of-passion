@@ -47,14 +47,12 @@ export const NewUser = ({
   const [selectedChapter, setSelectedChapter] = useState("");
 
   useEffect(() => {
-    setChapterOptions(chapter?.map((chap: Chapter) => chap.name));
-  }, [chapter]);
-
-  useEffect(() => {
-    if (chapterOptions) {
+    if (chapter) {
+      console.log(chapter);
+      setChapterOptions(chapter?.map((chap: Chapter) => chap.name));
       setSelectedChapter(chapter?.at(0).name);
     }
-  }, [chapterOptions]);
+  }, [chapter]);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -71,8 +69,8 @@ export const NewUser = ({
 
   const onCloseModal = () => {
     setSelectedPermission(permissionOptions[0]);
-    if (chapterOptions) {
-      setSelectedChapter(chapter?.at(0).name);
+    if (chapter) {
+      setSelectedChapter(chapter.at(0).name);
     }
     setName("");
     setEmail("");
