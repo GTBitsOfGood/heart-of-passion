@@ -16,6 +16,7 @@ export const eventRouter = createTRPCRouter({
             category: z.string().optional(),
             dates: z.array(z.date()),
             expenses: z.array(z.object({
+                cost: z.number(),
                 name: z.string(),
                 type: z.string(),
                 costType: z.string(),

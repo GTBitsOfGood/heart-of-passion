@@ -1,9 +1,11 @@
 import mongoose, { mongo } from "mongoose";
+import { number } from "zod";
 
 const { Schema } = mongoose;
 
 export interface IEvent {
     retreatId: mongoose.Types.ObjectId;
+    cost: number;
     name: string;
     location: string; //optional
     energyLevel: "low" | "medium" | "high"; //optoional
@@ -17,6 +19,9 @@ const EventSchema = new Schema<IEvent>({
         ref: "Retreat",
         type: Schema.Types.ObjectId,
         required: true,
+    },
+    cost: {
+        type: Number
     },
     name: {
         type: String,
