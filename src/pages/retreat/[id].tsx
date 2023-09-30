@@ -16,7 +16,7 @@ const sampleData: EventT[] = [
       {
         day: 1,
         from: "9:30 am",
-        to: "10:00 am",
+        to: "12:30 pm",
       },
     ],
     expenses: [
@@ -27,8 +27,6 @@ const sampleData: EventT[] = [
         notes: "",
       },
     ],
-    startTime: "9:30 am",
-    endTime: "10:00 am",
   },
   {
     name: "Lunch",
@@ -39,7 +37,7 @@ const sampleData: EventT[] = [
       {
         day: 2,
         from: "12:30 pm",
-        to: "1:15 pm",
+        to: "2:30 pm", // Longer duration
       },
     ],
     expenses: [
@@ -50,8 +48,6 @@ const sampleData: EventT[] = [
         notes: "Enjoyed a nice meal.",
       },
     ],
-    startTime: "12:30 pm",
-    endTime: "1:15 pm",
   },
   {
     name: "Meeting",
@@ -62,7 +58,7 @@ const sampleData: EventT[] = [
       {
         day: 3,
         from: "2:00 pm",
-        to: "3:00 pm",
+        to: "5:00 pm", // Longer duration
       },
     ],
     expenses: [
@@ -74,8 +70,6 @@ const sampleData: EventT[] = [
         notes: "Travel expenses.",
       },
     ],
-    startTime: "2:00 pm",
-    endTime: "3:00 pm",
   },
   {
     name: "Workshop",
@@ -86,7 +80,7 @@ const sampleData: EventT[] = [
       {
         day: 4,
         from: "4:30 pm",
-        to: "6:30 pm",
+        to: "7:30 pm", // Longer duration
       },
     ],
     expenses: [
@@ -97,8 +91,6 @@ const sampleData: EventT[] = [
         notes: "Materials and equipment.",
       },
     ],
-    startTime: "4:30 pm",
-    endTime: "6:30 pm",
   },
   {
     name: "Dinner",
@@ -109,12 +101,12 @@ const sampleData: EventT[] = [
       {
         day: 1,
         from: "7:00 pm",
-        to: "8:00 pm",
+        to: "10:00 pm", // Longer duration
       },
       {
         day: 4,
         from: "7:00 pm",
-        to: "8:00 pm",
+        to: "10:00 pm", // Longer duration
       },
     ],
     expenses: [
@@ -125,61 +117,83 @@ const sampleData: EventT[] = [
         notes: "Delicious dinner.",
       },
     ],
-    startTime: "7:00 pm",
-    endTime: "8:00 pm",
   },
   // Add more diverse events as needed.
 ];
+
+// You can continue to add more objects with different durations.
+
 
 // You can continue to add more objects with diverse "day" values.
 
 
 export default function Calendar() {
   const router = useRouter();
-  const dayGrouped = Array(4).fill([])
+  const eventInfo: any[] = []
   sampleData.forEach(e => {
+    const expenseTotal = e.expenses.reduce((acc, obj) => acc + (obj.numberOfUnits ?? 0), 0)
     e.dates.forEach(d => {
-      console.log(dayGrouped)
-      if (dayGrouped[d.day]) {
-        dayGrouped[d.day].push({
+      eventInfo.push({
+        date: {
           to: d.to,
           from: d.from,
-          name: e.name,
-          location: e.location,
-          eventObject: e,
-          energyLevel: e.energyLevel
-        })
-      }
+        },
+        expenses: {
+          name: expenseTotal,
+        },
+        name: e.name,
+        location: e.location,
+        event: e,
+        day: d.day,
+      })
     })
   })
+  //   return (
+  //     <Box key={index}>
+  //       <Text
+  //         width={"158px"}
+  //         height={"81px"}
+  //         fontSize={36}
+  //         fontWeight={700}
+  //         textAlign={"center"}
+  //         fontFamily={"oswald"}
+  //       >
+  //         Day {index + 1}
+  //       </Text>
+  //       <Box display={"flex"}>
+  //         <Box marginRight={"34px"}>
+  //           {day.map((event: any) => {
+  //             return <CalendarCard event={event} key={index} />;
+  //           })}
+  //         </Box>
+  //         <Box width={"1px"} background={"#989898"} height={"788px"} />
+  // {[1,2,3,4].map(num => {
   return (
     <Box>
       <Flex justifyContent="center" alignItems="center">
         <Box>{/*Sidebar*/}</Box>
         <Box display={"flex"} gap={"34px"}>
-          {dayGrouped.map((day, index) => {
-            return (
-              <Box key={index}>
-                <Text
-                  width={"158px"}
-                  height={"81px"}
-                  fontSize={36}
-                  fontWeight={700}
-                  textAlign={"center"}
-                  fontFamily={"oswald"}
-                >
-                  Day {index + 1}
-                </Text>
-                <Box display={"flex"}>
-                  <Box marginRight={"34px"}>
-                    {day.map((event: any) => {
-                      return <CalendarCard event={event} key={index} />;
-                    })}
-                  </Box>
-                  <Box width={"1px"} background={"#989898"} height={"788px"} />
+          {[1,2,3,4].map(num => {
+            return <Box>
+              <Text
+              width={"158px"}
+              height={"81px"}
+              fontSize={36}
+              fontWeight={700}
+              textAlign={"center"}
+              fontFamily={"oswald"}
+              >
+                Day {num}
+              </Text>
+              <Box display={"flex"}>
+                <Box marginRight={"34px"}>
+                  {eventInfo.map(einfo => {
+                    return einfo.day === num ? <CalendarCard {...einfo}/> : ""
+                  })}
                 </Box>
+                {num !== 4 && <Box width={"1px"} background={"#989898"} height={"788px"} />}
               </Box>
-            );
+          </Box>
           })}
         </Box>
       </Flex>
