@@ -1,6 +1,9 @@
 export const computeTime = (startTime: string, endTime: string): number => {
   var start = 0;
   var end = 0;
+  startTime = startTime.toLowerCase()
+  endTime = endTime.toLowerCase()
+
   if (startTime.endsWith("am")) {
     var [startHours, startMins] = (startTime.split(" am")[0] || "").split(":");
     if (startHours !== "12") {
