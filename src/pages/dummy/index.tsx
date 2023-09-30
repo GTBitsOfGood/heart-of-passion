@@ -2,6 +2,7 @@ import { Button, Stack, useDisclosure } from "@chakra-ui/react";
 import React from "react";
 import { NewChapter } from "~/components/NewChapter";
 import { NewUser } from "~/components/NewUser";
+import Sidebar from "~/components/Sidebar";
 
 export default function DummyPage() {
   const {
@@ -18,12 +19,19 @@ export default function DummyPage() {
   const finalRef = React.useRef(null);
   return (
     <>
+      <Sidebar
+        city="Atlanta"
+        year={2023}
+        totalCost={1234}
+        fundExpected={5678}
+        fundActual={3456}
+      />
       <Stack
         direction="row"
         spacing={4}
         align={"center"}
         justify={"center"}
-        marginTop="10px"
+        paddingTop="10px"
       >
         <Button
           colorScheme="twitter"

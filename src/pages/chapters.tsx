@@ -7,26 +7,29 @@ import {
   Box,
   IconButton,
 } from "@chakra-ui/react";
-import ChapterCard from "~/components/ChapterCard";
+import ChapterCard from "~/components/chapters/ChapterCard";
 import { IoMdSettings } from "react-icons/io";
 import "@fontsource/oswald/600.css";
 
 export default function Home() {
   const placeholderData = [
     {
-      name: "Atlanta 2023",
+      city: "Atlanta",
+      year: 2023,
       totalCost: 1234,
       fundExpected: 5678,
       fundActual: 3456,
     },
     {
-      name: "Charlotte 2023",
+      city: "Charlotte",
+      year: 2023,
       totalCost: 45678,
       fundExpected: 200,
       fundActual: 0,
     },
     {
-      name: "New Orleans 2023",
+      city: "New Orleans",
+      year: 2023,
       totalCost: 45678,
       fundExpected: 200,
       fundActual: 0,
@@ -69,7 +72,8 @@ export default function Home() {
         {placeholderData.map((chapter) => (
           <GridItem>
             <ChapterCard
-              name={chapter.name.toUpperCase()}
+              city={chapter.city.toUpperCase()}
+              year={chapter.year}
               totalCost={chapter.totalCost}
               fundExpected={chapter.fundExpected}
               fundActual={chapter.fundActual}
