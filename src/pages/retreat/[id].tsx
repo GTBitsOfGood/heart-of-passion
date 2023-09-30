@@ -37,7 +37,7 @@ const sampleData: EventT[] = [
       {
         day: 2,
         from: "12:30 pm",
-        to: "2:30 pm", // Longer duration
+        to: "1:20 pm", // Longer duration
       },
     ],
     expenses: [
@@ -138,9 +138,7 @@ export default function Calendar() {
           to: d.to,
           from: d.from,
         },
-        expenses: {
-          name: expenseTotal,
-        },
+        expenseTotal,
         name: e.name,
         location: e.location,
         event: e,
@@ -148,26 +146,6 @@ export default function Calendar() {
       })
     })
   })
-  //   return (
-  //     <Box key={index}>
-  //       <Text
-  //         width={"158px"}
-  //         height={"81px"}
-  //         fontSize={36}
-  //         fontWeight={700}
-  //         textAlign={"center"}
-  //         fontFamily={"oswald"}
-  //       >
-  //         Day {index + 1}
-  //       </Text>
-  //       <Box display={"flex"}>
-  //         <Box marginRight={"34px"}>
-  //           {day.map((event: any) => {
-  //             return <CalendarCard event={event} key={index} />;
-  //           })}
-  //         </Box>
-  //         <Box width={"1px"} background={"#989898"} height={"788px"} />
-  // {[1,2,3,4].map(num => {
   return (
     <Box>
       <Flex justifyContent="center" alignItems="center">

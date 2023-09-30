@@ -15,6 +15,9 @@ import {
 import TimesList from "./TimesList";
 import ExpensesList from "./ExpensesList";
 import { useState } from "react";
+import ExpenseEditor from "./ExpenseEditor";
+import { Event as EventT } from "~/common/types/types";
+import TimesEditor from "./TimesEditor";
 
 function ButtonLabelRow({ labelText, buttonText }: any) {
   return <Flex direction="row" justify="space-between" align="center">
@@ -23,8 +26,13 @@ function ButtonLabelRow({ labelText, buttonText }: any) {
   </Flex>
 }
 
+type PropT = {
+  event: EventT;
+  isOpen: boolean;
+  onClose: any;
+}
 
-export default function CalendarCardModal({ isOpen, onClose }: any) {
+export default function CalendarCardModal({ event, isOpen, onClose }: PropT) {
   const [showSide, setShowSide] = useState(true);
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -50,19 +58,20 @@ export default function CalendarCardModal({ isOpen, onClose }: any) {
               <TimesList />
 
               <ButtonLabelRow buttonText="ADD EXPENSE" labelText="Expenses" />
-              <ExpensesList />
+              <ExpensesList expenses={event.expenses}/>
 
-              {/* <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={onClose}>
-          Close
-          </Button>
-          <Button variant="ghost">Secondary Action</Button>
-        </ModalFooter> */}
             </Box>
             {showSide && <Box flexBasis="300px">
-              Bruh
+              {/* <ExpenseEditor expense={event.expenses?.[0]} /> */}
+              <TimesEditor date={event.dates?.[0]}/>
             </Box>}
           </Flex>
+              <ModalFooter>
+          <Button colorScheme="blue" mr={3} onClick={onClose}>
+          Add
+          </Button>
+          <Button variant="ghost">Delete</Button>
+        </ModalFooter>
         </ModalBody>
       </ModalContent>
     </Modal>
