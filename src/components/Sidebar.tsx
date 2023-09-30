@@ -6,11 +6,11 @@ import {
   Image,
   Box,
   Divider,
-  Select,
 } from "@chakra-ui/react";
 import ChapterProgress from "./chapters/ChapterProgress";
 import { Chapter } from "common/types/types";
 import { useState } from "react";
+import Select from "react-select";
 
 const Sidebar = ({
   city,
@@ -20,6 +20,13 @@ const Sidebar = ({
   fundActual,
 }: Chapter) => {
   const [clicked, setClicked] = useState(0);
+  const options = [
+    // placeholder data
+    { value: "2021", label: "2021" },
+    { value: "2022", label: "2022" },
+    { value: "2023", label: "2023" },
+    { value: "Add Archive", label: "Add Archive" },
+  ];
   return (
     <Box pos="fixed" w="400px" h="100%" overflow="hidden">
       <Box
@@ -47,15 +54,38 @@ const Sidebar = ({
               {city.toUpperCase()}
             </Text>
             <Select
+              defaultValue={{ value: year.toString(), label: year.toString() }}
+              options={options}
+              onChange={() => {}}
+              isSearchable={false}
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  border: 0,
+                  boxShadow: "none",
+                  textAlign: "right",
+                  backgroundColor: "#F9F9F9",
+                  fontSize: "36px",
+                  fontFamily: "nunito",
+                }),
+                dropdownIndicator: (base) => ({
+                  ...base,
+                  color: "black",
+                }),
+              }}
+              components={{
+                IndicatorSeparator: () => null,
+              }}
+            />
+            {/* <Select
               placeholder={year.toString()}
               fontSize="36px"
               fontFamily="nunito"
               variant="unstyled"
               textAlign="right"
             >
-              {/* TO DO: add other years.. not sure what years?*/}
               <option>Add Archive</option>
-            </Select>
+            </Select> */}
           </GridItem>
         </Grid>
         <ChapterProgress
