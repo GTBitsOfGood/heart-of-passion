@@ -2,7 +2,6 @@ import {
   Text,
   Grid,
   GridItem,
-  Progress,
   Flex,
   Spacer,
   Box,
@@ -11,47 +10,18 @@ import {
 import { BiSolidEdit } from "react-icons/bi";
 import "@fontsource/oswald/600.css";
 import ProgressBar from "@ramonak/react-progress-bar";
+import { Chapter } from "common/types/types";
 
-const ChapterCard = ({
-  name,
+const ChapterProgress = ({
+  city,
+  year,
   totalCost,
   fundExpected,
   fundActual,
-}: {
-  name: string;
-  totalCost: number;
-  fundExpected: number;
-  fundActual: number;
-}) => {
+}: Chapter) => {
   const progress = Math.floor((fundActual / fundExpected) * 100);
   return (
-    <Box
-      bgColor="#F9F9F9"
-      border={"2px #EDEDED solid"}
-      sx={{ borderRadius: "4%" }}
-      h="350px"
-      _hover={{ bg: "white", boxShadow: "lg" }}
-    >
-      <Flex mt="2" mr="2">
-        <Spacer />
-        <IconButton
-          aria-label="settings"
-          variant="ghost"
-          height="40px"
-          width="40px"
-          icon={<BiSolidEdit size="20px" onClick={() => {}} />}
-        />
-      </Flex>
-
-      <Text
-        align="center"
-        fontSize="40px"
-        fontWeight="bold"
-        fontFamily="oswald"
-      >
-        {name}
-      </Text>
-
+    <>
       <ProgressBar
         completed={progress}
         bgColor="#54A9DD"
@@ -69,7 +39,13 @@ const ChapterCard = ({
         }}
       />
 
-      <Grid templateColumns="repeat(3, 1fr)" gap={6} ml="5" mr="5">
+      <Grid
+        templateColumns="repeat(3, 1fr)"
+        gap={6}
+        ml="5"
+        mr="5"
+        justifyContent="center"
+      >
         <GridItem>
           <Text
             align="center"
@@ -110,8 +86,8 @@ const ChapterCard = ({
           </Text>
         </GridItem>
       </Grid>
-    </Box>
+    </>
   );
 };
 
-export default ChapterCard;
+export default ChapterProgress;
