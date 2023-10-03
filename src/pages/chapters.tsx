@@ -8,13 +8,13 @@ import {
   IconButton,
   useDisclosure,
 } from "@chakra-ui/react";
-import ChapterCard from "~/components/ChapterCard";
+import ChapterCard from "~/components/chapters/ChapterCard";
 import { IoMdSettings } from "react-icons/io";
 import "@fontsource/oswald/600.css";
 import { NewChapter } from "~/components/NewChapter";
-import { useEffect, useRef, useState } from "react";
-import { api } from "~/utils/api";
-import { Chapter } from "common/types/types";
+import { useRef } from "react";
+import { trpc } from "~/utils/api";
+import { Chapter } from "~/common/types";
 
 export default function Home() {
   const {
@@ -25,19 +25,7 @@ export default function Home() {
   const finalRef = useRef(null);
 
   // Get all the chapters from the backend and populate the frontend afterwards
-  let chapter = api.chapter.getChapters.useQuery().data?.message;
-
-  const [chapters, setChapters] = useState([] as Chapter[]);
-
-  // Wait for the backend call and then update chapter afterwards
-  useEffect(() => {
-    setChapters(chapter as Chapter[]);
-  }, [chapter]);
-
-  function updateChapters(data: Chapter): void {
-    const newChapters = [...chapters, data];
-    setChapters(newChapters);
-  }
+  let chapters = trpc.chapter.getChapters.useQuery();
 
   return (
     <Box m="2%">
@@ -63,7 +51,6 @@ export default function Home() {
             focusRef={finalRef}
             isOpen={isOpenAddChapterModal}
             onClose={onCloseAddChapterModal}
-            updateChapters={updateChapters}
           />
         </GridItem>
         <GridItem alignSelf="flex-end">
@@ -78,9 +65,9 @@ export default function Home() {
       </Grid>
 
       <Grid templateColumns="repeat(3, 1fr)" gap={6} ml="10%" mr="10%">
-        {chapters?.map((chapter: Chapter) => (
+        {chapters.data?.map((chapter: Chapter) => (
           <GridItem>
-            <ChapterCard name={chapter.name.toUpperCase()} />
+            <ChapterCard chapter={chapter} />
           </GridItem>
         ))}
       </Grid>

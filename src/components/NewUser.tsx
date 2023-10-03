@@ -15,66 +15,58 @@ import {
   ModalOverlay,
   VStack,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
 import { z } from "zod";
-import { User, Chapter } from "~/common/types/types";
-import { api } from "~/utils/api";
+import { User, Role, userSchema, roleSchema } from "~/common/types";
+import { trpc } from "~/utils/api";
 
 type NewUserProps = {
   focusRef: React.MutableRefObject<null>;
   isOpen: boolean;
   onClose: () => void;
-  updateUsers: (user: any) => void;
 };
 
-export const NewUser = ({
-  focusRef,
-  isOpen,
-  onClose,
-  updateUsers,
-}: NewUserProps) => {
-  const permissionOptions = ["Student", "Mentor", "Admin"];
-  const [selectedPermission, setSelectedPermission] = useState(
-    permissionOptions[0],
-  );
+enum EmailError {
+  None, // No error
+  Empty, // Empty email
+  Invalid, // Invalid email
+}
 
-  // Get the possible chapter to select for the chapter dropdown
-  let chapter: any = api.chapter.getChapters.useQuery().data?.message;
+enum UserError {
+  None, // No error
+  Empty, // Empty user
+}
 
-  const [chapterOptions, setChapterOptions] = useState([] as string[]);
-
-  const [selectedChapter, setSelectedChapter] = useState("");
-
-  useEffect(() => {
-    if (chapter && chapter.length > 0) {
-      setChapterOptions(chapter?.map((chap: Chapter) => chap.name));
-      setSelectedChapter(chapter?.at(0).name);
-    }
-  }, [chapter]);
-
+export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
+  // Form Data
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [role, setRole] = useState<Role>("student");
+  const [chapter, setChapter] = useState("");
 
-  const emailSchema = z.string().email();
+  // Errors
+  const [nameError, setNameError] = useState<UserError>(UserError.None);
+  const [emailError, setEmailError] = useState<EmailError>(EmailError.None);
 
-  const [nameError, setNameError] = useState(false);
-  // 0 - no error
-  // 1 - empty field
-  // 2 - invalid email
-  const [emailError, setEmailError] = useState(0);
-
-  const createUser = api.user.createUser.useMutation();
+  // TRPC Queries and Mutations
+  const trpcUtils = trpc.useContext();
+  const chapters = trpc.chapter.getChapters.useQuery();
+  const createUser = trpc.user.createUser.useMutation({
+    onSuccess: () => {
+      trpcUtils.user.invalidate();
+    },
+  });
 
   const onCloseModal = () => {
-    setSelectedPermission(permissionOptions[0]);
-    if (chapter && chapter.length > 0) {
-      setSelectedChapter(chapter.at(0).name);
+    setRole("student");
+    if (chapters.data && chapters.data.length > 0) {
+      setChapter(chapters.data[0]!.name);
     }
     setName("");
     setEmail("");
-    setNameError(false);
-    setEmailError(0);
+    setNameError(UserError.None);
+    setEmailError(EmailError.None);
     onClose();
   };
 
@@ -83,65 +75,38 @@ export const NewUser = ({
     if (!validateFields()) {
       return false;
     }
-    const userObj: User = {
-      name: name,
-      email: email,
-      role: selectedPermission?.toLowerCase() ?? "student",
-      ...(selectedPermission !== "Admin" && { chapter: selectedChapter }),
+
+    const user: User = {
+      name,
+      email,
+      role,
+      chapter,
     };
-    const temp = {
-      name: name,
-      email: email,
-      role: selectedPermission?.toLowerCase() ?? "student",
-      ...(selectedPermission !== "Admin" && {
-        chapter: { name: selectedChapter },
-      }),
-    };
-    createUser.mutate(userObj, {
-      onSuccess: () => {
-        updateUsers(temp);
-      },
-    });
+
+    createUser.mutate(user);
     onCloseModal();
     return true;
   };
 
   const validateFields = () => {
-    let valid = true;
+    let user: User = {
+      name,
+      email,
+      role,
+      chapter,
+    };
 
-    if (name === "") {
-      setNameError(true);
-      valid = false;
-    } else {
-      setNameError(false);
-    }
-    if (email === "") {
-      setEmailError(1);
-      valid = false;
-    } else {
-      try {
-        emailSchema.parse(email);
-        setEmailError(0);
-      } catch (e) {
-        setEmailError(2);
-        valid = false;
-      }
-    }
-
-    return valid;
+    return userSchema.safeParse(user).success;
   };
 
-  const handlePermissionChange = (permission: string) => {
-    setSelectedPermission(permission);
+  const handleRoleChange = (role: string) => {
+    setRole(roleSchema.parse(role));
   };
-
   const handleChapterChange = (chapter: string) => {
-    setSelectedChapter(chapter);
+    setChapter(chapter);
   };
-
   const handleNameChange = (event: React.FormEvent<HTMLInputElement>) =>
     setName(event.currentTarget.value);
-
   const handleEmailChange = (event: React.FormEvent<HTMLInputElement>) =>
     setEmail(event.currentTarget.value);
 
@@ -177,7 +142,7 @@ export const NewUser = ({
             mt="24px"
           >
             <HStack align="start" spacing="55px">
-              <FormControl isInvalid={nameError}>
+              <FormControl isInvalid={nameError !== UserError.None}>
                 <FormLabel textColor="black" fontWeight="600" mb="4px">
                   Name
                 </FormLabel>
@@ -207,17 +172,15 @@ export const NewUser = ({
                   Permission
                 </FormLabel>
                 <RadioDropdown
-                  options={permissionOptions}
-                  selectedOption={
-                    selectedPermission ?? (permissionOptions[0] as string)
-                  }
-                  setSelectedOption={handlePermissionChange}
+                  options={Object.keys(roleSchema)}
+                  selectedOption={role}
+                  setSelectedOption={handleRoleChange}
                 />
                 <FormErrorMessage minHeight="20px" />
               </FormControl>
             </HStack>
             <HStack align="start" spacing="55px">
-              <FormControl isInvalid={emailError !== 0}>
+              <FormControl isInvalid={emailError !== EmailError.None}>
                 <FormLabel textColor="black" fontWeight="600" mb="4px">
                   Email
                 </FormLabel>
@@ -236,12 +199,12 @@ export const NewUser = ({
                 />
                 <Box minHeight="20px" mt={2}>
                   <FormErrorMessage mt={0}>
-                    {emailError === 1 && "Email is required"}
+                    {emailError === EmailError.Empty && "Email is required"}
                     {emailError === 2 && "Invalid email"}
                   </FormErrorMessage>
                 </Box>
               </FormControl>
-              <FormControl isDisabled={selectedPermission === "Admin"}>
+              <FormControl isDisabled={role === "admin"}>
                 <FormLabel
                   fontFamily="body"
                   fontSize="16px"
@@ -251,10 +214,10 @@ export const NewUser = ({
                   Chapter
                 </FormLabel>
                 <RadioDropdown
-                  options={chapterOptions}
-                  selectedOption={selectedChapter}
+                  options={chapters.data?.map((ch) => ch.name) ?? []}
+                  selectedOption={chapter}
                   setSelectedOption={handleChapterChange}
-                  isDisabled={selectedPermission === "Admin"}
+                  isDisabled={role === "admin"}
                 />
                 <FormErrorMessage minHeight="20px" />
               </FormControl>

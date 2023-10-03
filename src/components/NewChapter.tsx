@@ -14,28 +14,25 @@ import {
   ModalOverlay,
   VStack,
 } from "@chakra-ui/react";
-import { Dispatch, useState } from "react";
-import { Chapter } from "~/common/types/types";
-import { api } from "~/utils/api";
+import { useState } from "react";
+import { trpc } from "~/utils/api";
 
 type NewChapterProps = {
   focusRef: React.MutableRefObject<null>;
   isOpen: boolean;
   onClose: () => void;
-  updateChapters: (data: Chapter) => void;
 };
 
-export const NewChapter = ({
-  focusRef,
-  isOpen,
-  onClose,
-  updateChapters,
-}: NewChapterProps) => {
+export const NewChapter = ({ focusRef, isOpen, onClose }: NewChapterProps) => {
   const [chapter, setChapter] = useState("");
-
   const [chapterError, setChapterError] = useState(false);
 
-  const createChapter = api.chapter.createChapter.useMutation();
+  const trpcUtils = trpc.useContext();
+  const createChapter = trpc.chapter.createChapter.useMutation({
+    onSuccess: () => {
+      trpcUtils.chapter.invalidate();
+    },
+  });
 
   const onCloseModal = () => {
     setChapter("");
@@ -51,11 +48,7 @@ export const NewChapter = ({
     if (!validateFields()) {
       return false;
     }
-    await createChapter.mutate(chapter, {
-      onSuccess: (newData) => {
-        updateChapters(newData.message as Chapter);
-      },
-    });
+    await createChapter.mutate(chapter);
     onCloseModal();
     return true;
   };

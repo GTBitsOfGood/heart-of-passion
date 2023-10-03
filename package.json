@@ -14,9 +14,9 @@
     "@chakra-ui/react": "^2.8.0",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@ramonak/react-progress-bar": "^5.0.3",
     "@fontsource/nunito": "^5.0.8",
     "@fontsource/oswald": "^5.0.12",
+    "@ramonak/react-progress-bar": "^5.0.3",
     "@t3-oss/env-nextjs": "^0.6.0",
     "@tanstack/react-query": "^4.29.25",
     "@trpc/client": "^10.34.0",
@@ -29,6 +29,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.11.0",
+    "react-select": "^5.7.5",
     "superjson": "^1.13.1",
     "zod": "^3.22.2"
   },

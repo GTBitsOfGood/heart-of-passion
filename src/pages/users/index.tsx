@@ -15,11 +15,11 @@ import Image from "next/image";
 import { TriangleDownIcon, SettingsIcon } from "@chakra-ui/icons";
 import { useEffect, useRef, useState } from "react";
 import UserList from "~/components/users/UserList";
-import { User } from "~/common/types/types";
+import { User } from "~/common/types";
 import logo from "public/hoplogo.png";
 import fonts from "common/theme/fonts";
 import { NewUser } from "~/components/NewUser";
-import { api } from "~/utils/api";
+import { trpc } from "~/utils/api";
 
 export default function Users() {
   const [filter, setFilter] = useState("chapter"); // value decides grouping behavior
@@ -44,7 +44,7 @@ export default function Users() {
   const finalRef = useRef(null);
 
   // Get user data from the backend and populate the frontend afterwards
-  const userData = api.user.getUsers.useQuery().data?.message;
+  const userData = trpc.user.getUsers.useQuery().data?.message;
   const [users, setUsers] = useState([] as User[]);
 
   // Wait for the data to get fetched and then update users list

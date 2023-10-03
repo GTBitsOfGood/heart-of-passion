@@ -1,54 +1,28 @@
 import { z } from "zod";
 
-import {
-  createTRPCRouter,
-  adminProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-import { getGlobalCount, incrementGlobalCount } from "~/server/actions/Count";
 import { Model } from "~/server/models/User";
 import { ChapterModel } from "~/server/models/Chapter";
-import { ObjectId } from "mongoose";
+import { User, userSchema } from "~/common/types";
 export const userRouter = createTRPCRouter({
-  createUser: publicProcedure
-    .input(
-      z.object({
-        name: z.string().optional(),
-        email: z.string(),
-        role: z.string(),
-        chapter: z.string().optional(),
-      }),
-    )
-    .mutation(async ({ input }) => {
-      let chapter: any;
-      await ChapterModel.findOne({ name: input.chapter })
-        .then((data) => data?.toJSON())
-        .then((chap) => {
-          chapter = chap;
-        });
-      const user = new Model({
-        name: input.name,
-        chapter: chapter?._id as ObjectId,
-        email: input.email,
-        role: input.role,
-      });
-      await user.save();
-      return user as any;
-    }),
+  createUser: publicProcedure.input(userSchema).mutation(async ({ input }) => {
+    let chapter = (await ChapterModel.findOne({
+      name: input.chapter,
+    }).exec())!;
+
+    const user = new Model({
+      name: input.name,
+      chapter: chapter.id,
+      email: input.email,
+      role: input.role,
+    });
+    await user.save();
+    return user;
+  }),
   deleteUser: publicProcedure.input(z.string()).mutation(async (opts) => {
-    try {
-      const user = await Model.findOneAndDelete({ email: opts.input });
-      return {
-        success: true,
-        message: user,
-      };
-    } catch (e) {
-      return {
-        success: false,
-        message: e,
-      };
-    }
+    const user = await Model.findOneAndDelete({ email: opts.input }).exec();
+    return user;
   }),
   updateUser: publicProcedure
     .input(
@@ -63,48 +37,19 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async (opts) => {
-      try {
-        const user = await Model.findOneAndUpdate(
-          { email: opts.input.email },
-          opts.input.updateData,
-        );
-        return {
-          success: true,
-          message: user,
-        };
-      } catch (e) {
-        return {
-          success: false,
-          message: e,
-        };
-      }
+      const user = await Model.findOneAndUpdate(
+        { email: opts.input.email },
+        opts.input.updateData,
+      );
+
+      return user;
     }),
   getUser: publicProcedure.input(z.string()).query(async (opts) => {
-    try {
-      const user = await Model.findOne({ email: opts.input });
-      return {
-        success: true,
-        message: user,
-      };
-    } catch (e) {
-      return {
-        success: false,
-        message: e,
-      };
-    }
+    const user = await Model.findOne({ email: opts.input });
+    return user;
   }),
   getUsers: publicProcedure.query(async (opts) => {
-    try {
-      const users = await Model.find().populate("chapter");
-      return {
-        success: true,
-        message: users,
-      };
-    } catch (e) {
-      return {
-        success: false,
-        message: e,
-      };
-    }
+    const users = await Model.find().populate("chapter");
+    return users;
   }),
 });
