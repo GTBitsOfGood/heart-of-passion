@@ -38,6 +38,8 @@ enum UserError {
   Empty, // Empty user
 }
 
+const roleOptions = Object.values(roleSchema.enum);
+
 export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
   // Form Data
   const [name, setName] = useState("");
@@ -172,7 +174,7 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
                   Permission
                 </FormLabel>
                 <RadioDropdown
-                  options={Object.keys(roleSchema)}
+                  options={roleOptions}
                   selectedOption={role}
                   setSelectedOption={handleRoleChange}
                 />
