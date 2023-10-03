@@ -1,25 +1,16 @@
-import {
-  Text,
-  Grid,
-  GridItem,
-  Flex,
-  Spacer,
-  Box,
-  IconButton,
-} from "@chakra-ui/react";
-import { BiSolidEdit } from "react-icons/bi";
+import { Text, Grid, GridItem } from "@chakra-ui/react";
 import "@fontsource/oswald/600.css";
 import ProgressBar from "@ramonak/react-progress-bar";
-import { Chapter } from "common/types/types";
+import { Chapter } from "src/common/types";
 
-const ChapterProgress = ({
-  city,
-  year,
-  totalCost,
-  fundExpected,
-  fundActual,
-}: Chapter) => {
-  const progress = Math.floor((fundActual / fundExpected) * 100);
+interface ChapterProgressProps {
+  chapter: Chapter;
+}
+
+const ChapterProgress = ({ chapter }: ChapterProgressProps) => {
+  const progress = Math.floor(
+    (chapter.fundActual / chapter.fundExpected) * 100,
+  );
   return (
     <>
       <ProgressBar
@@ -53,7 +44,7 @@ const ChapterProgress = ({
             fontSize="36px"
             fontFamily="oswald"
           >
-            ${totalCost}
+            ${chapter.totalCost}
           </Text>
           <Text align="center" fontSize="13px">
             Total Cost
@@ -66,7 +57,7 @@ const ChapterProgress = ({
             fontSize="36px"
             fontFamily="oswald"
           >
-            ${fundExpected}
+            ${chapter.fundExpected}
           </Text>
           <Text align="center" fontSize="13px">
             Fundraising Expected
@@ -79,7 +70,7 @@ const ChapterProgress = ({
             fontSize="36px"
             fontFamily="oswald"
           >
-            ${fundActual}
+            ${chapter.fundActual}
           </Text>
           <Text align="center" fontSize="13px">
             Fundraising Actual

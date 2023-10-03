@@ -1,26 +1,17 @@
-import {
-  Text,
-  Grid,
-  GridItem,
-  Flex,
-  Spacer,
-  Box,
-  IconButton,
-} from "@chakra-ui/react";
+import { Text, Flex, Spacer, Box, IconButton } from "@chakra-ui/react";
 import { BiSolidEdit } from "react-icons/bi";
 import "@fontsource/oswald/600.css";
-import ProgressBar from "@ramonak/react-progress-bar";
-import { Chapter } from "common/types/types";
+import { Chapter } from "src/common/types";
 import ChapterProgress from "./ChapterProgress";
 
-const ChapterCard = ({
-  city,
-  year,
-  totalCost,
-  fundExpected,
-  fundActual,
-}: Chapter) => {
-  const progress = Math.floor((fundActual / fundExpected) * 100);
+interface ChapterCardProps {
+  chapter: Chapter;
+}
+
+const ChapterCard = ({ chapter }: ChapterCardProps) => {
+  const progress = Math.floor(
+    (chapter.fundActual / chapter.fundExpected) * 100,
+  );
   return (
     <Box
       bgColor="#F9F9F9"
@@ -46,16 +37,10 @@ const ChapterCard = ({
         fontWeight="bold"
         fontFamily="oswald"
       >
-        {city + " " + year}
+        {chapter.name.toUpperCase()}
       </Text>
 
-      <ChapterProgress
-        city={city.toUpperCase()}
-        year={year}
-        totalCost={totalCost}
-        fundExpected={fundExpected}
-        fundActual={fundActual}
-      />
+      <ChapterProgress chapter={chapter} />
     </Box>
   );
 };

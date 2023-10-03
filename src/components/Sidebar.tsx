@@ -8,20 +8,18 @@ import {
   Divider,
 } from "@chakra-ui/react";
 import ChapterProgress from "./chapters/ChapterProgress";
-import { Chapter } from "common/types/types";
+import { Chapter } from "src/common/types";
 import { useState } from "react";
 import Select from "react-select";
 
-const Sidebar = ({
-  city,
-  year,
-  totalCost,
-  fundExpected,
-  fundActual,
-}: Chapter) => {
+interface SidebarProps {
+  chapter: Chapter;
+  year: number;
+}
+
+const Sidebar = ({ chapter, year }: SidebarProps) => {
   const [clicked, setClicked] = useState(0);
   const options = [
-    // placeholder data
     { value: "2021", label: "2021" },
     { value: "2022", label: "2022" },
     { value: "2023", label: "2023" },
@@ -51,10 +49,13 @@ const Sidebar = ({
               fontFamily="oswald"
               fontWeight="bold"
             >
-              {city.toUpperCase()}
+              {chapter.name.toUpperCase()}
             </Text>
             <Select
-              defaultValue={{ value: year.toString(), label: year.toString() }}
+              defaultValue={{
+                value: year.toString(),
+                label: year.toString(),
+              }}
               options={options}
               onChange={() => {}}
               isSearchable={false}
@@ -88,13 +89,7 @@ const Sidebar = ({
             </Select> */}
           </GridItem>
         </Grid>
-        <ChapterProgress
-          city={city.toUpperCase()}
-          year={year}
-          totalCost={totalCost}
-          fundExpected={fundExpected}
-          fundActual={fundActual}
-        />
+        <ChapterProgress chapter={chapter} />
         <Button
           border={"2px black solid"}
           borderRadius="none"

@@ -17,15 +17,19 @@ export default function DummyPage() {
   } = useDisclosure();
 
   const finalRef = React.useRef(null);
+
+  let dummyChapter = {
+    name: "Atlanta",
+    totalCost: 5100,
+    fundExpected: 5180,
+    fundActual: 2600,
+  };
+
+  let dummyYear = 2023;
+
   return (
     <>
-      <Sidebar
-        city="Atlanta"
-        year={2023}
-        totalCost={1234}
-        fundExpected={5678}
-        fundActual={3456}
-      />
+      <Sidebar chapter={dummyChapter} year={dummyYear} />
       <Stack
         direction="row"
         spacing={4}
