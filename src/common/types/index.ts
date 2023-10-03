@@ -13,13 +13,12 @@ export const userSchema = z
     chapter: z.string().optional(),
   })
   .refine((data) => {
-    if (data.role === "student") {
+    if (data.role === "student" || data.role === "mentor") {
       return data.chapter !== undefined;
     }
 
     return true;
   });
-
 export type User = z.infer<typeof userSchema>;
 
 // User List
@@ -38,9 +37,11 @@ export const chapterSchema = z.object({
 });
 export type Chapter = z.infer<typeof chapterSchema>;
 
+// Energy Level
 export const energyLevelSchema = z.enum(["low", "medium", "high"]);
 export type EnergyLevel = z.infer<typeof energyLevelSchema>;
 
+// Category
 export const categorySchema = z.enum(["entertainment", "educational", "other"]);
 export type Category = z.infer<typeof categorySchema>;
 
