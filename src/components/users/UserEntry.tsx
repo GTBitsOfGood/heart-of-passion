@@ -1,7 +1,7 @@
 import { Flex, Box } from "@chakra-ui/react";
 import { EditIcon } from "@chakra-ui/icons";
-import { User } from "common/types/types";
-import fonts from "common/theme/fonts";
+import { User } from "~/common/types";
+import fonts from "~/common/theme/fonts";
 
 export default function Users({ name, email, role, chapter }: User) {
   return (
@@ -20,6 +20,7 @@ export default function Users({ name, email, role, chapter }: User) {
           justifySelf="center"
           py=".1em"
           px=".5em"
+          textTransform="capitalize"
         >
           {role}
         </Box>

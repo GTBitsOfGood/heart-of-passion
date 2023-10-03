@@ -1,43 +1,31 @@
 import { z } from "zod";
 
-import {
-  createTRPCRouter,
-  adminProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-import { getGlobalCount, incrementGlobalCount } from "~/server/actions/Count";
 import { Model } from "~/server/models/User";
+import { ChapterModel } from "~/server/models/Chapter";
+import { Chapter, User, userSchema } from "~/common/types";
 export const userRouter = createTRPCRouter({
-  createUser: publicProcedure
-    .input(
-      z.object({
-        name: z.string().optional(),
-        email: z.string(),
-        role: z.string(),
-        chapter: z.string().optional(),
-      }),
-    )
-    .mutation(async ({ input }) => {
-      const user = new Model(input);
-      await user.save();
-      return user;
-    }),
-  deleteUser: publicProcedure.input(z.string()).mutation(async (opts) => {
-    try {
-      console.log(opts.input);
-      const user = await Model.findOneAndDelete({ email: opts.input });
-      return {
-        success: true,
-        message: user,
-      };
-    } catch (e) {
-      return {
-        success: false,
-        message: e,
-      };
-    }
+  createUser: publicProcedure.input(userSchema).mutation(async ({ input }) => {
+    let chapter = (await ChapterModel.findOne({
+      name: input.chapter,
+    }).exec())!;
+
+    const user = new Model({
+      name: input.name,
+      chapter: chapter.id,
+      email: input.email,
+      role: input.role,
+    });
+    await user.save();
+    return user;
   }),
+
+  deleteUser: publicProcedure.input(z.string()).mutation(async (opts) => {
+    const user = await Model.findOneAndDelete({ email: opts.input }).exec();
+    return user;
+  }),
+
   updateUser: publicProcedure
     .input(
       z.object({
@@ -51,48 +39,35 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async (opts) => {
-      try {
-        const user = await Model.findOneAndUpdate(
-          { email: opts.input.email },
-          opts.input.updateData,
-        );
-        return {
-          success: true,
-          message: user,
-        };
-      } catch (e) {
-        return {
-          success: false,
-          message: e,
-        };
-      }
+      const user = await Model.findOneAndUpdate(
+        { email: opts.input.email },
+        opts.input.updateData,
+      ).exec();
+
+      return user;
     }),
-  getUser: publicProcedure.input(z.string()).query(async (opts) => {
-    try {
-      const user = await Model.findOne({ email: opts.input });
-      return {
-        success: true,
-        message: user,
-      };
-    } catch (e) {
-      return {
-        success: false,
-        message: e,
-      };
-    }
-  }),
-  getUsers: publicProcedure.query(async (opts) => {
-    try {
-      const users = await Model.find();
-      return {
-        success: true,
-        message: users,
-      };
-    } catch (e) {
-      return {
-        success: false,
-        message: e,
-      };
-    }
+  getUser: publicProcedure
+    .input(z.string())
+    .query(async (opts): Promise<User> => {
+      const user = await Model.findOne({ email: opts.input })
+        .populate<{ chapter: Chapter }>("chapter")
+        .exec();
+      return processUser(user);
+    }),
+  getUsers: publicProcedure.query(async (opts): Promise<User[]> => {
+    const users = await Model.find()
+      .populate<{ chapter: Chapter }>("chapter")
+      .exec();
+
+    return users.map(processUser);
   }),
 });
+
+function processUser(user: any): User {
+  return {
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    chapter: user.chapter.name,
+  };
+}

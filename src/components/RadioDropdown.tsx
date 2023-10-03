@@ -7,7 +7,7 @@ import {
   RadioGroup,
   Stack,
 } from "@chakra-ui/react";
-import { DownArrowIcon } from "~/common/icons/icons";
+import { DownArrowIcon } from "~/common/theme/icons";
 
 type Props = {
   options: string[];
@@ -65,15 +65,6 @@ export const RadioDropdown = ({
                 {option}
               </Radio>
             ))}
-            {/* <Radio value="Student" variant="customRadio">
-                Student
-              </Radio>
-              <Radio value="Mentor" variant="customRadio">
-                Mentor
-              </Radio>
-              <Radio value="Admin" variant="customRadio">
-                Admin
-              </Radio> */}
           </Stack>
         </RadioGroup>
       </MenuList>

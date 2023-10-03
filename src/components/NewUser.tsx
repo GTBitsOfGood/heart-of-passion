@@ -18,7 +18,8 @@ import {
 import { useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
 import { z } from "zod";
-import { User } from "~/common/types/types";
+import { User, Role, userSchema, roleSchema } from "~/common/types";
+import { trpc } from "~/utils/api";
 
 type NewUserProps = {
   focusRef: React.MutableRefObject<null>;
@@ -26,87 +27,86 @@ type NewUserProps = {
   onClose: () => void;
 };
 
+enum EmailError {
+  None, // No error
+  Empty, // Empty email
+  Invalid, // Invalid email
+}
+
+enum UserError {
+  None, // No error
+  Empty, // Empty user
+}
+
 export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
-  const permissionOptions = ["Student", "Mentor", "Admin"];
-  const [selectedPermission, setSelectedPermission] = useState(
-    permissionOptions[0],
-  );
-
-  const chapterOptions = ["Atlanta", "Charlotte"];
-  const [selectedChapter, setSelectedChapter] = useState(chapterOptions[0]);
-
+  // Form Data
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [role, setRole] = useState<Role>("student");
+  const [chapter, setChapter] = useState("");
 
-  const emailSchema = z.string().email();
+  // Errors
+  const [nameError, setNameError] = useState<UserError>(UserError.None);
+  const [emailError, setEmailError] = useState<EmailError>(EmailError.None);
 
-  const [nameError, setNameError] = useState(false);
-  // 0 - no error
-  // 1 - empty field
-  // 2 - invalid email
-  const [emailError, setEmailError] = useState(0);
+  // TRPC Queries and Mutations
+  const trpcUtils = trpc.useContext();
+  const chapters = trpc.chapter.getChapters.useQuery();
+  const createUser = trpc.user.createUser.useMutation({
+    onSuccess: () => {
+      trpcUtils.user.invalidate();
+    },
+  });
 
   const onCloseModal = () => {
-    setSelectedPermission(permissionOptions[0]);
-    setSelectedChapter(chapterOptions[0]);
+    setRole("student");
+    if (chapters.data && chapters.data.length > 0) {
+      setChapter(chapters.data[0]!.name);
+    }
     setName("");
     setEmail("");
-    setNameError(false);
-    setEmailError(0);
+    setNameError(UserError.None);
+    setEmailError(EmailError.None);
     onClose();
   };
 
+  // Create the user in the backend and update the frontend with dummy data temporarily on success
   const handleSave = () => {
     if (!validateFields()) {
       return false;
     }
-    onCloseModal();
-    const userObj: User = {
-      name: name,
-      email: email,
-      role: selectedPermission?.toLowerCase() ?? "student",
-      ...(selectedPermission !== "Admin" && { chapter: selectedChapter }),
+
+    const user: User = {
+      name,
+      email,
+      role,
+      chapter,
     };
-    console.log(userObj);
+
+    createUser.mutate(user);
+    onCloseModal();
     return true;
   };
 
   const validateFields = () => {
-    let valid = true;
+    let user: User = {
+      name,
+      email,
+      role,
+      chapter,
+    };
 
-    if (name === "") {
-      setNameError(true);
-      valid = false;
-    } else {
-      setNameError(false);
-    }
-    if (email === "") {
-      setEmailError(1);
-      valid = false;
-    } else {
-      try {
-        emailSchema.parse(email);
-        setEmailError(0);
-      } catch (e) {
-        setEmailError(2);
-        valid = false;
-      }
-    }
-
-    return valid;
+    return userSchema.safeParse(user).success;
   };
 
-  const handlePermissionChange = (permission: string) => {
-    setSelectedPermission(permission);
+  const handleRoleChange = (role: string) => {
+    setRole(roleSchema.parse(role));
   };
-
   const handleChapterChange = (chapter: string) => {
-    setSelectedChapter(chapter);
+    setChapter(chapter);
   };
-
   const handleNameChange = (event: React.FormEvent<HTMLInputElement>) =>
     setName(event.currentTarget.value);
-
   const handleEmailChange = (event: React.FormEvent<HTMLInputElement>) =>
     setEmail(event.currentTarget.value);
 
@@ -142,7 +142,7 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
             mt="24px"
           >
             <HStack align="start" spacing="55px">
-              <FormControl isInvalid={nameError}>
+              <FormControl isInvalid={nameError !== UserError.None}>
                 <FormLabel textColor="black" fontWeight="600" mb="4px">
                   Name
                 </FormLabel>
@@ -172,17 +172,15 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
                   Permission
                 </FormLabel>
                 <RadioDropdown
-                  options={permissionOptions}
-                  selectedOption={
-                    selectedPermission ?? (permissionOptions[0] as string)
-                  }
-                  setSelectedOption={handlePermissionChange}
+                  options={Object.keys(roleSchema)}
+                  selectedOption={role}
+                  setSelectedOption={handleRoleChange}
                 />
                 <FormErrorMessage minHeight="20px" />
               </FormControl>
             </HStack>
             <HStack align="start" spacing="55px">
-              <FormControl isInvalid={emailError !== 0}>
+              <FormControl isInvalid={emailError !== EmailError.None}>
                 <FormLabel textColor="black" fontWeight="600" mb="4px">
                   Email
                 </FormLabel>
@@ -201,12 +199,12 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
                 />
                 <Box minHeight="20px" mt={2}>
                   <FormErrorMessage mt={0}>
-                    {emailError === 1 && "Email is required"}
+                    {emailError === EmailError.Empty && "Email is required"}
                     {emailError === 2 && "Invalid email"}
                   </FormErrorMessage>
                 </Box>
               </FormControl>
-              <FormControl isDisabled={selectedPermission === "Admin"}>
+              <FormControl isDisabled={role === "admin"}>
                 <FormLabel
                   fontFamily="body"
                   fontSize="16px"
@@ -216,12 +214,10 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
                   Chapter
                 </FormLabel>
                 <RadioDropdown
-                  options={chapterOptions}
-                  selectedOption={
-                    selectedChapter ?? (chapterOptions[0] as string)
-                  }
+                  options={chapters.data?.map((ch) => ch.name) ?? []}
+                  selectedOption={chapter}
                   setSelectedOption={handleChapterChange}
-                  isDisabled={selectedPermission === "Admin"}
+                  isDisabled={role === "admin"}
                 />
                 <FormErrorMessage minHeight="20px" />
               </FormControl>

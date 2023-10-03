@@ -13,10 +13,13 @@ import {
 } from "@chakra-ui/react";
 import Image from "next/image";
 import { TriangleDownIcon, SettingsIcon } from "@chakra-ui/icons";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import UserList from "~/components/users/UserList";
+import { User } from "~/common/types";
 import logo from "public/hoplogo.png";
-import fonts from "common/theme/fonts";
+import fonts from "src/common/theme/fonts";
+import { NewUser } from "~/components/NewUser";
+import { trpc } from "~/utils/api";
 
 export default function Users() {
   const [filter, setFilter] = useState("chapter"); // value decides grouping behavior
@@ -27,72 +30,73 @@ export default function Users() {
     onClose: onCloseFilterPopeover,
   } = useDisclosure();
 
+  const {
+    isOpen: isOpenAddUserModal,
+    onOpen: onOpenAddUserModal,
+    onClose: onCloseAddUserModal,
+  } = useDisclosure();
+
   function handleFilterClick(filter: string) {
     setFilter(filter);
     onCloseFilterPopeover();
   }
 
-  // dummy data
-  const users = [
-    {
-      name: "Yiwen Zhao",
-      email: "yiwen.zhao@gatech.edu",
-      role: "Admin",
-      chapter: "Atlanta",
-    },
-    {
-      name: "Yiwen Zhao",
-      email: "yiwen.zhao@gatech.edu",
-      role: "Student",
-      chapter: "Atlanta",
-    },
-    {
-      name: "Yiwen Zhao",
-      email: "yiwen.zhao@gatech.edu",
-      role: "Mentor",
-      chapter: "Atlanta",
-    },
-    {
-      name: "Nabeel Zhao",
-      email: "yiwen.zhao@gatech.edu",
-      role: "Admin",
-      chapter: "Georgia",
-    },
-    {
-      name: "Ricky Zhao",
-      email: "yiwen.zhao@gatech.edu",
-      role: "Student",
-      chapter: "Atlanta",
-    },
-    {
-      name: "Ricky Zhao",
-      email: "yiwen.zhao@gatech.edu",
-      role: "Admin",
-      chapter: "New Orleans",
-    },
-    {
-      name: "Ricky Zhao",
-      email: "yiwen.zhao@gatech.edu",
-      role: "Student",
-      chapter: "Atlanta",
-    },
-    {
-      name: "Jay Zhao",
-      email: "yiwen.zhao@gatech.edu",
-      role: "Student",
-      chapter: "Georgia",
-    },
-  ];
+  const finalRef = useRef(null);
+
+  // Get user data from the backend and populate the frontend afterwards
+  const userData = trpc.user.getUsers.useQuery().data;
+  const [users, setUsers] = useState([] as User[]);
+
+  // Wait for the data to get fetched and then update users list
+  useEffect(() => {
+    setUsers(userData as User[]);
+  }, [userData]);
+
+  function updateUsers(user: User) {
+    const newUsers = [...users, user];
+    setUsers(newUsers);
+  }
 
   // uses value of filter variable to group users by a text property in their class
   const groups = (function () {
-    const uniques = [...new Set(users.map((u: any) => u[filter]))]; // array of unique vals
-    // group users by groupBy name into dictionary
-    const umap = new Map(uniques.map((u: any) => [u, new Array()])); // map of val to empty array
-    users.forEach((u: any) => umap.get(u[filter])?.push(u));
-    return uniques.map((u: string) => ({ title: u, users: umap.get(u) }));
+    let uniques;
+    if (users && users.length > 0) {
+      if (filter == "chapter") {
+        uniques = [...new Set(users?.map((u: any) => u[filter]["name"]))];
+      } else {
+        uniques = [...new Set(users?.map((u: any) => u[filter]))]; // array of unique vals}
+      }
+      // group users by groupBy name into dictionary
+      const umap = new Map(uniques.map((u: any) => [u, new Array()])); // map of val to empty array
+      if (filter === "chapter") {
+        users?.forEach(
+          (u: any) =>
+            umap.get(u[filter]["name"])?.push({
+              email: u["email"],
+              name: u["name"],
+              role: u["role"],
+              chapter: u["chapter"]["name"],
+            }),
+        );
+      } else {
+        users?.forEach(
+          (u: any) =>
+            umap.get(u[filter])?.push({
+              email: u["email"],
+              name: u["name"],
+              role: u["role"],
+              chapter: u["chapter"]["name"],
+            }),
+        );
+      }
+      return uniques.map((u: string) => ({ title: u, users: umap.get(u) }));
+    } else {
+      return [];
+    }
   })();
-  const groupsRendered = groups.map((gr: any) => <UserList {...gr} />);
+  const groupsRendered = groups.map((gr: any) => (
+    <UserList key={gr.title} {...gr} />
+  ));
 
   return (
     <>
@@ -165,11 +169,17 @@ export default function Users() {
               borderRadius="0"
               h="80%"
               w="4.5em"
+              onClick={onOpenAddUserModal}
             >
               <Text color="white" fontFamily={fonts.oswald} fontWeight="light">
                 ADD USER
               </Text>
             </Button>
+            <NewUser
+              focusRef={finalRef}
+              isOpen={isOpenAddUserModal}
+              onClose={onCloseAddUserModal}
+            />
           </Box>
           <SettingsIcon
             boxSize="2.5em"
