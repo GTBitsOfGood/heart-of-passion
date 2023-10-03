@@ -13,6 +13,7 @@ This repository aims to support teen volunteers in their retreat planning and bu
 - Create a `.env` file in the root of the repository with the content: `DATABASE_URL=YOUR-URL-HERE`
    - This is generally `DATABASE_URL=mongodb://localhost:27017/heartofpassion`
 - `npm install`
+- `npm run generate-dummy-data`
 - `npm run dev`
 
 ## Major Technologies
