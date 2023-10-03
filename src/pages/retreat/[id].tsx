@@ -1,4 +1,3 @@
-import { useRouter } from "next/router";
 import { Box, Flex, Text } from "@chakra-ui/react";
 import CalendarCard from "src/components/Calendar/CalendarCard";
 import { Event } from "src/common/types";
