@@ -12,7 +12,6 @@ import { computeTime } from "./helper";
 import CalendarCardModal from "./CalendarCardModal";
 import { DateObject, Event } from "~/common/types";
 import { useRef, useEffect, useState } from "react";
-import { readSync } from "fs";
 
 export default function CalendarCard({
   event,

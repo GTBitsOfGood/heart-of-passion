@@ -124,9 +124,21 @@ const sampleData: Event[] = [
 
 // You can continue to add more objects with diverse "day" values.
 
+interface EventInfo {
+  date: {
+    day: number;
+    to: string;
+    from: string;
+  };
+  expenseTotal: number;
+  name: string;
+  location?: string;
+  event: Event;
+  day: number;
+}
+
 export default function Calendar() {
-  const router = useRouter();
-  const eventInfo: any[] = [];
+  let eventInfo: EventInfo[] = [];
   sampleData.forEach((e) => {
     const expenseTotal = e.expenses.reduce(
       (acc, obj) => acc + (obj.numberOfUnits ?? 0),
@@ -135,6 +147,7 @@ export default function Calendar() {
     e.dates.forEach((d) => {
       eventInfo.push({
         date: {
+          day: d.day,
           to: d.to,
           from: d.from,
         },
@@ -168,7 +181,7 @@ export default function Calendar() {
                   <Box marginRight={"34px"}>
                     {eventInfo.map((einfo) => {
                       return einfo.day === num ? (
-                        <CalendarCard {...einfo} />
+                        <CalendarCard key={einfo.name} {...einfo} />
                       ) : (
                         ""
                       );
