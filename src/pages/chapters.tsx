@@ -66,7 +66,7 @@ export default function Home() {
 
       <Grid templateColumns="repeat(3, 1fr)" gap={6} ml="10%" mr="10%">
         {chapters.data?.map((chapter: Chapter) => (
-          <GridItem>
+          <GridItem key={chapter.name}>
             <ChapterCard chapter={chapter} />
           </GridItem>
         ))}

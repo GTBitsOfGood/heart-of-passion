@@ -17,7 +17,7 @@ import { useEffect, useRef, useState } from "react";
 import UserList from "~/components/users/UserList";
 import { User } from "~/common/types";
 import logo from "public/hoplogo.png";
-import fonts from "common/theme/fonts";
+import fonts from "src/common/theme/fonts";
 import { NewUser } from "~/components/NewUser";
 import { trpc } from "~/utils/api";
 
@@ -44,7 +44,7 @@ export default function Users() {
   const finalRef = useRef(null);
 
   // Get user data from the backend and populate the frontend afterwards
-  const userData = trpc.user.getUsers.useQuery().data?.message;
+  const userData = trpc.user.getUsers.useQuery().data;
   const [users, setUsers] = useState([] as User[]);
 
   // Wait for the data to get fetched and then update users list
@@ -179,7 +179,6 @@ export default function Users() {
               focusRef={finalRef}
               isOpen={isOpenAddUserModal}
               onClose={onCloseAddUserModal}
-              updateUsers={updateUsers}
             />
           </Box>
           <SettingsIcon
