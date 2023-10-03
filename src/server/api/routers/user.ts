@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-import { Model } from "~/server/models/User";
+import { UserModel } from "~/server/models/User";
 import { ChapterModel } from "~/server/models/Chapter";
 import { Chapter, User, userSchema } from "~/common/types";
 export const userRouter = createTRPCRouter({
@@ -11,7 +11,7 @@ export const userRouter = createTRPCRouter({
       name: input.chapter,
     }).exec())!;
 
-    const user = new Model({
+    const user = new UserModel({
       name: input.name,
       chapter: chapter.id,
       email: input.email,
@@ -22,7 +22,7 @@ export const userRouter = createTRPCRouter({
   }),
 
   deleteUser: publicProcedure.input(z.string()).mutation(async (opts) => {
-    const user = await Model.findOneAndDelete({ email: opts.input }).exec();
+    const user = await UserModel.findOneAndDelete({ email: opts.input }).exec();
     return user;
   }),
 
@@ -39,7 +39,7 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async (opts) => {
-      const user = await Model.findOneAndUpdate(
+      const user = await UserModel.findOneAndUpdate(
         { email: opts.input.email },
         opts.input.updateData,
       ).exec();
@@ -49,13 +49,13 @@ export const userRouter = createTRPCRouter({
   getUser: publicProcedure
     .input(z.string())
     .query(async (opts): Promise<User> => {
-      const user = await Model.findOne({ email: opts.input })
+      const user = await UserModel.findOne({ email: opts.input })
         .populate<{ chapter: Chapter }>("chapter")
         .exec();
       return processUser(user);
     }),
   getUsers: publicProcedure.query(async (opts): Promise<User[]> => {
-    const users = await Model.find()
+    const users = await UserModel.find()
       .populate<{ chapter: Chapter }>("chapter")
       .exec();
 

@@ -17,7 +17,6 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
-import { z } from "zod";
 import { User, Role, userSchema, roleSchema } from "~/common/types";
 import { trpc } from "~/utils/api";
 

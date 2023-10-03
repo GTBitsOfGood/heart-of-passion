@@ -7,7 +7,8 @@
     "dev": "next dev",
     "lint": "next lint",
     "start": "next start",
-    "prettier-format": "prettier --config prettier.config.mjs \"src/**/*.{ts,tsx}\" --write"
+    "prettier-format": "prettier --config prettier.config.mjs \"src/**/*.{ts,tsx}\" --write",
+    "generate-dummy-data": "tsx scripts/generate-dummy-data.ts"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
@@ -42,12 +43,14 @@
     "@typescript-eslint/eslint-plugin": "^6.3.0",
     "@typescript-eslint/parser": "^6.3.0",
     "autoprefixer": "^10.4.14",
+    "dotenv": "^16.3.1",
     "eslint": "^8.47.0",
     "eslint-config-next": "^13.4.13",
     "postcss": "^8.4.27",
     "prettier": "^3.0.0",
     "prettier-plugin-tailwindcss": "^0.5.1",
     "tailwindcss": "^3.3.3",
+    "tsx": "^3.13.0",
     "typescript": "^5.1.6"
   }
 }
