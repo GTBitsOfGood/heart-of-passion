@@ -38,18 +38,18 @@ export const chapterSchema = z.object({
 });
 export type Chapter = z.infer<typeof chapterSchema>;
 
-
 export const energyLevelSchema = z.enum(["low", "medium", "high"]);
 export type EnergyLevel = z.infer<typeof energyLevelSchema>;
-
 
 export const categorySchema = z.enum(["entertainment", "educational", "other"]);
 export type Category = z.infer<typeof categorySchema>;
 
-
-export const expenseTypeSchema = z.enum(["entertainment", "transportation", "other"]);
+export const expenseTypeSchema = z.enum([
+  "entertainment",
+  "transportation",
+  "other",
+]);
 export type ExpenseType = z.infer<typeof expenseTypeSchema>;
-
 
 export const costTypeSchema = z.enum(["per unit", "flat cost"]);
 export type CostType = z.infer<typeof costTypeSchema>;
@@ -78,3 +78,4 @@ export const eventSchema = z.object({
   dates: z.array(dateObjectSchema),
   expenses: z.array(expenseObjectSchema),
 });
+export type Event = z.infer<typeof eventSchema>;

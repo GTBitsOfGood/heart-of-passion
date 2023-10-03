@@ -1,17 +1,16 @@
 import { useRouter } from "next/router";
 import { Box, Flex, Text } from "@chakra-ui/react";
-// import Card from "./card";
 import CalendarCard from "src/components/Calendar/CalendarCard";
-import "@fontsource/oswald/700.css";
-import { Event as EventT, EnergyLevel, Category, ExpenseType, CostType } from "src/common/types/types"
-import { useRef } from "react";
+import { Event } from "src/common/types";
 
-const sampleData: EventT[] = [
+import "@fontsource/oswald/700.css";
+
+const sampleData: Event[] = [
   {
     name: "Breakfast",
     location: "123 First Drive",
-    energyLevel: EnergyLevel.Low,
-    category: Category.Other,
+    energyLevel: "low",
+    category: "other",
     dates: [
       {
         day: 1,
@@ -22,8 +21,8 @@ const sampleData: EventT[] = [
     expenses: [
       {
         name: "Expense Name",
-        type: ExpenseType.Other,
-        costType: CostType.FlatCost,
+        type: "other",
+        costType: "flat cost",
         notes: "",
       },
     ],
@@ -31,8 +30,8 @@ const sampleData: EventT[] = [
   {
     name: "Lunch",
     location: "456 Second Street",
-    energyLevel: EnergyLevel.Medium,
-    category: Category.Entertainment,
+    energyLevel: "medium",
+    category: "entertainment",
     dates: [
       {
         day: 2,
@@ -43,8 +42,8 @@ const sampleData: EventT[] = [
     expenses: [
       {
         name: "Lunch Expense",
-        type: ExpenseType.Entertainment,
-        costType: CostType.FlatCost,
+        type: "entertainment",
+        costType: "flat cost",
         notes: "Enjoyed a nice meal.",
       },
     ],
@@ -52,8 +51,8 @@ const sampleData: EventT[] = [
   {
     name: "Meeting",
     location: "789 Third Avenue",
-    energyLevel: EnergyLevel.High,
-    category: Category.Educational,
+    energyLevel: "high",
+    category: "educational",
     dates: [
       {
         day: 3,
@@ -64,8 +63,8 @@ const sampleData: EventT[] = [
     expenses: [
       {
         name: "Meeting Expense",
-        type: ExpenseType.Transportation,
-        costType: CostType.PerUnit,
+        type: "transportation",
+        costType: "per unit",
         numberOfUnits: 4,
         notes: "Travel expenses.",
       },
@@ -74,8 +73,8 @@ const sampleData: EventT[] = [
   {
     name: "Workshop",
     location: "101 Fourth Street",
-    energyLevel: EnergyLevel.Medium,
-    category: Category.Educational,
+    energyLevel: "high",
+    category: "educational",
     dates: [
       {
         day: 4,
@@ -86,8 +85,8 @@ const sampleData: EventT[] = [
     expenses: [
       {
         name: "Workshop Expense",
-        type: ExpenseType.Entertainment,
-        costType: CostType.FlatCost,
+        type: "entertainment",
+        costType: "flat cost",
         notes: "Materials and equipment.",
       },
     ],
@@ -95,8 +94,8 @@ const sampleData: EventT[] = [
   {
     name: "Dinner",
     location: "987 Fifth Avenue",
-    energyLevel: EnergyLevel.Medium,
-    category: Category.Entertainment,
+    energyLevel: "medium",
+    category: "entertainment",
     dates: [
       {
         day: 1,
@@ -112,8 +111,8 @@ const sampleData: EventT[] = [
     expenses: [
       {
         name: "Dinner Expense",
-        type: ExpenseType.Entertainment,
-        costType: CostType.FlatCost,
+        type: "entertainment",
+        costType: "flat cost",
         notes: "Delicious dinner.",
       },
     ],
@@ -123,16 +122,17 @@ const sampleData: EventT[] = [
 
 // You can continue to add more objects with different durations.
 
-
 // You can continue to add more objects with diverse "day" values.
-
 
 export default function Calendar() {
   const router = useRouter();
-  const eventInfo: any[] = []
-  sampleData.forEach(e => {
-    const expenseTotal = e.expenses.reduce((acc, obj) => acc + (obj.numberOfUnits ?? 0), 0)
-    e.dates.forEach(d => {
+  const eventInfo: any[] = [];
+  sampleData.forEach((e) => {
+    const expenseTotal = e.expenses.reduce(
+      (acc, obj) => acc + (obj.numberOfUnits ?? 0),
+      0,
+    );
+    e.dates.forEach((d) => {
       eventInfo.push({
         date: {
           to: d.to,
@@ -143,35 +143,47 @@ export default function Calendar() {
         location: e.location,
         event: e,
         day: d.day,
-      })
-    })
-  })
+      });
+    });
+  });
   return (
     <Box>
       <Flex justifyContent="center" alignItems="center">
         <Box>{/*Sidebar*/}</Box>
         <Box display={"flex"} gap={"34px"}>
-          {[1,2,3,4].map(num => {
-            return <Box>
-              <Text
-              width={"158px"}
-              height={"81px"}
-              fontSize={36}
-              fontWeight={700}
-              textAlign={"center"}
-              fontFamily={"oswald"}
-              >
-                Day {num}
-              </Text>
-              <Box display={"flex"}>
-                <Box marginRight={"34px"}>
-                  {eventInfo.map(einfo => {
-                    return einfo.day === num ? <CalendarCard {...einfo}/> : ""
-                  })}
+          {[1, 2, 3, 4].map((num) => {
+            return (
+              <Box key={num}>
+                <Text
+                  width={"158px"}
+                  height={"81px"}
+                  fontSize={36}
+                  fontWeight={700}
+                  textAlign={"center"}
+                  fontFamily={"oswald"}
+                >
+                  Day {num}
+                </Text>
+                <Box display={"flex"}>
+                  <Box marginRight={"34px"}>
+                    {eventInfo.map((einfo) => {
+                      return einfo.day === num ? (
+                        <CalendarCard {...einfo} />
+                      ) : (
+                        ""
+                      );
+                    })}
+                  </Box>
+                  {num !== 4 && (
+                    <Box
+                      width={"1px"}
+                      background={"#989898"}
+                      height={"788px"}
+                    />
+                  )}
                 </Box>
-                {num !== 4 && <Box width={"1px"} background={"#989898"} height={"788px"} />}
               </Box>
-          </Box>
+            );
           })}
         </Box>
       </Flex>

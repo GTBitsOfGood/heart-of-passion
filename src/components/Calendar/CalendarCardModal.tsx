@@ -15,22 +15,23 @@ import {
 import TimesList from "./TimesList";
 import ExpensesList from "./ExpensesList";
 import { useState } from "react";
-import ExpenseEditor from "./ExpenseEditor";
-import { Event as EventT } from "~/common/types/types";
+import { Event } from "~/common/types";
 import TimesEditor from "./TimesEditor";
 
 function ButtonLabelRow({ labelText, buttonText }: any) {
-  return <Flex direction="row" justify="space-between" align="center">
-    <Box>{labelText}</Box>
-    <Button>{buttonText}</Button>
-  </Flex>
+  return (
+    <Flex direction="row" justify="space-between" align="center">
+      <Box>{labelText}</Box>
+      <Button>{buttonText}</Button>
+    </Flex>
+  );
 }
 
 type PropT = {
-  event: EventT;
+  event: Event;
   isOpen: boolean;
   onClose: any;
-}
+};
 
 export default function CalendarCardModal({ event, isOpen, onClose }: PropT) {
   const [showSide, setShowSide] = useState(true);
@@ -53,25 +54,24 @@ export default function CalendarCardModal({ event, isOpen, onClose }: PropT) {
               </Select>
               Location
               <Input />
-
               <ButtonLabelRow buttonText="ADD TIME" labelText="Dates" />
               <TimesList />
-
               <ButtonLabelRow buttonText="ADD EXPENSE" labelText="Expenses" />
-              <ExpensesList expenses={event.expenses}/>
-
+              <ExpensesList expenses={event.expenses} />
             </Box>
-            {showSide && <Box flexBasis="300px">
-              {/* <ExpenseEditor expense={event.expenses?.[0]} /> */}
-              <TimesEditor date={event.dates?.[0]}/>
-            </Box>}
+            {showSide && (
+              <Box flexBasis="300px">
+                {/*TODO: We should probably check the event has a date */}
+                <TimesEditor date={event.dates?.[0]!} />
+              </Box>
+            )}
           </Flex>
-              <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={onClose}>
-          Add
-          </Button>
-          <Button variant="ghost">Delete</Button>
-        </ModalFooter>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={onClose}>
+              Add
+            </Button>
+            <Button variant="ghost">Delete</Button>
+          </ModalFooter>
         </ModalBody>
       </ModalContent>
     </Modal>

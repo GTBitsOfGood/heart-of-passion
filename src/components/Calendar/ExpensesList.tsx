@@ -1,5 +1,5 @@
 import { Box, Flex, VStack } from "@chakra-ui/react";
-import { ExpenseObject, ExpenseType } from "~/common/types/types"
+import { ExpenseObject, ExpenseType } from "~/common/types"
 
 type PropT = {
     expenses?: ExpenseObject[];
@@ -15,7 +15,7 @@ function OneExpense({ exp }: { exp: ExpenseObject }) {
 export default function ExpensesList({ expenses }: PropT) {
     return <VStack>
         {expenses?.map(e =>
-            <OneExpense exp={e} />  
+            <OneExpense key={e.name + e.costType + e.type} exp={e} />  
         ) ?? ""}
     </VStack>
 }
