@@ -6,7 +6,8 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "prettier-format": "prettier --config prettier.config.mjs \"src/**/*.{ts,tsx}\" --write"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
@@ -31,7 +32,7 @@
     "react-icons": "^4.11.0",
     "react-select": "^5.7.5",
     "superjson": "^1.13.1",
-    "zod": "^3.22.2"
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@types/eslint": "^8.44.2",

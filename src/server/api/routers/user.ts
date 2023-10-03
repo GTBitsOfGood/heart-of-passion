@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-import { IUser, Model } from "~/server/models/User";
+import { Model } from "~/server/models/User";
 import { ChapterModel } from "~/server/models/Chapter";
 import { Chapter, User, userSchema } from "~/common/types";
 export const userRouter = createTRPCRouter({
@@ -20,10 +20,12 @@ export const userRouter = createTRPCRouter({
     await user.save();
     return user;
   }),
+
   deleteUser: publicProcedure.input(z.string()).mutation(async (opts) => {
     const user = await Model.findOneAndDelete({ email: opts.input }).exec();
     return user;
   }),
+
   updateUser: publicProcedure
     .input(
       z.object({
