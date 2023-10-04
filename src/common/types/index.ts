@@ -66,6 +66,7 @@ export const expenseObjectSchema = z.object({
   name: z.string(),
   type: expenseTypeSchema,
   costType: costTypeSchema,
+  cost: z.number().positive().int(),
   numberOfUnits: z.number().optional(),
   notes: z.string().optional(),
 });
