@@ -10,14 +10,14 @@ services:
       - "3000:3000"
     entrypoint: ./entrypoint.sh
     environment:
-      DATABASE_URL: "DATABASE_URL=mongodb://localhost:27017/heartofpassion"
+      DATABASE_URL: mongodb://mongo:27017/heartofpassion
     networks:
       - heart-of-passion-net
     depends_on:
-      - mongodb
+      - mongo
 
-  mongodb:
-    image: mongo:latest
+  mongo:
+    image: mongo
     ports:
       - "27017:27017"
     networks:
