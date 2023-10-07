@@ -21,7 +21,7 @@ This repository aims to support teen volunteers in their retreat planning and bu
 1. Install [Docker](https://docs.docker.com/engine/install/)
 2. Start the application with Docker Compose: `docker compose up`
 
-If you make any changes to the packages, you may need to rebuild the images. To do this, append --build to the above docker compose up command.
+If you make any changes to the packages, you may need to rebuild the images. To do this, append `--build` to the above docker compose up command.
 
 The Dockerized application will have live-reloading of changes made on the host machine.
 
