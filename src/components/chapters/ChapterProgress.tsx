@@ -1,57 +1,18 @@
-import {
-  Text,
-  Grid,
-  GridItem,
-  Progress,
-  Flex,
-  Spacer,
-  Box,
-  IconButton,
-} from "@chakra-ui/react";
-import { BiSolidEdit } from "react-icons/bi";
+import { Text, Grid, GridItem } from "@chakra-ui/react";
 import "@fontsource/oswald/600.css";
 import ProgressBar from "@ramonak/react-progress-bar";
+import { Chapter } from "src/common/types";
 
-const ChapterCard = ({
-  name,
-  totalCost,
-  fundExpected,
-  fundActual,
-}: {
-  name: string;
-  totalCost: number;
-  fundExpected: number;
-  fundActual: number;
-}) => {
-  const progress = Math.floor((fundActual / fundExpected) * 100);
+interface ChapterProgressProps {
+  chapter: Chapter;
+}
+
+const ChapterProgress = ({ chapter }: ChapterProgressProps) => {
+  const progress = Math.floor(
+    (chapter.fundActual / chapter.fundExpected) * 100,
+  );
   return (
-    <Box
-      bgColor="#F9F9F9"
-      border={"2px #EDEDED solid"}
-      sx={{ borderRadius: "4%" }}
-      h="350px"
-      _hover={{ bg: "white", boxShadow: "lg" }}
-    >
-      <Flex mt="2" mr="2">
-        <Spacer />
-        <IconButton
-          aria-label="settings"
-          variant="ghost"
-          height="40px"
-          width="40px"
-          icon={<BiSolidEdit size="20px" onClick={() => {}} />}
-        />
-      </Flex>
-
-      <Text
-        align="center"
-        fontSize="40px"
-        fontWeight="bold"
-        fontFamily="oswald"
-      >
-        {name}
-      </Text>
-
+    <>
       <ProgressBar
         completed={progress}
         bgColor="#54A9DD"
@@ -69,7 +30,13 @@ const ChapterCard = ({
         }}
       />
 
-      <Grid templateColumns="repeat(3, 1fr)" gap={6} ml="5" mr="5">
+      <Grid
+        templateColumns="repeat(3, 1fr)"
+        gap={6}
+        ml="5"
+        mr="5"
+        justifyContent="center"
+      >
         <GridItem>
           <Text
             align="center"
@@ -77,7 +44,7 @@ const ChapterCard = ({
             fontSize="36px"
             fontFamily="oswald"
           >
-            ${totalCost}
+            ${chapter.totalCost}
           </Text>
           <Text align="center" fontSize="13px">
             Total Cost
@@ -90,7 +57,7 @@ const ChapterCard = ({
             fontSize="36px"
             fontFamily="oswald"
           >
-            ${fundExpected}
+            ${chapter.fundExpected}
           </Text>
           <Text align="center" fontSize="13px">
             Fundraising Expected
@@ -103,15 +70,15 @@ const ChapterCard = ({
             fontSize="36px"
             fontFamily="oswald"
           >
-            ${fundActual}
+            ${chapter.fundActual}
           </Text>
           <Text align="center" fontSize="13px">
             Fundraising Actual
           </Text>
         </GridItem>
       </Grid>
-    </Box>
+    </>
   );
 };
 
-export default ChapterCard;
+export default ChapterProgress;

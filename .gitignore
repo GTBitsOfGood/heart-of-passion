@@ -131,3 +131,6 @@ dist
 
 # MacOS files
 .DS_STORE
+
+# IDE
+.vscode/
