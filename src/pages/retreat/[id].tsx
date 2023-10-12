@@ -23,6 +23,7 @@ const sampleData: Event[] = [
         type: "other",
         costType: "flat cost",
         notes: "",
+        cost: 121,
       },
     ],
   },
@@ -44,6 +45,7 @@ const sampleData: Event[] = [
         type: "entertainment",
         costType: "flat cost",
         notes: "Enjoyed a nice meal.",
+        cost: 21,
       },
     ],
   },
@@ -66,6 +68,7 @@ const sampleData: Event[] = [
         costType: "per unit",
         numberOfUnits: 4,
         notes: "Travel expenses.",
+        cost: 41,
       },
     ],
   },
@@ -87,6 +90,7 @@ const sampleData: Event[] = [
         type: "entertainment",
         costType: "flat cost",
         notes: "Materials and equipment.",
+        cost: 420,
       },
     ],
   },
@@ -113,6 +117,7 @@ const sampleData: Event[] = [
         type: "entertainment",
         costType: "flat cost",
         notes: "Delicious dinner.",
+        cost: 4201,
       },
     ],
   },
@@ -134,6 +139,7 @@ interface EventInfo {
   location?: string;
   event: Event;
   day: number;
+  spacer?: boolean;
 }
 
 export default function Calendar() {

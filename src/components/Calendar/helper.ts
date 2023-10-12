@@ -1,4 +1,4 @@
-export const computeTime = (startTime: string, endTime: string): number => {
+export const computeHeight = (startTime: string, endTime: string): number => {
   var start = 0;
   var end = 0;
   startTime = startTime.toLowerCase()
@@ -35,5 +35,5 @@ export const computeTime = (startTime: string, endTime: string): number => {
     }
     end += parseInt(endMins || "0");
   }
-  return Math.round(((end - start) / 1440) * 150); // * 100 -> * 150 to make slightly bigger
+  return Math.round((end - start) / 60 * 126); //
 };

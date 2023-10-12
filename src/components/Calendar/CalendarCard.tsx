@@ -8,7 +8,7 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import { computeTime } from "./helper";
+import { computeHeight } from "./helper";
 import CalendarCardModal from "./CalendarCardModal";
 import { DateObject, Event } from "~/common/types";
 import { useRef, useEffect, useState } from "react";
@@ -23,9 +23,9 @@ export default function CalendarCard({
   expenseTotal: number;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const ht = computeTime(date.from, date.to);
+  const height = computeHeight(date.from, date.to);
   const parentRef: any = useRef();
-  const [heightPixel, setHeightPixel] = useState(-1);
+  const [cardHt, setCardHeight] = useState(-1); // debugging only, can remove
   const [variant, setVariant] = useState(3);
   useEffect(() => {
     if (parentRef.current) {
@@ -44,7 +44,7 @@ export default function CalendarCard({
         }
       })();
       setVariant(findVariant);
-      setHeightPixel(htPx);
+      setCardHeight(htPx);
     }
   }, [parentRef]);
 
@@ -60,7 +60,7 @@ export default function CalendarCard({
             {date.from} + {variant}{" "}
           </Text>
           <Text color={"#C32127"} fontWeight={700}>
-            {event.name}
+            {event?.name}
           </Text>
           <Text color={"#C32127"}>{event?.location}</Text>
         </Box>
@@ -73,14 +73,6 @@ export default function CalendarCard({
     );
   }
   function NegativeVariant() {
-    // return <Flex gap="10px" width="1000%">
-    //     <Text color={"#C32127"}>{date.from}</Text>
-    //     <Text color={"#C32127"} fontWeight={700}>
-    //       {event.name}
-    //     </Text>
-    //     <Text color={"#C32127"}>{event?.location}</Text>
-    //     <Text fontWeight={700} color={"#C32127"}>${expenseTotal}</Text>
-    //   </Flex>
     return (
       <Text
         width="158px"
@@ -89,7 +81,7 @@ export default function CalendarCard({
         whiteSpace="nowrap"
         color={"#C32127"}
       >
-        ${date.from} <b>{event.name}</b> {event?.location}{" "}
+        ${date.from} <b>{event?.name}</b> {event?.location}{" "}
         <b>${expenseTotal}</b>
       </Text>
     );
@@ -100,7 +92,7 @@ export default function CalendarCard({
       <Grid
         templateColumns="207px 27px"
         width={"207px"}
-        height={`${ht}vh`}
+        height={`${height}px`}
         display={"flex"}
         border="1px solid #D9D9D9"
         marginBottom={10}
@@ -121,8 +113,8 @@ export default function CalendarCard({
           as={Center}
         >
           {variant > 0
-            ? event.energyLevel?.toUpperCase()
-            : event.energyLevel?.[0]?.toUpperCase()}
+            ? event?.energyLevel?.toUpperCase()
+            : event?.energyLevel?.[0]?.toUpperCase()}
         </GridItem>
       </Grid>
       <CalendarCardModal event={event} isOpen={isOpen} onClose={onClose} />
