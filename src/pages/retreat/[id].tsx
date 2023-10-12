@@ -1,8 +1,17 @@
-import { Box, Flex, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Text,
+  Grid,
+  HStack,
+  StackDivider,
+  GridItem,
+} from "@chakra-ui/react";
 import CalendarCard from "src/components/Calendar/CalendarCard";
 import { Event } from "src/common/types";
 
 import "@fontsource/oswald/700.css";
+import { useEffect, useRef, useState } from "react";
 
 const sampleData: Event[] = [
   {
@@ -13,8 +22,8 @@ const sampleData: Event[] = [
     dates: [
       {
         day: 1,
-        from: "9:30 am",
-        to: "12:30 pm",
+        from: "12:00 am",
+        to: "1:00 am",
       },
     ],
     expenses: [
@@ -34,9 +43,9 @@ const sampleData: Event[] = [
     category: "entertainment",
     dates: [
       {
-        day: 2,
-        from: "12:30 pm",
-        to: "1:20 pm", // Longer duration
+        day: 1,
+        from: "2:00 am",
+        to: "3:00 am", // Longer duration
       },
     ],
     expenses: [
@@ -139,7 +148,7 @@ interface EventInfo {
   location?: string;
   event: Event;
   day: number;
-  spacer?: boolean;
+  ghost?: boolean;
 }
 
 export default function Calendar() {
@@ -164,6 +173,23 @@ export default function Calendar() {
       });
     });
   });
+  const Ghost = () => <GridItem w="207px" h={0} area="stack" />;
+  const CalendarCards = (num: number) =>
+    eventInfo.map((einfo) => {
+      return einfo.day === num ? (
+        <CalendarCard key={einfo.name} {...einfo} />
+      ) : (
+        ""
+      );
+    });
+  const calendarColRef = useRef<any>();
+  const [colHeight, setColHeight] = useState<number>(-1);
+  useEffect(() => {
+    if (calendarColRef.current) {
+      const ht = calendarColRef.current.getBoundingClientRect().height;
+      setColHeight(ht);
+    }
+  }, [calendarColRef]);
   return (
     <Box>
       <Flex justifyContent="center" alignItems="center">
@@ -183,20 +209,20 @@ export default function Calendar() {
                   Day {num}
                 </Text>
                 <Box display={"flex"}>
-                  <Box marginRight={"34px"}>
-                    {eventInfo.map((einfo) => {
-                      return einfo.day === num ? (
-                        <CalendarCard key={einfo.name} {...einfo} />
-                      ) : (
-                        ""
-                      );
-                    })}
-                  </Box>
+                  <Grid
+                    gridTemplateAreas="stack"
+                    marginRight={"34px"}
+                    ref={calendarColRef}
+                    mb="30px"
+                  >
+                    {CalendarCards(num)}
+                    {Ghost()}
+                  </Grid>
                   {num !== 4 && (
                     <Box
                       width={"1px"}
                       background={"#989898"}
-                      height={"788px"}
+                      height={colHeight + "px"}
                     />
                   )}
                 </Box>

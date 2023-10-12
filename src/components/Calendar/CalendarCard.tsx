@@ -24,6 +24,7 @@ export default function CalendarCard({
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const height = computeHeight(date.from, date.to);
+  const top = computeHeight("12:00 am", date.from);
   const parentRef: any = useRef();
   const [cardHt, setCardHeight] = useState(-1); // debugging only, can remove
   const [variant, setVariant] = useState(3);
@@ -93,12 +94,15 @@ export default function CalendarCard({
         templateColumns="207px 27px"
         width={"207px"}
         height={`${height}px`}
+        mt={`${top}px`}
         display={"flex"}
         border="1px solid #D9D9D9"
         marginBottom={10}
         onClick={onOpen}
         overflow="hidden"
         ref={parentRef}
+        as={GridItem}
+        area="stack"
       >
         <GridItem width={"100%"} padding={"7px"}>
           {variant >= 0 ? <PositiveVariant /> : <NegativeVariant />}

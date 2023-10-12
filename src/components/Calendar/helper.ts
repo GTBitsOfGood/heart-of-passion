@@ -1,8 +1,8 @@
 export const computeHeight = (startTime: string, endTime: string): number => {
   var start = 0;
   var end = 0;
-  startTime = startTime.toLowerCase()
-  endTime = endTime.toLowerCase()
+  startTime = startTime.toLowerCase();
+  endTime = endTime.toLowerCase();
 
   if (startTime.endsWith("am")) {
     var [startHours, startMins] = (startTime.split(" am")[0] || "").split(":");
@@ -35,5 +35,5 @@ export const computeHeight = (startTime: string, endTime: string): number => {
     }
     end += parseInt(endMins || "0");
   }
-  return Math.round((end - start) / 60 * 126); //
+  return Math.round(((end - start) / 60) * 126); //
 };
