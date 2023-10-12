@@ -17,7 +17,6 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
-import { z } from "zod";
 import { User, Role, userSchema, roleSchema } from "~/common/types";
 import { trpc } from "~/utils/api";
 
@@ -37,6 +36,8 @@ enum UserError {
   None, // No error
   Empty, // Empty user
 }
+
+const roleOptions = Object.values(roleSchema.enum);
 
 export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
   // Form Data
@@ -172,7 +173,7 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
                   Permission
                 </FormLabel>
                 <RadioDropdown
-                  options={Object.keys(roleSchema)}
+                  options={roleOptions}
                   selectedOption={role}
                   setSelectedOption={handleRoleChange}
                 />

@@ -8,18 +8,17 @@ export type Role = z.infer<typeof roleSchema>;
 export const userSchema = z
   .object({
     name: z.string(),
-    email: z.string(),
+    email: z.string().email(),
     role: roleSchema,
     chapter: z.string().optional(),
   })
   .refine((data) => {
-    if (data.role === "student") {
+    if (data.role === "student" || data.role === "mentor") {
       return data.chapter !== undefined;
     }
 
     return true;
   });
-
 export type User = z.infer<typeof userSchema>;
 
 // User List
@@ -38,9 +37,11 @@ export const chapterSchema = z.object({
 });
 export type Chapter = z.infer<typeof chapterSchema>;
 
+// Energy Level
 export const energyLevelSchema = z.enum(["low", "medium", "high"]);
 export type EnergyLevel = z.infer<typeof energyLevelSchema>;
 
+// Category
 export const categorySchema = z.enum(["entertainment", "educational", "other"]);
 export type Category = z.infer<typeof categorySchema>;
 
@@ -65,6 +66,7 @@ export const expenseObjectSchema = z.object({
   name: z.string(),
   type: expenseTypeSchema,
   costType: costTypeSchema,
+  cost: z.number().positive().int(),
   numberOfUnits: z.number().optional(),
   notes: z.string().optional(),
 });
