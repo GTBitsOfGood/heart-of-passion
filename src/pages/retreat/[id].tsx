@@ -23,7 +23,7 @@ const sampleData: Event[] = [
       {
         day: 1,
         from: "12:00 am",
-        to: "12:34 am",
+        to: "12:22 am",
       },
     ],
     expenses: [

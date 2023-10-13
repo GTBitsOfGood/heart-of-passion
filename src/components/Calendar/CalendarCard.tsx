@@ -41,6 +41,9 @@ export default function CalendarCard({
         else if (htPx < 70) {
           return 0.5;
         }
+        else if (htPx < 85) {
+          return 0.75;
+        }
         else if (htPx < 98) {
           return 1;
         }
@@ -82,16 +85,18 @@ export default function CalendarCard({
   }
   function NegativeVariant() {
     return (
-      <Text
-        width="158px"
-        overflow="hidden"
-        textOverflow="ellipsis"
-        whiteSpace="nowrap"
-        color={"#C32127"}
-      >
-        ${date.from} <b>{event?.name}</b> {event?.location}{" "}
-        <b>${expenseTotal}</b>
-      </Text>
+      <Flex direction="column" justify="center" h="100%">
+        <Text
+          width="158px"
+          overflow="hidden"
+          textOverflow="ellipsis"
+          whiteSpace="nowrap"
+          color={"#C32127"}
+        >
+          ${date.from} <b>{event?.name}</b> {event?.location}{" "}
+          <b>${expenseTotal}</b>
+        </Text>
+      </Flex>
     );
   }
   function EnergyText() {
@@ -135,6 +140,7 @@ export default function CalendarCard({
           transform="rotate(180deg)"
           fontWeight={700}
           as={Center}
+          fontSize="20px"
         >
           {EnergyText()}
         </GridItem>
