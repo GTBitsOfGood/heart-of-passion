@@ -17,13 +17,13 @@ const sampleData: Event[] = [
   {
     name: "Breakfast",
     location: "123 First Drive",
-    energyLevel: "low",
+    energyLevel: "medium",
     category: "other",
     dates: [
       {
         day: 1,
         from: "12:00 am",
-        to: "1:00 am",
+        to: "12:34 am",
       },
     ],
     expenses: [
