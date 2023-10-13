@@ -32,6 +32,9 @@ export default function CalendarCard({
     if (parentRef.current) {
       const htPx = parentRef.current.getBoundingClientRect().height;
       const findVariant = (function () {
+        if (htPx < 32) {
+          return -2;
+        }
         if (htPx < 46.5) {
           return -1;
         }
@@ -85,7 +88,7 @@ export default function CalendarCard({
   }
   function NegativeVariant() {
     return (
-      <Flex direction="column" justify="center" h="100%">
+      <Flex direction="column" justify="center" h={variant < -1 ? "20px" : "100%"} overflow="visible">
         <Text
           width="158px"
           overflow="hidden"
@@ -124,7 +127,7 @@ export default function CalendarCard({
         border="1px solid #D9D9D9"
         marginBottom={10}
         onClick={onOpen}
-        overflow="hidden"
+        overflow={variant < -1 ? "visible" : "hidden"}
         ref={parentRef}
         as={GridItem}
         area="stack"
