@@ -38,14 +38,18 @@ export const retreatRouter = createTRPCRouter({
     return retreats.map((e) => e.year).sort();
   }),
   getRetreatCost: publicProcedure
-    .input(z.string())
-    .query(async ({ input }) => {
+    .input(z.string()).query(async ({ input }) => {
       const events = await EventModel.find({ retreatId: input })
       let cost = 0;
       events.forEach((event: IEvent) => {
         let expenses: [IExpense] = event.expenses
         expenses.forEach((expense) => {
-          cost += expense.cost
+          if (expense.costType == "flat cost") {
+            cost += expense.cost
+          } else {
+            cost += expense.cost * expense.numberOfUnits;
+          }
+
         });
       }
       )
