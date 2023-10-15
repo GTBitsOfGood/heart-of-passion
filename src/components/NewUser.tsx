@@ -17,7 +17,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
-import { User, Role, userSchema, roleSchema } from "~/common/types";
+import { User, Role, userSchema, roleSchema, Chapter } from "~/common/types";
 import { trpc } from "~/utils/api";
 
 type NewUserProps = {
@@ -229,7 +229,7 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
                   Chapter
                 </FormLabel>
                 <RadioDropdown
-                  options={chapters.data?.map((ch: User) => ch.name) ?? []}
+                  options={chapters.data?.map((ch: Chapter) => ch.name) ?? []}
                   selectedOption={chapter}
                   setSelectedOption={handleChapterChange}
                   isDisabled={role === "admin"}
