@@ -3,6 +3,8 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 import { RetreatModel } from "~/server/models/Retreat";
+import { EventModel, IEvent, IExpense } from "~/server/models/Event";
+
 export const retreatRouter = createTRPCRouter({
   createRetreat: publicProcedure
     .input(
@@ -35,4 +37,19 @@ export const retreatRouter = createTRPCRouter({
       .exec();
     return retreats.map((e) => e.year).sort();
   }),
+  getRetreatCost: publicProcedure
+    .input(z.string())
+    .query(async ({ input }) => {
+      const events = await EventModel.find({ retreatId: input })
+      let cost = 0;
+      events.forEach((event: IEvent) => {
+        let expenses: [IExpense] = event.expenses
+        expenses.forEach((expense) => {
+          cost += expense.cost
+        });
+      }
+      )
+      return cost;
+    })
+
 });
