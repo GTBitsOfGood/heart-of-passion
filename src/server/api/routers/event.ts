@@ -30,7 +30,6 @@ export const eventRouter = createTRPCRouter({
       await event.save();
     }),
   getEvent: publicProcedure.input(z.string()).query(async (opts) => {
-    console.log(opts);
     const event = await EventModel.findOne({ _id: opts.input }).exec();
     return event;
   }),
