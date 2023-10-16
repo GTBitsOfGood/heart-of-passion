@@ -1,4 +1,4 @@
-import { radioAnatomy } from '@chakra-ui/anatomy';
+import { radioAnatomy } from "@chakra-ui/anatomy";
 import { createMultiStyleConfigHelpers } from "@chakra-ui/react";
 
 const { definePartsStyle, defineMultiStyleConfig } =

@@ -14,6 +14,6 @@ const ChapterSchema = new Schema<IChapter>({
   },
 });
 
-export const Model =
+export const ChapterModel =
   (mongoose.models.Chapter as mongoose.Model<IChapter>) ??
   mongoose.model("Chapter", ChapterSchema);

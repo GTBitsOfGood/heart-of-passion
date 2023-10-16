@@ -5,5 +5,5 @@ const colors = {
   hop_blue: {
     500: "#26ACE2",
   },
-}
+};
 export default colors;
