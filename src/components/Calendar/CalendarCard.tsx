@@ -26,7 +26,7 @@ export default function CalendarCard({
   const height = computeHeight(date.from, date.to);
   const top = computeHeight("12:00 am", date.from);
   const parentRef: any = useRef();
-  const [cardHt, setCardHeight] = useState(-1); // debugging only, can remove
+  // const [cardHt, setCardHeight] = useState(-1); // debugging only, can remove
   const [variant, setVariant] = useState(3);
   useEffect(() => {
     if (parentRef.current) {
@@ -37,28 +37,22 @@ export default function CalendarCard({
         }
         if (htPx < 46.5) {
           return -1;
-        }
-        else if (htPx < 66.5) {
+        } else if (htPx < 66.5) {
           return 0;
-        }
-        else if (htPx < 70) {
+        } else if (htPx < 70) {
           return 0.5;
-        }
-        else if (htPx < 85) {
+        } else if (htPx < 85) {
           return 0.75;
-        }
-        else if (htPx < 98) {
+        } else if (htPx < 98) {
           return 1;
-        }
-        else if (htPx < 126) {
+        } else if (htPx < 126) {
           return 2;
-        }
-        else {
+        } else {
           return 3;
         }
       })();
       setVariant(findVariant);
-      setCardHeight(htPx);
+      // setCardHeight(htPx);
     }
   }, [parentRef]);
 
@@ -70,13 +64,11 @@ export default function CalendarCard({
         justify={variant > 2 ? "space-between" : "flex-start"}
       >
         <Box>
-          <Text color={"#C32127"}>
-            {date.from} + {cardHt}
-          </Text>
+          <Text color={"#C32127"}>{date.from}</Text>
           <Text color={"#C32127"} fontWeight={700}>
             {event?.name}
           </Text>
-          {variant > 0 && (<Text color={"#C32127"}>{event?.location}</Text>)}
+          {variant > 0 && <Text color={"#C32127"}>{event?.location}</Text>}
         </Box>
         {variant > 1 && (
           <Text fontWeight={700} color={"#C32127"}>
@@ -88,7 +80,12 @@ export default function CalendarCard({
   }
   function NegativeVariant() {
     return (
-      <Flex direction="column" justify="center" h={variant < -1 ? "20px" : "100%"} overflow="visible">
+      <Flex
+        direction="column"
+        justify="center"
+        h={variant < -1 ? "20px" : "100%"}
+        overflow="visible"
+      >
         <Text
           width="158px"
           overflow="hidden"
@@ -105,14 +102,12 @@ export default function CalendarCard({
   function EnergyText() {
     if (variant >= 0) {
       if (event?.energyLevel === "medium" && variant < 1) {
-        return "MED"
+        return "MED";
+      } else {
+        return event?.energyLevel?.toUpperCase();
       }
-      else {
-        return event?.energyLevel?.toUpperCase()
-      }
-    }
-    else {
-      return event?.energyLevel?.[0]?.toUpperCase()
+    } else {
+      return event?.energyLevel?.[0]?.toUpperCase();
     }
   }
 
