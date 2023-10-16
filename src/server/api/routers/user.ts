@@ -7,13 +7,16 @@ import { ChapterModel } from "~/server/models/Chapter";
 import { Chapter, User, userSchema } from "~/common/types";
 export const userRouter = createTRPCRouter({
   createUser: publicProcedure.input(userSchema).mutation(async ({ input }) => {
-    let chapter = (await ChapterModel.findOne({
-      name: input.chapter,
-    }).exec())!;
+    let chapter;
+    if (input.chapter) {
+      chapter = (await ChapterModel.findOne({
+        name: input.chapter,
+      }).exec())!;
+    }
 
     const user = new UserModel({
       name: input.name,
-      chapter: chapter.id,
+      chapter: chapter ? chapter.id : null,
       email: input.email,
       role: input.role,
     });
@@ -58,7 +61,6 @@ export const userRouter = createTRPCRouter({
     const users = await UserModel.find()
       .populate<{ chapter: Chapter }>("chapter")
       .exec();
-
     return users.map(processUser);
   }),
 });
@@ -68,6 +70,6 @@ function processUser(user: any): User {
     name: user.name,
     email: user.email,
     role: user.role,
-    chapter: user.chapter.name,
+    chapter: user.chapter ? user.chapter.name : null,
   };
 }

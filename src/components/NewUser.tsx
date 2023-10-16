@@ -15,9 +15,9 @@ import {
   ModalOverlay,
   VStack,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
-import { User, Role, userSchema, roleSchema } from "~/common/types";
+import { User, Role, userSchema, roleSchema, Chapter } from "~/common/types";
 import { trpc } from "~/utils/api";
 
 type NewUserProps = {
@@ -58,6 +58,17 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
       trpcUtils.user.invalidate();
     },
   });
+
+  useEffect(() => {
+    if (
+      chapter === "" &&
+      role !== "admin" &&
+      chapters.data &&
+      chapters.data.length > 0
+    ) {
+      setChapter(chapters.data[0]!.name);
+    }
+  }, [chapter, chapters, role]);
 
   const onCloseModal = () => {
     setRole("student");
@@ -101,6 +112,9 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
   };
 
   const handleRoleChange = (role: string) => {
+    if (role === "admin") {
+      setChapter("");
+    }
     setRole(roleSchema.parse(role));
   };
   const handleChapterChange = (chapter: string) => {
@@ -215,7 +229,7 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
                   Chapter
                 </FormLabel>
                 <RadioDropdown
-                  options={chapters.data?.map((ch) => ch.name) ?? []}
+                  options={chapters.data?.map((ch: Chapter) => ch.name) ?? []}
                   selectedOption={chapter}
                   setSelectedOption={handleChapterChange}
                   isDisabled={role === "admin"}
