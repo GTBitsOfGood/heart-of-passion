@@ -1,4 +1,12 @@
-import { Box, Flex, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Text,
+  Grid,
+  HStack,
+  StackDivider,
+  GridItem,
+} from "@chakra-ui/react";
 import CalendarCard from "src/components/Calendar/CalendarCard";
 
 import "@fontsource/oswald/700.css";
