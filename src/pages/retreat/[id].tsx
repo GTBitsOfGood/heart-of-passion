@@ -13,7 +13,7 @@ import "@fontsource/oswald/700.css";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { trpc } from "~/utils/api";
-import { generateDateObject } from "./helper";
+import { DateObject } from "~/common/types";
 
 // const sampleData: Event[] = [
 //   {
@@ -187,8 +187,19 @@ export default function Calendar() {
                     <Box marginRight={"34px"}>
                       {event.map((einfo: any) => {
                         return einfo.dates.map((date: any) => {
-                          const [dayDifference, dateObject] =
-                            generateDateObject(date, num);
+                          const day1 = new Date();
+                          day1.setHours(0, 0, 0, 0);
+                          day1.setDate(new Date().getDate() + num);
+                          const day2 = new Date(date.date);
+
+                          const dayDifference =
+                            day1.getDate() - day2.getDate() - 1;
+
+                          const dateObject: DateObject = {
+                            day: dayDifference,
+                            from: date.from,
+                            to: date.to,
+                          };
 
                           return dayDifference === 0 ? (
                             <CalendarCard
