@@ -24,7 +24,7 @@ export default function CalendarCard({
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const height = computeHeight(date.from, date.to);
-  const top = computeHeight("12:00 am", date.from);
+  const top = computeHeight("9:00 am", date.from);
   const parentRef: any = useRef();
   // const [cardHt, setCardHeight] = useState(-1); // debugging only, can remove
   const [variant, setVariant] = useState(3);
