@@ -22,8 +22,8 @@ const sampleData: Event[] = [
     dates: [
       {
         day: 1,
-        from: "12:00 am",
-        to: "12:10 am",
+        from: "2:00 pm",
+        to: "2:30 pm",
       },
     ],
     expenses: [
@@ -44,8 +44,8 @@ const sampleData: Event[] = [
     dates: [
       {
         day: 1,
-        from: "2:00 am",
-        to: "3:00 am", // Longer duration
+        from: "10:00 am",
+        to: "10:30 am", // Longer duration
       },
     ],
     expenses: [
@@ -90,7 +90,7 @@ const sampleData: Event[] = [
       {
         day: 4,
         from: "4:30 pm",
-        to: "7:30 pm", // Longer duration
+        to: "6:30 pm", // Longer duration
       },
     ],
     expenses: [
