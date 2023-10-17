@@ -242,27 +242,26 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
 
         <ModalFooter pr="14px" pb="30px" pt="0px">
           <Button
-            colorScheme="twitter"
-            bg="hop_blue.500"
-            mr="30px"
-            onClick={handleSave}
-            borderRadius="none"
-            fontFamily="heading"
-            fontSize="20px"
-            fontWeight="400"
-          >
-            APPLY
-          </Button>
-          <Button
-            fontFamily="heading"
             fontSize="20px"
             fontWeight="400"
             colorScheme="red"
             color="hop_red.500"
             variant="outline"
-            borderRadius="none"
+            mr="15px"
+            fontFamily="oswald"
           >
             DELETE
+          </Button>
+          <Button
+            colorScheme="twitter"
+            bg="hop_blue.500"
+            onClick={handleSave}
+            fontSize="20px"
+            fontWeight="400"
+            fontFamily="oswald"
+            mr="15px"
+          >
+            APPLY
           </Button>
         </ModalFooter>
       </ModalContent>
