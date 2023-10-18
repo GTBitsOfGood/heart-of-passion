@@ -1,7 +1,7 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { type AppType } from "next/app";
 
-import { api } from "~/utils/api";
+import { trpc } from "~/utils/api";
 import { theme } from "../theme";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
@@ -12,4 +12,4 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   );
 };
 
-export default api.withTRPC(MyApp);
+export default trpc.withTRPC(MyApp);

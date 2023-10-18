@@ -3,6 +3,7 @@ import React from "react";
 import { NewChapterModal } from "~/components/NewChapterModal";
 import { NewEventModal } from "~/components/NewEventModal";
 import { NewUserModal } from "~/components/NewUserModal";
+import Sidebar from "~/components/Sidebar";
 
 export default function DummyPage() {
   const {
@@ -22,14 +23,25 @@ export default function DummyPage() {
   } = useDisclosure();
 
   const finalRef = React.useRef(null);
+
+  let dummyChapter = {
+    name: "Atlanta",
+    totalCost: 5100,
+    fundExpected: 5180,
+    fundActual: 2600,
+  };
+
+  let dummyYear = 2023;
+
   return (
     <>
+      <Sidebar chapter={dummyChapter} year={dummyYear} />
       <Stack
         direction="row"
         spacing={4}
         align={"center"}
         justify={"center"}
-        marginTop="10px"
+        paddingTop="10px"
       >
         <Button
           colorScheme="twitter"

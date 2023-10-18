@@ -15,7 +15,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { Chapter } from "~/common/types/types";
+import { trpc } from "~/utils/api";
 
 type NewChapterProps = {
   focusRef: React.MutableRefObject<null>;
@@ -25,8 +25,14 @@ type NewChapterProps = {
 
 export const NewChapterModal = ({ focusRef, isOpen, onClose }: NewChapterProps) => {
   const [chapter, setChapter] = useState("");
-
   const [chapterError, setChapterError] = useState(false);
+
+  const trpcUtils = trpc.useContext();
+  const createChapter = trpc.chapter.createChapter.useMutation({
+    onSuccess: () => {
+      trpcUtils.chapter.invalidate();
+    },
+  });
 
   const onCloseModal = () => {
     setChapter("");
@@ -37,13 +43,13 @@ export const NewChapterModal = ({ focusRef, isOpen, onClose }: NewChapterProps) 
   const handleChapterChange = (event: React.FormEvent<HTMLInputElement>) =>
     setChapter(event.currentTarget.value);
 
-  const handleSave = () => {
+  // Create the new chapter in the backend and update the frontend afterwards
+  const handleSave = async () => {
     if (!validateFields()) {
       return false;
     }
+    await createChapter.mutate(chapter);
     onCloseModal();
-    const chapterObj: Chapter = {name: chapter}
-    console.log(chapterObj);
     return true;
   };
 

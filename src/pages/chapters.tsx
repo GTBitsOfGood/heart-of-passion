@@ -6,32 +6,26 @@ import {
   Image,
   Box,
   IconButton,
+  useDisclosure,
 } from "@chakra-ui/react";
-import ChapterCard from "~/components/ChapterCard";
+import ChapterCard from "~/components/chapters/ChapterCard";
 import { IoMdSettings } from "react-icons/io";
 import "@fontsource/oswald/600.css";
+import { NewChapter } from "~/components/NewChapter";
+import { useRef } from "react";
+import { trpc } from "~/utils/api";
+import { Chapter } from "~/common/types";
 
 export default function Home() {
-  const placeholderData = [
-    {
-      name: "Atlanta 2023",
-      totalCost: 1234,
-      fundExpected: 5678,
-      fundActual: 3456,
-    },
-    {
-      name: "Charlotte 2023",
-      totalCost: 45678,
-      fundExpected: 200,
-      fundActual: 0,
-    },
-    {
-      name: "New Orleans 2023",
-      totalCost: 45678,
-      fundExpected: 200,
-      fundActual: 0,
-    },
-  ];
+  const {
+    isOpen: isOpenAddChapterModal,
+    onOpen: onOpenAddChapterModal,
+    onClose: onCloseAddChapterModal,
+  } = useDisclosure();
+  const finalRef = useRef(null);
+
+  // Get all the chapters from the backend and populate the frontend afterwards
+  let chapters = trpc.chapter.getChapters.useQuery();
 
   return (
     <Box m="2%">
@@ -49,10 +43,15 @@ export default function Home() {
             fontFamily="oswald"
             height="50px"
             fontSize="20px"
-            onClick={() => {}}
+            onClick={onOpenAddChapterModal}
           >
             ADD CHAPTER
           </Button>
+          <NewChapter
+            focusRef={finalRef}
+            isOpen={isOpenAddChapterModal}
+            onClose={onCloseAddChapterModal}
+          />
         </GridItem>
         <GridItem alignSelf="flex-end">
           <IconButton
@@ -66,14 +65,9 @@ export default function Home() {
       </Grid>
 
       <Grid templateColumns="repeat(3, 1fr)" gap={6} ml="10%" mr="10%">
-        {placeholderData.map((chapter) => (
-          <GridItem>
-            <ChapterCard
-              name={chapter.name.toUpperCase()}
-              totalCost={chapter.totalCost}
-              fundExpected={chapter.fundExpected}
-              fundActual={chapter.fundActual}
-            />
+        {chapters.data?.map((chapter: Chapter) => (
+          <GridItem key={chapter.name}>
+            <ChapterCard chapter={chapter} />
           </GridItem>
         ))}
       </Grid>

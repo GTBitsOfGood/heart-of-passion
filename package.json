@@ -6,7 +6,9 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "prettier-format": "prettier --config prettier.config.mjs \"src/**/*.{ts,tsx}\" --write",
+    "generate-dummy-data": "tsx scripts/generate-dummy-data.ts"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
@@ -14,9 +16,9 @@
     "@chakra-ui/react": "^2.8.0",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@ramonak/react-progress-bar": "^5.0.3",
     "@fontsource/nunito": "^5.0.8",
     "@fontsource/oswald": "^5.0.12",
+    "@ramonak/react-progress-bar": "^5.0.3",
     "@t3-oss/env-nextjs": "^0.6.0",
     "@tanstack/react-query": "^4.29.25",
     "@trpc/client": "^10.34.0",
@@ -25,10 +27,11 @@
     "@trpc/server": "^10.34.0",
     "framer-motion": "^10.16.3",
     "mongoose": "^7.5.0",
-    "next": "^13.4.13",
+    "next": "13.4.x",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.11.0",
+    "react-select": "^5.7.5",
     "superjson": "^1.13.1",
     "zod": "^3.22.2"
   },
@@ -40,12 +43,14 @@
     "@typescript-eslint/eslint-plugin": "^6.3.0",
     "@typescript-eslint/parser": "^6.3.0",
     "autoprefixer": "^10.4.14",
+    "dotenv": "^16.3.1",
     "eslint": "^8.47.0",
     "eslint-config-next": "^13.4.13",
     "postcss": "^8.4.27",
     "prettier": "^3.0.0",
     "prettier-plugin-tailwindcss": "^0.5.1",
     "tailwindcss": "^3.3.3",
+    "tsx": "^3.13.0",
     "typescript": "^5.1.6"
   }
 }
