@@ -26,7 +26,7 @@ type NewUserProps = {
   onClose: () => void;
 };
 
-export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
+export const NewUserModal = ({ focusRef, isOpen, onClose }: NewUserProps) => {
   const permissionOptions = ["Student", "Mentor", "Admin"];
   const [selectedPermission, setSelectedPermission] = useState(
     permissionOptions[0],
@@ -125,7 +125,7 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
         borderRadius="none"
         boxShadow={"0px 4px 29px 0px #00000040"}
       >
-        <ModalHeader />
+        <ModalHeader/>
         <ModalCloseButton
           borderRadius="50%"
           outline="solid"

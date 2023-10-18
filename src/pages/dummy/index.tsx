@@ -1,7 +1,8 @@
 import { Button, Stack, useDisclosure } from "@chakra-ui/react";
 import React from "react";
-import { NewChapter } from "~/components/NewChapter";
-import { NewUser } from "~/components/NewUser";
+import { NewChapterModal } from "~/components/NewChapterModal";
+import { NewEventModal } from "~/components/NewEventModal";
+import { NewUserModal } from "~/components/NewUserModal";
 
 export default function DummyPage() {
   const {
@@ -13,6 +14,11 @@ export default function DummyPage() {
     isOpen: isOpenAddChapterModal,
     onOpen: onOpenAddChapterModal,
     onClose: onCloseAddChapterModal,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenAddEventModal,
+    onOpen: onOpenAddEventModal,
+    onClose: onCloseAddEventModal,
   } = useDisclosure();
 
   const finalRef = React.useRef(null);
@@ -36,7 +42,7 @@ export default function DummyPage() {
         >
           ADD USER
         </Button>
-        <NewUser
+        <NewUserModal
           focusRef={finalRef}
           isOpen={isOpenAddUserModal}
           onClose={onCloseAddUserModal}
@@ -53,10 +59,26 @@ export default function DummyPage() {
         >
           ADD CHAPTER
         </Button>
-        <NewChapter
+        <NewChapterModal
           focusRef={finalRef}
           isOpen={isOpenAddChapterModal}
           onClose={onCloseAddChapterModal}
+        />
+        <Button
+          colorScheme="twitter"
+          bg="hop_blue.500"
+          borderRadius="none"
+          onClick={onOpenAddEventModal}
+          fontFamily="heading"
+          fontWeight="400"
+          fontSize="24px"
+        >
+          ADD EVENT
+        </Button>
+        <NewEventModal
+          focusRef={finalRef}
+          isOpen={isOpenAddEventModal}
+          onClose={onCloseAddEventModal}
         />
       </Stack>
     </>
