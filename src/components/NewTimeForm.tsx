@@ -11,8 +11,8 @@ import {
   VStack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { DropdownIcon } from "~/common/icons/icons";
+import { useCallback, useEffect, useState } from "react";
+import { DropdownIcon } from "~/common/theme/icons";
 import { Time, Times } from "~/common/types/types";
 
 type NewTimeFormProps = {
@@ -22,7 +22,7 @@ type NewTimeFormProps = {
   onCloseError: () => void;
   onCloseSide: () => void;
   selectedTime: Time | undefined;
-  setSelectedTime: (t: Time | undefined)=>void;
+  setSelectedTime: (t: Time | undefined) => void;
 };
 
 export const NewTimeForm = ({
@@ -36,13 +36,16 @@ export const NewTimeForm = ({
 }: NewTimeFormProps) => {
   const timeList = ["9:00 am", "9:30 am", "10:00 am", "10:30 am", "11:00 am"];
   const [day, setDay] = useState(selectedTime?.day ?? "Day 1");
-  const editing = selectedTime!==undefined;
+  const editing = selectedTime !== undefined;
 
-  const getTimeIndex = (s: string, d: number) => {
-    const ind = timeList.findIndex((e) => e === s);
-    // console.log(ind);
-    return ind === -1 ? d : ind;
-  };
+  const getTimeIndex = useCallback(
+    (s: string, d: number) => {
+      const ind = timeList.findIndex((e) => e === s);
+      // console.log(ind);
+      return ind === -1 ? d : ind;
+    },
+    [timeList],
+  );
 
   const [startTime, setStartTime] = useState(
     getTimeIndex(selectedTime?.start ?? "-1", 0),
@@ -56,7 +59,7 @@ export const NewTimeForm = ({
     setDay(selectedTime?.day ?? "Day 1");
     setStartTime(getTimeIndex(selectedTime?.start ?? "-1", 0));
     setEndTime(getTimeIndex(selectedTime?.end ?? "-1", 2));
-  }, [selectedTime]);
+  }, [selectedTime, getTimeIndex]);
 
   const handleApply = () => {
     if (!validateFields()) {
@@ -73,16 +76,25 @@ export const NewTimeForm = ({
     };
     setTimes((prevTimes) => {
       const updatedTimes = { ...prevTimes };
-      if(editing) {
-        updatedTimes[selectedTime.day] = (updatedTimes[selectedTime.day] ?? []).filter(time => {
-          return time.start !== selectedTime.start || time.end !== selectedTime.end;
+      if (editing) {
+        updatedTimes[selectedTime.day] = (
+          updatedTimes[selectedTime.day] ?? []
+        ).filter((time) => {
+          return (
+            time.start !== selectedTime.start || time.end !== selectedTime.end
+          );
         });
-        updatedTimes[newTime.day] = [...(updatedTimes[newTime.day] ?? []), newTime];
+        updatedTimes[newTime.day] = [
+          ...(updatedTimes[newTime.day] ?? []),
+          newTime,
+        ];
       } else {
-        updatedTimes[newTime.day] = [...(prevTimes[newTime.day] ?? []), newTime];
+        updatedTimes[newTime.day] = [
+          ...(prevTimes[newTime.day] ?? []),
+          newTime,
+        ];
       }
-      return updatedTimes
-      
+      return updatedTimes;
     });
     setSelectedTime(undefined);
     // console.log(times);
@@ -175,7 +187,9 @@ export const NewTimeForm = ({
             >
               {timeList.map((time, i) => {
                 return (
-                  <MenuItem onClick={() => setStartTime(i)}>{time}</MenuItem>
+                  <MenuItem key={i} onClick={() => setStartTime(i)}>
+                    {time}
+                  </MenuItem>
                 );
               })}
             </MenuList>
@@ -218,6 +232,7 @@ export const NewTimeForm = ({
               {timeList.map((time, i) => {
                 return (
                   <MenuItem
+                    key={i}
                     onClick={() => {
                       setEndTime(i);
                       setEndTimeError(false);

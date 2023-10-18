@@ -16,7 +16,7 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { ChangeEvent, useEffect, useState } from "react";
-import { DropdownIcon } from "~/common/icons/icons";
+import { DropdownIcon } from "~/common/theme/icons";
 import { Expense, Time, Times } from "~/common/types/types";
 
 type NewExpenseFormProps = {

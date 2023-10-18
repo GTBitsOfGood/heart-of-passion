@@ -24,7 +24,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { DownArrowIcon, DropdownIcon } from "~/common/icons/icons";
+import { DropdownIcon } from "~/common/theme/icons";
 import { NewTimeForm } from "./NewTimeForm";
 import { FloatingAlert } from "./FloatingAlert";
 import { Expense, Time, Times } from "~/common/types/types";
@@ -331,6 +331,7 @@ export const NewEventModal = ({ focusRef, isOpen, onClose }: NewEventProps) => {
                             setIsExpenseFormOpen(false);
                             setIsTimeFormOpen(true);
                           }}
+                          key={i}
                         >
                           <HStack
                             width="372px"
@@ -397,7 +398,7 @@ export const NewEventModal = ({ focusRef, isOpen, onClose }: NewEventProps) => {
                   // height="148px"
                   maxHeight="148px"
                 >
-                  {expenses.map((e) => {
+                  {expenses.map((e, i) => {
                     const isSelected = e === selectedExpense;
                     return (
                       <button
@@ -407,6 +408,7 @@ export const NewEventModal = ({ focusRef, isOpen, onClose }: NewEventProps) => {
                           setIsTimeFormOpen(false);
                           setIsExpenseFormOpen(true);
                         }}
+                        key={i}
                       >
                         <HStack
                           width="372px"

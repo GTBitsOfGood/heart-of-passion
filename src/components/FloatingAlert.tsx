@@ -10,7 +10,7 @@ import {
   CloseButton,
   Button,
 } from "@chakra-ui/react";
-import { WarningIcon, XIcon } from "~/common/icons/icons";
+import { WarningIcon, XIcon } from "~/common/theme/icons";
 
 type FloatingAlertProps = {
   onClose: () => void;
