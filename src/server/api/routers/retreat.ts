@@ -35,4 +35,8 @@ export const retreatRouter = createTRPCRouter({
       .exec();
     return retreats.map((e) => e.year).sort();
   }),
+  getRetreats: publicProcedure.input(z.string()).query(async (opts) => {
+    const retreats = await RetreatModel.find({ chapterId: opts.input }).exec();
+    return retreats;
+  }),
 });
