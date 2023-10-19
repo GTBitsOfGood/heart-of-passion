@@ -39,7 +39,7 @@ export default function Home() {
         <GridItem alignSelf="flex-end">
           <Button
             color="white"
-            bgColor="#54A9DD"
+            bg="hop_blue.500"
             fontFamily="oswald"
             height="50px"
             fontSize="20px"
