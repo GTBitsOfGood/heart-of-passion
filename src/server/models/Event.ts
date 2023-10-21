@@ -20,7 +20,7 @@ export interface IEvent {
   expenses: [IExpense];
 }
 
-const EventSchema = new Schema<IEvent>({
+export const EventSchema = new Schema<IEvent>({
   retreatId: {
     ref: "Retreat",
     type: Schema.Types.ObjectId,
