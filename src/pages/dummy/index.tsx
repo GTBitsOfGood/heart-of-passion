@@ -1,7 +1,8 @@
 import { Button, Stack, useDisclosure } from "@chakra-ui/react";
 import React from "react";
-import { NewChapter } from "~/components/NewChapter";
-import { NewUser } from "~/components/NewUser";
+import { NewChapterModal } from "~/components/NewChapterModal";
+import { NewEventModal } from "~/components/NewEventModal";
+import { NewUserModal } from "~/components/NewUserModal";
 import Sidebar from "~/components/Sidebar";
 
 export default function DummyPage() {
@@ -14,6 +15,11 @@ export default function DummyPage() {
     isOpen: isOpenAddChapterModal,
     onOpen: onOpenAddChapterModal,
     onClose: onCloseAddChapterModal,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenAddEventModal,
+    onOpen: onOpenAddEventModal,
+    onClose: onCloseAddEventModal,
   } = useDisclosure();
 
   const finalRef = React.useRef(null);
@@ -39,16 +45,17 @@ export default function DummyPage() {
       >
         <Button
           colorScheme="twitter"
-          bg="hop_blue.500"
-          borderRadius="none"
           onClick={onOpenAddUserModal}
-          fontFamily="heading"
           fontWeight="400"
-          fontSize="24px"
+          color="white"
+          bg="hop_blue.500"
+          fontFamily="oswald"
+          height="50px"
+          fontSize="20px"
         >
           ADD USER
         </Button>
-        <NewUser
+        <NewUserModal
           focusRef={finalRef}
           isOpen={isOpenAddUserModal}
           onClose={onCloseAddUserModal}
@@ -56,19 +63,36 @@ export default function DummyPage() {
 
         <Button
           colorScheme="twitter"
+          onClick={onOpenAddChapterModal}
+          fontWeight="400"
+          color="white"
+          bg="hop_blue.500"
+          fontFamily="oswald"
+          height="50px"
+          fontSize="20px"
+        >
+          ADD CHAPTER
+        </Button>
+        <NewChapterModal
+          focusRef={finalRef}
+          isOpen={isOpenAddChapterModal}
+          onClose={onCloseAddChapterModal}
+        />
+        <Button
+          colorScheme="twitter"
           bg="hop_blue.500"
           borderRadius="none"
-          onClick={onOpenAddChapterModal}
+          onClick={onOpenAddEventModal}
           fontFamily="heading"
           fontWeight="400"
           fontSize="24px"
         >
-          ADD CHAPTER
+          ADD EVENT
         </Button>
-        <NewChapter
+        <NewEventModal
           focusRef={finalRef}
-          isOpen={isOpenAddChapterModal}
-          onClose={onCloseAddChapterModal}
+          isOpen={isOpenAddEventModal}
+          onClose={onCloseAddEventModal}
         />
       </Stack>
     </>

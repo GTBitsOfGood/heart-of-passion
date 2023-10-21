@@ -16,6 +16,19 @@ This repository aims to support teen volunteers in their retreat planning and bu
 - `npm run generate-dummy-data`
 - `npm run dev`
 
+## Run With Docker
+
+1. Install [Docker](https://docs.docker.com/engine/install/)
+2. Start the application with Docker Compose: `docker compose up`
+
+If you make any changes to the packages, you may need to rebuild the images. To do this, append `--build` to the above docker compose up command.
+
+The Dockerized application will have live-reloading of changes made on the host machine.
+
+Note: On linux-based operating systems, if you come across an entrypoint permission error (i.e. `process: exec: "./entrypoint.sh": permission denied: unknown`), run `chmod +x ./entrypoint.sh` to make the shell file an executable.
+
+Windows Users: If you come across this error `exec ./entrypoint.sh: no such file or directory` when running the docker compose command, please follow this [Stackoverflow thread](https://stackoverflow.com/questions/40452508/docker-error-on-an-entrypoint-script-no-such-file-or-directory) to fix it.
+
 ## Major Technologies
 
 - [MongoDB](https://www.mongodb.com/)

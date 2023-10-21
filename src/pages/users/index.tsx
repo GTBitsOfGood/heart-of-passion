@@ -18,7 +18,7 @@ import UserList from "~/components/users/UserList";
 import { User } from "~/common/types";
 import logo from "public/hoplogo.png";
 import fonts from "src/common/theme/fonts";
-import { NewUser } from "~/components/NewUser";
+import { NewUserModal } from "~/components/NewUserModal";
 import { trpc } from "~/utils/api";
 
 export default function Users() {
@@ -46,48 +46,35 @@ export default function Users() {
   // Get user data from the backend and populate the frontend afterwards
   const userData = trpc.user.getUsers.useQuery().data;
   const [users, setUsers] = useState([] as User[]);
+  let adminRendered;
 
   // Wait for the data to get fetched and then update users list
   useEffect(() => {
     setUsers(userData as User[]);
   }, [userData]);
 
-  function updateUsers(user: User) {
-    const newUsers = [...users, user];
-    setUsers(newUsers);
-  }
-
   // uses value of filter variable to group users by a text property in their class
   const groups = (function () {
     let uniques;
     if (users && users.length > 0) {
-      if (filter == "chapter") {
-        uniques = [...new Set(users?.map((u: any) => u[filter]["name"]))];
-      } else {
-        uniques = [...new Set(users?.map((u: any) => u[filter]))]; // array of unique vals}
-      }
+      uniques = [
+        ...new Set(users?.map((u: any) => (u[filter] ? u[filter] : "admin"))),
+      ]; // array of unique vals}
       // group users by groupBy name into dictionary
       const umap = new Map(uniques.map((u: any) => [u, new Array()])); // map of val to empty array
-      if (filter === "chapter") {
-        users?.forEach(
-          (u: any) =>
-            umap.get(u[filter]["name"])?.push({
-              email: u["email"],
-              name: u["name"],
-              role: u["role"],
-              chapter: u["chapter"]["name"],
-            }),
-        );
-      } else {
-        users?.forEach(
-          (u: any) =>
-            umap.get(u[filter])?.push({
-              email: u["email"],
-              name: u["name"],
-              role: u["role"],
-              chapter: u["chapter"]["name"],
-            }),
-        );
+      users?.forEach(
+        (u: any) =>
+          umap.get(u[filter] ? u[filter] : "admin")?.push({
+            email: u["email"],
+            name: u["name"],
+            role: u["role"],
+            chapter: u["chapter"],
+          }),
+      );
+      let index = uniques.indexOf("admin");
+      if (index !== -1) {
+        adminRendered = umap.get("admin");
+        uniques.splice(index, 1);
       }
       return uniques.map((u: string) => ({ title: u, users: umap.get(u) }));
     } else {
@@ -175,7 +162,7 @@ export default function Users() {
                 ADD USER
               </Text>
             </Button>
-            <NewUser
+            <NewUserModal
               focusRef={finalRef}
               isOpen={isOpenAddUserModal}
               onClose={onCloseAddUserModal}
@@ -189,6 +176,11 @@ export default function Users() {
           />
         </Flex>
         {groupsRendered}
+        {adminRendered ? (
+          <UserList key={"admin"} title={"admin"} users={...adminRendered} />
+        ) : (
+          <></>
+        )}
       </Stack>
     </>
   );
