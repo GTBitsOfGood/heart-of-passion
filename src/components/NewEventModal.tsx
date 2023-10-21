@@ -29,6 +29,7 @@ import { NewTimeForm } from "./NewTimeForm";
 import { FloatingAlert } from "./FloatingAlert";
 import { Expense, Time, Times } from "~/common/types/types";
 import { NewExpenseForm } from "./NewExpenseForm";
+import { NewExpenseModal } from "./NewExpenseModal";
 
 type NewEventProps = {
   focusRef: React.MutableRefObject<null>;
@@ -58,6 +59,8 @@ export const NewEventModal = ({ focusRef, isOpen, onClose }: NewEventProps) => {
   const [selectedExpense, setSelectedExpense] = useState<Expense>();
 
   const [energyError, setEnergyError] = useState(false);
+
+  const useModal = false;
 
   const {
     isOpen: isError,
@@ -495,7 +498,7 @@ export const NewEventModal = ({ focusRef, isOpen, onClose }: NewEventProps) => {
                   setSelectedTime={(t: Time | undefined) => setSelectedTime(t)}
                 ></NewTimeForm>
               )}
-              {isExpenseFormOpen && (
+              {isExpenseFormOpen && !useModal && (
                 <NewExpenseForm
                   expenses={expenses}
                   setExpenses={(e: Expense[]) => setExpenses(e)}
@@ -506,13 +509,21 @@ export const NewEventModal = ({ focusRef, isOpen, onClose }: NewEventProps) => {
                   setSelectedExpense={(e: Expense | undefined) =>
                     setSelectedExpense(e)
                   }
-                ></NewExpenseForm>
+                />
               )}
             </ModalBody>
           )}
         </HStack>
         {isError && <FloatingAlert onClose={onCloseError} />}
       </ModalContent>
+      {useModal && <NewExpenseModal
+        focusRef={focusRef}
+        isOpen={isExpenseFormOpen}
+        onClose={onCloseExpenseForm}
+        expenses={expenses}
+        setExpenses={(e: Expense[]) => setExpenses(e)}
+        thisExpense={selectedExpense}
+      />}
     </Modal>
   );
 };
