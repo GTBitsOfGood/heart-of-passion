@@ -4,6 +4,10 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 import { ChapterModel, IChapter } from "~/server/models/Chapter";
 import { Chapter } from "~/common/types";
+import { EventModel, IEvent, IExpense } from "~/server/models/Event";
+import { RetreatModel, IRetreat } from "~/server/models/Retreat";
+import { exec } from "child_process";
+
 
 export const chapterRouter = createTRPCRouter({
   createChapter: publicProcedure
@@ -27,15 +31,30 @@ export const chapterRouter = createTRPCRouter({
 
   getChapters: publicProcedure.query(async (opts): Promise<Chapter[]> => {
     const chapters = (await ChapterModel.find().exec())!;
-    return chapters.map(processChapter);
+    return await Promise.all(chapters.map(processChapter));
   }),
 });
 
 // TODO: We need to calculate this information based on expenses
-function processChapter(chapterModel: IChapter): Chapter {
+async function processChapter(chapterModel: IChapter): Promise<Chapter> {
+  let retreat: IRetreat | null = (await RetreatModel.findOne({ chapterId: chapterModel._id }).sort("-year").exec())!
+  let cost = 0
+  if (retreat) {
+    const events = (await EventModel.find({ retreatId: retreat?.id }).exec())!
+    events?.forEach((event: IEvent) => {
+      let expenses: [IExpense] = event.expenses
+      expenses?.forEach((expense) => {
+        if (expense.costType == "flat cost") {
+          cost += expense.cost
+        } else {
+          cost += expense.cost * expense.numberOfUnits;
+        }
+      });
+    })
+  }
   return {
     name: chapterModel.name,
-    totalCost: 5000,
+    totalCost: cost,
     fundExpected: 5100,
     fundActual: 2600,
   };

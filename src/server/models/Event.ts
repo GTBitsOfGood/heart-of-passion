@@ -2,7 +2,14 @@ import mongoose, { mongo } from "mongoose";
 import { number } from "zod";
 
 const { Schema } = mongoose;
-
+export interface IExpense {
+  name: string;
+  cost: number;
+  type: "entertainment" | "transportation" | "other";
+  costType: "per unit" | "flat cost";
+  numberOfUnits: number;
+  notes: string;
+}
 export interface IEvent {
   retreatId: mongoose.Types.ObjectId;
   name: string;
@@ -46,6 +53,7 @@ const EventSchema = new Schema<IEvent>({
         },
         cost: {
           type: Number,
+          required: true,
         },
         type: {
           type: String,
