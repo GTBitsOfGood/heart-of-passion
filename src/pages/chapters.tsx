@@ -11,7 +11,7 @@ import {
 import ChapterCard from "~/components/chapters/ChapterCard";
 import { IoMdSettings } from "react-icons/io";
 import "@fontsource/oswald/600.css";
-import { NewChapter } from "~/components/NewChapter";
+import { NewChapterModal } from "~/components/NewChapterModal";
 import { useRef } from "react";
 import { trpc } from "~/utils/api";
 import { Chapter } from "~/common/types";
@@ -47,7 +47,7 @@ export default function Home() {
           >
             ADD CHAPTER
           </Button>
-          <NewChapter
+          <NewChapterModal
             focusRef={finalRef}
             isOpen={isOpenAddChapterModal}
             onClose={onCloseAddChapterModal}

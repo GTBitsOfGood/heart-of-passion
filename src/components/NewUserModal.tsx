@@ -39,7 +39,7 @@ enum UserError {
 
 const roleOptions = Object.values(roleSchema.enum);
 
-export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
+export const NewUserModal = ({ focusRef, isOpen, onClose }: NewUserProps) => {
   // Form Data
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -140,7 +140,7 @@ export const NewUser = ({ focusRef, isOpen, onClose }: NewUserProps) => {
         borderRadius="none"
         boxShadow={"0px 4px 29px 0px #00000040"}
       >
-        <ModalHeader />
+        <ModalHeader/>
         <ModalCloseButton
           borderRadius="50%"
           outline="solid"

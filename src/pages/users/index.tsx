@@ -18,7 +18,7 @@ import UserList from "~/components/users/UserList";
 import { User } from "~/common/types";
 import logo from "public/hoplogo.png";
 import fonts from "src/common/theme/fonts";
-import { NewUser } from "~/components/NewUser";
+import { NewUserModal } from "~/components/NewUserModal";
 import { trpc } from "~/utils/api";
 
 export default function Users() {
@@ -162,7 +162,7 @@ export default function Users() {
                 ADD USER
               </Text>
             </Button>
-            <NewUser
+            <NewUserModal
               focusRef={finalRef}
               isOpen={isOpenAddUserModal}
               onClose={onCloseAddUserModal}
