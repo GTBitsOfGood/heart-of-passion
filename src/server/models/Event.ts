@@ -2,15 +2,22 @@ import mongoose, { mongo } from "mongoose";
 import { number } from "zod";
 
 const { Schema } = mongoose;
-
+export interface IExpense {
+  name: string,
+  cost: number,
+  type: "entertainment" | "transportation" | "other",
+  costType: "per unit" | "flat cost",
+  numberOfUnits: number,
+  notes: string
+}
 export interface IEvent {
   retreatId: mongoose.Types.ObjectId;
   name: string;
   location: string; //optional
-  energyLevel: "low" | "medium" | "high"; //optoional
-  category: "entertainment" | "educational" | "other"; //optoional
+  energyLevel: "low" | "medium" | "high"; //optional
+  category: "entertainment" | "educational" | "other"; //optional
   dates: [Date];
-  expenses: [object];
+  expenses: [IExpense];
 }
 
 const EventSchema = new Schema<IEvent>({
@@ -46,6 +53,7 @@ const EventSchema = new Schema<IEvent>({
         },
         cost: {
           type: Number,
+          required: true
         },
         type: {
           type: String,
