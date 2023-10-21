@@ -23,7 +23,7 @@ type NewChapterProps = {
   onClose: () => void;
 };
 
-export const NewChapter = ({ focusRef, isOpen, onClose }: NewChapterProps) => {
+export const NewChapterModal = ({ focusRef, isOpen, onClose }: NewChapterProps) => {
   const [chapter, setChapter] = useState("");
   const [chapterError, setChapterError] = useState(false);
 
@@ -122,8 +122,7 @@ export const NewChapter = ({ focusRef, isOpen, onClose }: NewChapterProps) => {
             colorScheme="twitter"
             bg="hop_blue.500"
             onClick={handleSave}
-            borderRadius="none"
-            fontFamily="heading"
+            fontFamily="oswald"
             fontSize="20px"
             fontWeight="400"
           >

@@ -11,7 +11,7 @@ import {
 import ChapterCard from "~/components/chapters/ChapterCard";
 import { IoMdSettings } from "react-icons/io";
 import "@fontsource/oswald/600.css";
-import { NewChapter } from "~/components/NewChapter";
+import { NewChapterModal } from "~/components/NewChapterModal";
 import { useRef } from "react";
 import { trpc } from "~/utils/api";
 import { Chapter } from "~/common/types";
@@ -39,7 +39,7 @@ export default function Home() {
         <GridItem alignSelf="flex-end">
           <Button
             color="white"
-            bgColor="#54A9DD"
+            bg="hop_blue.500"
             fontFamily="oswald"
             height="50px"
             fontSize="20px"
@@ -47,7 +47,7 @@ export default function Home() {
           >
             ADD CHAPTER
           </Button>
-          <NewChapter
+          <NewChapterModal
             focusRef={finalRef}
             isOpen={isOpenAddChapterModal}
             onClose={onCloseAddChapterModal}

@@ -1,5 +1,5 @@
 const colors = {
-    blue: "blue",
-}
+  blue: "blue",
+};
 
-export default colors
+export default colors;

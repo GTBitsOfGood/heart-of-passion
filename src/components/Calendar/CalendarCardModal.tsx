@@ -28,7 +28,7 @@ function ButtonLabelRow({ labelText, buttonText }: any) {
 }
 
 type PropT = {
-  event: Event;
+  event?: Event;
   isOpen: boolean;
   onClose: any;
 };
@@ -57,12 +57,12 @@ export default function CalendarCardModal({ event, isOpen, onClose }: PropT) {
               <ButtonLabelRow buttonText="ADD TIME" labelText="Dates" />
               <TimesList />
               <ButtonLabelRow buttonText="ADD EXPENSE" labelText="Expenses" />
-              <ExpensesList expenses={event.expenses} />
+              <ExpensesList expenses={event?.expenses} />
             </Box>
             {showSide && (
               <Box flexBasis="300px">
                 {/*TODO: We should probably check the event has a date */}
-                <TimesEditor date={event.dates?.[0]!} />
+                <TimesEditor date={event?.dates?.[0]!} />
               </Box>
             )}
           </Flex>

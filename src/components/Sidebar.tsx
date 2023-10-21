@@ -94,7 +94,7 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
           border={"2px black solid"}
           borderRadius="none"
           backgroundColor={clicked == 1 ? "#54A9DD" : "#F9F9F9"}
-          width="100%"
+          width="98%"
           height="50px"
           justifyContent="left"
           fontFamily="nunito"
@@ -126,7 +126,7 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
               fontFamily="nunito"
               borderRadius="none"
               p="10px"
-              width="100%"
+              width="98%"
               justifyContent="left"
               backgroundColor={clicked == 2 ? "#54A9DD" : "#F9F9F9"}
               onClick={() => {
@@ -141,7 +141,7 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
               fontFamily="nunito"
               borderRadius="none"
               p="10px"
-              width="100%"
+              width="98%"
               justifyContent="left"
               backgroundColor={clicked == 3 ? "#54A9DD" : "#F9F9F9"}
               onClick={() => {
@@ -156,7 +156,7 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
           border={"2px black solid"}
           borderRadius="none"
           backgroundColor={clicked == 4 ? "#54A9DD" : "#F9F9F9"}
-          width="100%"
+          width="98%"
           height="50px"
           justifyContent="left"
           fontFamily="nunito"
@@ -188,7 +188,7 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
               fontFamily="nunito"
               borderRadius="none"
               p="10px"
-              width="100%"
+              width="98%"
               justifyContent="left"
               backgroundColor={clicked == 5 ? "#54A9DD" : "#F9F9F9"}
               onClick={() => {
@@ -203,7 +203,7 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
               fontFamily="nunito"
               borderRadius="none"
               p="10px"
-              width="100%"
+              width="98%"
               justifyContent="left"
               backgroundColor={clicked == 6 ? "#54A9DD" : "#F9F9F9"}
               onClick={() => {
@@ -218,7 +218,7 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
               fontFamily="nunito"
               borderRadius="none"
               p="10px"
-              width="100%"
+              width="98%"
               justifyContent="left"
               backgroundColor={clicked == 7 ? "#54A9DD" : "#F9F9F9"}
               onClick={() => {
@@ -233,7 +233,7 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
           fontFamily="nunito"
           borderRadius="none"
           p="10px"
-          width="100%"
+          width="98%"
           justifyContent="left"
           backgroundColor={clicked == 8 ? "#54A9DD" : "#F9F9F9"}
           onClick={() => {
@@ -246,7 +246,7 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
           fontFamily="nunito"
           borderRadius="none"
           p="10px"
-          width="100%"
+          width="98%"
           justifyContent="left"
           backgroundColor={clicked == 9 ? "#54A9DD" : "#F9F9F9"}
           onClick={() => {
