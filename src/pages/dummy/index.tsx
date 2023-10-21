@@ -45,12 +45,13 @@ export default function DummyPage() {
       >
         <Button
           colorScheme="twitter"
-          bg="hop_blue.500"
-          borderRadius="none"
           onClick={onOpenAddUserModal}
-          fontFamily="heading"
           fontWeight="400"
-          fontSize="24px"
+          color="white"
+          bg="hop_blue.500"
+          fontFamily="oswald"
+          height="50px"
+          fontSize="20px"
         >
           ADD USER
         </Button>
@@ -62,12 +63,13 @@ export default function DummyPage() {
 
         <Button
           colorScheme="twitter"
-          bg="hop_blue.500"
-          borderRadius="none"
           onClick={onOpenAddChapterModal}
-          fontFamily="heading"
           fontWeight="400"
-          fontSize="24px"
+          color="white"
+          bg="hop_blue.500"
+          fontFamily="oswald"
+          height="50px"
+          fontSize="20px"
         >
           ADD CHAPTER
         </Button>

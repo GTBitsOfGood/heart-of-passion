@@ -122,8 +122,7 @@ export const NewChapterModal = ({ focusRef, isOpen, onClose }: NewChapterProps) 
             colorScheme="twitter"
             bg="hop_blue.500"
             onClick={handleSave}
-            borderRadius="none"
-            fontFamily="heading"
+            fontFamily="oswald"
             fontSize="20px"
             fontWeight="400"
           >
