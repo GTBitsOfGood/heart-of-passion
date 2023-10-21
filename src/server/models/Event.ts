@@ -17,7 +17,7 @@ export interface IEvent {
   energyLevel: "low" | "medium" | "high"; //optoional
   category: "entertainment" | "educational" | "other"; //optoional
   dates: [mongoose.Schema.Types.Mixed];
-  expenses: [object];
+  expenses: [IExpense];
 }
 
 const EventSchema = new Schema<IEvent>({
