@@ -3,20 +3,20 @@ import { number } from "zod";
 
 const { Schema } = mongoose;
 export interface IExpense {
-  name: string,
-  cost: number,
-  type: "entertainment" | "transportation" | "other",
-  costType: "per unit" | "flat cost",
-  numberOfUnits: number,
-  notes: string
+  name: string;
+  cost: number;
+  type: "entertainment" | "transportation" | "other";
+  costType: "per unit" | "flat cost";
+  numberOfUnits: number;
+  notes: string;
 }
 export interface IEvent {
   retreatId: mongoose.Types.ObjectId;
   name: string;
   location: string; //optional
-  energyLevel: "low" | "medium" | "high"; //optional
-  category: "entertainment" | "educational" | "other"; //optional
-  dates: [Date];
+  energyLevel: "low" | "medium" | "high"; //optoional
+  category: "entertainment" | "educational" | "other"; //optoional
+  dates: [mongoose.Schema.Types.Mixed];
   expenses: [IExpense];
 }
 
@@ -41,7 +41,7 @@ const EventSchema = new Schema<IEvent>({
     enum: ["entertainment", "educational", "other"],
   },
   dates: {
-    type: [Date],
+    type: [Schema.Types.Mixed], // [{date: Date, from: time, to: time}]
     required: true,
   },
   expenses: {
@@ -53,7 +53,7 @@ const EventSchema = new Schema<IEvent>({
         },
         cost: {
           type: Number,
-          required: true
+          required: true,
         },
         type: {
           type: String,
