@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 export interface IRetreat {
-  year: Number;
+  id: string,
+  year: number;
   chapterId: mongoose.Types.ObjectId;
 }
 

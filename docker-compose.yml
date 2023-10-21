@@ -1,0 +1,28 @@
+services:
+  app:
+    build:
+      dockerfile: ./Dockerfile.dev
+    volumes:
+      - ./:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+    entrypoint: ./entrypoint.sh
+    environment:
+      DATABASE_URL: mongodb://mongo:27017/heartofpassion
+    networks:
+      - heart-of-passion-net
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    networks:
+      - heart-of-passion-net
+
+networks:
+  heart-of-passion-net:
+    driver: bridge
