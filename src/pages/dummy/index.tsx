@@ -59,6 +59,8 @@ export default function DummyPage() {
           focusRef={finalRef}
           isOpen={isOpenAddUserModal}
           onClose={onCloseAddUserModal}
+          userData={{ name: "", email: "", role: "student", chapter: "" }}
+          create={true}
         />
 
         <Button
@@ -77,6 +79,8 @@ export default function DummyPage() {
           focusRef={finalRef}
           isOpen={isOpenAddChapterModal}
           onClose={onCloseAddChapterModal}
+          chapterName=""
+          create={true}
         />
         <Button
           colorScheme="twitter"
