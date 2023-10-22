@@ -109,7 +109,6 @@ export const NewUserModal = ({
     if (!validateFields()) {
       return false;
     }
-    console.log(chapter);
     const user: User = {
       name,
       email,
