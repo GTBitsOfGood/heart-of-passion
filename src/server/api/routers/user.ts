@@ -3,8 +3,10 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 import { UserModel } from "~/server/models/User";
-import { ChapterModel } from "~/server/models/Chapter";
+import { ChapterModel, IChapter } from "~/server/models/Chapter";
 import { Chapter, User, userSchema } from "~/common/types";
+import { auth } from "~/server/auth";
+
 export const userRouter = createTRPCRouter({
   createUser: publicProcedure.input(userSchema).mutation(async ({ input }) => {
     let chapter;
@@ -14,13 +16,21 @@ export const userRouter = createTRPCRouter({
       }).exec())!;
     }
 
-    const user = new UserModel({
-      name: input.name,
-      chapter: chapter ? chapter.id : null,
-      email: input.email,
-      role: input.role,
+
+    const user = auth.createUser({
+      key: {
+        providerId: "google",
+        providerUserId: input.email,
+        password: null,
+      },
+      attributes: {
+        name: input.name,
+        email: input.email,
+        role: input.role,
+        chapter: chapter?.id,
+      },
     });
-    await user.save();
+
     return user;
   }),
 

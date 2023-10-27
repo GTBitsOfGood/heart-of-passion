@@ -11,7 +11,7 @@ import {
   VStack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { DropdownIcon } from "~/common/theme/icons";
 import { Time, Times } from "~/common/types/types";
 
@@ -34,13 +34,16 @@ export const NewTimeForm = ({
   selectedTime,
   setSelectedTime,
 }: NewTimeFormProps) => {
-  const timeList = ["9:00 am", "9:30 am", "10:00 am", "10:30 am", "11:00 am"];
+  const timeList = useMemo(
+    () => ["9:00 am", "9:30 am", "10:00 am", "10:30 am", "11:00 am"],
+    [],
+  );
   const [day, setDay] = useState(selectedTime?.day ?? "Day 1");
   const editing = selectedTime !== undefined;
 
   const getTimeIndex = useCallback(
     (s: string, d: number) => {
-      const ind = timeList.findIndex((e) => e === s);
+      const ind = timeList.findIndex((e: string) => e === s);
       // console.log(ind);
       return ind === -1 ? d : ind;
     },

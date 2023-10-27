@@ -25,4 +25,8 @@ async function dbConnect() {
   return cached.conn;
 }
 
+(async () => {
+  await dbConnect();
+})();
+
 export default dbConnect;
