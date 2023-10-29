@@ -129,8 +129,8 @@ export default function DummyPage() {
           thisExpense={selectedExpense}
         />
       </Stack>
+      {/* Remove Center element */}
       <Center w="100%">
-        bruh
         <VStack
                     mt="8px"
                     // minHeight="19px"
