@@ -37,7 +37,7 @@ import { NewExpense } from "./NewExpense";
     onClose: () => void;
     expenses: Expense[];
     setExpenses: (e: Expense[]) => void;
-    thisExpense: Expense;
+    thisExpense: Expense | undefined;
   };
   
   export const NewExpenseModal = ({ focusRef, isOpen, onClose, expenses, setExpenses, thisExpense }: NewExpenseProps) => {
@@ -99,6 +99,7 @@ import { NewExpense } from "./NewExpense";
                 onOpenError={onOpenError}
                 onCloseError={onCloseError}
                 selectedExpense={thisExpense}
+                onCloseSide={onClose}
             />
             </ModalBody>
           </HStack>
