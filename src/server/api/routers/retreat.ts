@@ -59,17 +59,19 @@ export const retreatRouter = createTRPCRouter({
   }),
 
   getAllEvents: publicProcedure.input(z.string()).query(async (opts) => {
-    const retreats: IRetreat = await RetreatModel.find({
+    const retreats: IRetreat[] = await RetreatModel.find({
       chapterId: opts.input,
     }).exec();
+
     const events: any = {};
-    retreats.forEach(async (retreat: IRetreat) => {
+    for (const retreat of retreats) {
       if (!events[retreat.year]) {
         events[retreat.year] = [];
       }
-      const event = await EventModel.find({ retreatId: retreat.id });
+
+      const event = await EventModel.findOne({ retreatId: retreat.id });
       events[retreat.year].push(event);
-    });
+    }
 
     return events;
   }),

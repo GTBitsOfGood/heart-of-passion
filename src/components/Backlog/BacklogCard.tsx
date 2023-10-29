@@ -11,8 +11,14 @@ export default function BacklogCard({
   totalCost: number;
 }) {
   return (
-    <Box border={"2px solid #D9D9D9"} paddingX={4} paddingY={6} marginY={6}>
-      <Text fontFamily={"nunito"} fontWeight={700} fontSize={20}>
+    <Box border={"2px solid #D9D9D9"} paddingX={4} paddingY={6} width={286}>
+      <Text
+        fontFamily={"nunito"}
+        fontWeight={700}
+        fontSize={20}
+        height={70}
+        marginBottom={49}
+      >
         {name}
       </Text>
       <Box display={"flex"} justifyContent={"space-between"}>
@@ -20,7 +26,7 @@ export default function BacklogCard({
           {date}
         </Text>
         <Text fontFamily={"nunito"} fontWeight={500} fontSize={20}>
-          {totalCost}
+          ${totalCost}
         </Text>
       </Box>
     </Box>

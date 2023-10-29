@@ -151,8 +151,8 @@ export default function Calendar() {
   const router = useRouter();
   const { id }: { id?: string } = router.query;
 
-  const { data: currEventData } = trpc.event.getEvents.useQuery(id || "", {
-    enabled: id !== undefined,
+  const { data: currEventData } = trpc.event.getEvents.useQuery(id!, {
+    enabled: !!id,
   });
 
   useEffect(() => {
