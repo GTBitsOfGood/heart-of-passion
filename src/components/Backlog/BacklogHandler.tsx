@@ -24,7 +24,12 @@ export default function BacklogHandler({
     <Box>
       {Object.keys(chapterEvents).map((year: any) => {
         return (
-          <Box display={"flex"} justifyContent={"center"} marginTop={7}>
+          <Box
+            display={"flex"}
+            justifyContent={"center"}
+            marginTop={7}
+            key={year}
+          >
             <Box width={"97%"}>
               <Box
                 display={"flex"}
