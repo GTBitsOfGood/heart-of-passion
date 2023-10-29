@@ -7,50 +7,25 @@ export type User = {
 
 export type Chapter = {
   name: string;
-}
+};
 
-export enum EnergyLevel {
-  Low = 'low',
-  Medium = 'medium',
-  High = 'high'
-}
+export type Time = {
+  day: string;
+  start: string;
+  end: string;
+};
 
-export enum Category {
-  Entertainment = 'entertainment',
-  Educational = 'educational',
-  Other = 'other'
-}
+export type Times = {
+  [key: string]: Time[];
+};
 
-export enum ExpenseType {
-  Entertainment = 'entertainment',
-  Transportation = 'transportation',
-  Other = 'other'
-}
-
-export enum CostType {
-  PerUnit = 'per unit',
-  FlatCost = 'flat cost'
-}
-
-export interface DateObject {
-  day: number;
-  from: string;
-  to: string;
-}
-
-export interface ExpenseObject {
+export type Expense = {
   name: string;
-  type: ExpenseType;
-  costType: CostType;
-  numberOfUnits?: number;
-  notes?: string;
-}
-
-export type Event = {
-  name: string;
-  location?: string;
-  energyLevel?: EnergyLevel;
-  category?: Category;
-  dates: DateObject[];
-  expenses: ExpenseObject[];
-}
+  type: string;
+  cost: number;
+  //1 - per unit
+  //2 - flat cost
+  costType: string;
+  units: number;
+  notes: string;
+};
