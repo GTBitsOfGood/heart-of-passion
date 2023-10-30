@@ -3,21 +3,21 @@ export type User = {
   email: string;
   role: string;
   chapter?: string;
-}
+};
 
 export type Chapter = {
   name: string;
-}
+};
 
 export type Time = {
   day: string;
   start: string;
   end: string;
-}
+};
 
 export type Times = {
   [key: string]: Time[];
-}
+};
 
 export type Expense = {
   name: string;
@@ -28,4 +28,4 @@ export type Expense = {
   costType: string;
   units: number;
   notes: string;
-}
+};

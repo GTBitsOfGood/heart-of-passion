@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-import { RetreatModel } from "~/server/models/Retreat";
+import { IRetreat, RetreatModel } from "~/server/models/Retreat";
 import { EventModel, IEvent, IExpense } from "~/server/models/Event";
 
 export const retreatRouter = createTRPCRouter({
@@ -70,5 +70,23 @@ export const retreatRouter = createTRPCRouter({
   getRetreats: publicProcedure.input(z.string()).query(async (opts) => {
     const retreats = await RetreatModel.find({ chapterId: opts.input }).exec();
     return retreats;
+  }),
+
+  getAllEvents: publicProcedure.input(z.string()).query(async (opts) => {
+    const retreats: IRetreat[] = await RetreatModel.find({
+      chapterId: opts.input,
+    }).exec();
+
+    const events: any = {};
+    for (const retreat of retreats) {
+      if (!events[retreat.year]) {
+        events[retreat.year] = [];
+      }
+
+      const event = await EventModel.findOne({ retreatId: retreat.id });
+      events[retreat.year].push(event);
+    }
+
+    return events;
   }),
 });
