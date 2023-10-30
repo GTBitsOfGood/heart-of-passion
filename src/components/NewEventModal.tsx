@@ -29,6 +29,7 @@ import { NewTimeForm } from "./NewTimeForm";
 import { FloatingAlert } from "./FloatingAlert";
 import { Expense, Time, Times } from "~/common/types/types";
 import { NewExpenseForm } from "./NewExpenseForm";
+import { NewExpenseModal } from "./NewExpenseModal";
 
 type NewEventProps = {
   focusRef: React.MutableRefObject<null>;
@@ -131,31 +132,11 @@ export const NewEventModal = ({ focusRef, isOpen, onClose }: NewEventProps) => {
         boxShadow={"0px 4px 29px 0px #00000040"}
         position="relative"
       >
-        {/* <ModalHeader
-          fontFamily="heading"
-          fontWeight="700"
-          alignSelf="center"
-          width="389px"
-          maxWidth="389px"
-          color="#9F9F9F"
-          fontSize="36px"
-          lineHeight="53px"
-          letterSpacing="0em"
-          paddingInlineStart="none"
-          paddingInlineEnd="none"
-          paddingTop="34px"
-          paddingBottom="none"
-        >
-          Enter Event Name
-          <Divider borderColor="black" />
-        </ModalHeader> */}
         <ModalCloseButton
           borderRadius="50%"
           outline="solid"
           width="28px"
           height="28px"
-          // top="20px"
-          // left="442px"
         />
         <HStack width="100%" height="100%" spacing="none">
           <ModalBody
@@ -495,19 +476,17 @@ export const NewEventModal = ({ focusRef, isOpen, onClose }: NewEventProps) => {
                   setSelectedTime={(t: Time | undefined) => setSelectedTime(t)}
                 ></NewTimeForm>
               )}
-              {isExpenseFormOpen && (
-                <NewExpenseForm
-                  expenses={expenses}
-                  setExpenses={(e: Expense[]) => setExpenses(e)}
-                  onOpenError={onOpenError}
-                  onCloseError={onCloseError}
-                  onCloseSide={onCloseExpenseForm}
-                  selectedExpense={selectedExpense}
-                  setSelectedExpense={(e: Expense | undefined) =>
-                    setSelectedExpense(e)
-                  }
-                ></NewExpenseForm>
-              )}
+              <NewExpenseForm
+                expenses={expenses}
+                setExpenses={(e: Expense[]) => setExpenses(e)}
+                onOpenError={onOpenError}
+                onCloseError={onCloseError}
+                onCloseSide={onCloseExpenseForm}
+                selectedExpense={selectedExpense}
+                setSelectedExpense={(e: Expense | undefined) =>
+                  setSelectedExpense(e)
+                }
+              />
             </ModalBody>
           )}
         </HStack>

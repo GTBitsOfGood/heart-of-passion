@@ -13,9 +13,11 @@ import {
   ModalHeader,
   ModalOverlay,
   VStack,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { trpc } from "~/utils/api";
+import { FloatingAlert } from "./FloatingAlert";
 
 type NewChapterProps = {
   focusRef: React.MutableRefObject<null>;
@@ -34,6 +36,11 @@ export const NewChapterModal = ({
 }: NewChapterProps) => {
   const [chapter, setChapter] = useState(chapterName);
   const [chapterError, setChapterError] = useState(false);
+  const {
+    isOpen: isError,
+    onClose: onCloseError,
+    onOpen: onOpenError,
+  } = useDisclosure({ defaultIsOpen: false });
 
   const trpcUtils = trpc.useContext();
   const createChapter = trpc.chapter.createChapter.useMutation({
@@ -81,9 +88,11 @@ export const NewChapterModal = ({
 
     if (chapter === "") {
       setChapterError(true);
+      onOpenError();
       valid = false;
     } else {
       setChapterError(false);
+      onCloseError();
     }
     return valid;
   };
@@ -152,6 +161,7 @@ export const NewChapterModal = ({
             APPLY
           </Button>
         </ModalFooter>
+        {isError && <FloatingAlert onClose={onCloseError} />}
       </ModalContent>
     </Modal>
   );

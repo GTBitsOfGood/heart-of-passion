@@ -14,11 +14,13 @@ import {
   ModalHeader,
   ModalOverlay,
   VStack,
+  useDisclosure
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
 import { User, Role, userSchema, roleSchema, Chapter } from "~/common/types";
 import { trpc } from "~/utils/api";
+import { FloatingAlert } from "./FloatingAlert";
 
 type NewUserProps = {
   focusRef: React.MutableRefObject<null>;
@@ -57,6 +59,11 @@ export const NewUserModal = ({
   // Errors
   const [nameError, setNameError] = useState<UserError>(UserError.None);
   const [emailError, setEmailError] = useState<EmailError>(EmailError.None);
+  const {
+    isOpen: isError,
+    onClose: onCloseError,
+    onOpen: onOpenError,
+  } = useDisclosure({ defaultIsOpen: false });
 
   // TRPC Queries and Mutations
   const trpcUtils = trpc.useContext();
@@ -107,6 +114,10 @@ export const NewUserModal = ({
   // Create the user in the backend and update the frontend with dummy data temporarily on success
   const handleSave = () => {
     if (!validateFields()) {
+      if (emailError !== EmailError.Empty) {
+        setEmailError(EmailError.Invalid);
+      }
+      onOpenError();
       return false;
     }
     const user: User = {
@@ -127,6 +138,7 @@ export const NewUserModal = ({
   const handleDelete = () => {
     deleteUser.mutate(userData.email);
     onCloseModal();
+    onCloseError();
     return true;
   };
 
@@ -137,7 +149,8 @@ export const NewUserModal = ({
       role,
       chapter,
     };
-
+    setNameError(name === "" ? UserError.Empty : UserError.None)
+    setEmailError(email === "" ? EmailError.Empty : EmailError.None)
     return userSchema.safeParse(user).success;
   };
 
@@ -296,6 +309,7 @@ export const NewUserModal = ({
             APPLY
           </Button>
         </ModalFooter>
+        {isError && <FloatingAlert onClose={onCloseError} />}
       </ModalContent>
     </Modal>
   );
