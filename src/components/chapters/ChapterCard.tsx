@@ -3,6 +3,9 @@ import { BiSolidEdit } from "react-icons/bi";
 import "@fontsource/oswald/600.css";
 import { Chapter } from "src/common/types";
 import ChapterProgress from "./ChapterProgress";
+import { NewChapterModal } from "../NewChapterModal";
+import { useDisclosure } from "@chakra-ui/react";
+import { useRef } from "react";
 
 interface ChapterCardProps {
   chapter: Chapter;
@@ -12,6 +15,14 @@ const ChapterCard = ({ chapter }: ChapterCardProps) => {
   const progress = Math.floor(
     (chapter.fundActual / chapter.fundExpected) * 100,
   );
+
+  const {
+    isOpen: isOpenAddChapterModal,
+    onOpen: onOpenAddChapterModal,
+    onClose: onCloseAddChapterModal,
+  } = useDisclosure();
+  const finalRef = useRef(null);
+
   return (
     <Box
       bgColor="#F9F9F9"
@@ -27,7 +38,14 @@ const ChapterCard = ({ chapter }: ChapterCardProps) => {
           variant="ghost"
           height="40px"
           width="40px"
-          icon={<BiSolidEdit size="20px" onClick={() => {}} />}
+          icon={<BiSolidEdit size="20px" onClick={onOpenAddChapterModal} />}
+        />
+        <NewChapterModal
+          focusRef={finalRef}
+          isOpen={isOpenAddChapterModal}
+          onClose={onCloseAddChapterModal}
+          chapterName={chapter.name}
+          create={false}
         />
       </Flex>
 
