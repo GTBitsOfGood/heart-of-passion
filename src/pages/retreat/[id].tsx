@@ -85,12 +85,12 @@ export default function Calendar() {
     enabled: !!id,
   }).data;
   return <Container chapter={chapter} year={2023} events={events} />;
-  return (
-    <Box>
-      {<Sidebar chapter={chapter} year={2023} />}
-      {events && <Content events={events} />}
-    </Box>
-  );
+  // return (
+  //   <Box>
+  //     {<Sidebar chapter={chapter} year={2023} />}
+  //     {events && <Content events={events} />}
+  //   </Box>
+  // );
 }
 
 function Container({ chapter, year, events }: any) {
