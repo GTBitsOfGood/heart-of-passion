@@ -17,11 +17,13 @@ export const chapterRouter = createTRPCRouter({
       });
 
       await chapter.save();
-      const retreat = new RetreatModel({ chapterId: chapter.id, year: new Date().getFullYear() });
+      const retreat = new RetreatModel({
+        chapterId: chapter.id,
+        year: new Date().getFullYear(),
+      });
       await retreat.save();
     }),
-
-  getChapter: publicProcedure
+  getChapterByName: publicProcedure
     .input(z.string())
     .query(async (opts): Promise<Chapter> => {
       const chapter = (await ChapterModel.findOne({
@@ -29,7 +31,7 @@ export const chapterRouter = createTRPCRouter({
       }).exec())!;
       return processChapter(chapter);
     }),
-  getChapterWithRetreat: publicProcedure
+  getChapterByRetreatId: publicProcedure
     .input(z.string())
     .query(async (opts): Promise<Chapter> => {
       const retreat = (await RetreatModel.findOne({
@@ -56,7 +58,6 @@ export const chapterRouter = createTRPCRouter({
     }),
 });
 
-// TODO: We need to calculate this information based on expenses
 async function processChapter(chapterModel: IChapter): Promise<Chapter> {
   let retreat: IRetreat | null = (await RetreatModel.findOne({
     chapterId: chapterModel._id,
@@ -65,7 +66,7 @@ async function processChapter(chapterModel: IChapter): Promise<Chapter> {
     .exec())!;
   let cost = 0;
   if (retreat) {
-    const events = (await EventModel.find({ retreatId: retreat?.id }).exec())!;
+    const events = (await EventModel.find({ retreatId: retreat?._id }).exec())!;
     events?.forEach((event: IEvent) => {
       let expenses: [IExpense] = event.expenses;
       expenses?.forEach((expense) => {
@@ -77,12 +78,12 @@ async function processChapter(chapterModel: IChapter): Promise<Chapter> {
       });
     });
   }
+
   return {
     name: chapterModel.name,
     totalCost: cost,
     fundExpected: 5100,
     fundActual: 2600,
     id: chapterModel._id,
-    retreat: retreat
   };
 }

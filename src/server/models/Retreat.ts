@@ -5,7 +5,7 @@ import { eventSchema } from "~/common/types";
 const { Schema } = mongoose;
 
 export interface IRetreat {
-  _id: string,
+  _id: string;
   year: number;
   chapterId: mongoose.Types.ObjectId;
   expenses: IExpense;

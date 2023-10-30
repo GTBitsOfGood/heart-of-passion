@@ -31,11 +31,18 @@ export type UserList = z.infer<typeof userListSchema>;
 export const retreatSchema = z.object({
   _id: z.string(),
   year: z.number(),
-})
+});
 export type Retreat = z.infer<typeof retreatSchema>;
 
 // Role
-export const typeSchema = z.enum(["Entertainment", "Food", "Transportation", "Hotel", "Decorations", "Miscellaneous"]);
+export const typeSchema = z.enum([
+  "Entertainment",
+  "Food",
+  "Transportation",
+  "Hotel",
+  "Decorations",
+  "Miscellaneous",
+]);
 export type Type = z.infer<typeof typeSchema>;
 
 // Expense
@@ -45,8 +52,8 @@ export const expenseSchema = z.object({
   dates: z.array(z.string()),
   type: typeSchema,
   cost: z.number(),
-  numUnits: z.number().optional()
-})
+  numUnits: z.number().optional(),
+});
 export type Expense = z.infer<typeof expenseSchema>;
 
 // Expense List
@@ -63,7 +70,6 @@ export const chapterSchema = z.object({
   fundExpected: z.number(),
   fundActual: z.number(),
   id: z.string(),
-  retreat: retreatSchema
 });
 export type Chapter = z.infer<typeof chapterSchema>;
 
