@@ -10,7 +10,7 @@ export const userSchema = z
     name: z.string(),
     email: z.string().email(),
     role: roleSchema,
-    chapter: z.string().optional(),
+    chapter: z.string(),
   })
   .refine((data) => {
     if (data.role === "student" || data.role === "mentor") {

@@ -24,6 +24,8 @@ type NewUserProps = {
   focusRef: React.MutableRefObject<null>;
   isOpen: boolean;
   onClose: () => void;
+  userData: User;
+  create: boolean;
 };
 
 enum EmailError {
@@ -39,12 +41,18 @@ enum UserError {
 
 const roleOptions = Object.values(roleSchema.enum);
 
-export const NewUserModal = ({ focusRef, isOpen, onClose }: NewUserProps) => {
+export const NewUserModal = ({
+  focusRef,
+  isOpen,
+  onClose,
+  userData,
+  create,
+}: NewUserProps) => {
   // Form Data
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState<Role>("student");
-  const [chapter, setChapter] = useState("");
+  const [name, setName] = useState(userData.name);
+  const [email, setEmail] = useState(userData.email);
+  const [role, setRole] = useState<Role>(userData.role);
+  const [chapter, setChapter] = useState(userData.chapter);
 
   // Errors
   const [nameError, setNameError] = useState<UserError>(UserError.None);
@@ -54,6 +62,18 @@ export const NewUserModal = ({ focusRef, isOpen, onClose }: NewUserProps) => {
   const trpcUtils = trpc.useContext();
   const chapters = trpc.chapter.getChapters.useQuery();
   const createUser = trpc.user.createUser.useMutation({
+    onSuccess: () => {
+      trpcUtils.user.invalidate();
+    },
+  });
+
+  const updateUser = trpc.user.updateUser.useMutation({
+    onSuccess: () => {
+      trpcUtils.user.invalidate();
+    },
+  });
+
+  const deleteUser = trpc.user.deleteUser.useMutation({
     onSuccess: () => {
       trpcUtils.user.invalidate();
     },
@@ -71,12 +91,14 @@ export const NewUserModal = ({ focusRef, isOpen, onClose }: NewUserProps) => {
   }, [chapter, chapters, role]);
 
   const onCloseModal = () => {
-    setRole("student");
-    if (chapters.data && chapters.data.length > 0) {
-      setChapter(chapters.data[0]!.name);
+    if (create) {
+      setRole("student");
+      if (chapters.data && chapters.data.length > 0) {
+        setChapter(chapters.data[0]!.name);
+      }
+      setName("");
+      setEmail("");
     }
-    setName("");
-    setEmail("");
     setNameError(UserError.None);
     setEmailError(EmailError.None);
     onClose();
@@ -87,15 +109,23 @@ export const NewUserModal = ({ focusRef, isOpen, onClose }: NewUserProps) => {
     if (!validateFields()) {
       return false;
     }
-
     const user: User = {
       name,
       email,
       role,
       chapter,
     };
+    if (create) {
+      createUser.mutate(user);
+    } else {
+      updateUser.mutate({ email: userData.email, updateData: user });
+    }
+    onCloseModal();
+    return true;
+  };
 
-    createUser.mutate(user);
+  const handleDelete = () => {
+    deleteUser.mutate(userData.email);
     onCloseModal();
     return true;
   };
@@ -140,7 +170,7 @@ export const NewUserModal = ({ focusRef, isOpen, onClose }: NewUserProps) => {
         borderRadius="none"
         boxShadow={"0px 4px 29px 0px #00000040"}
       >
-        <ModalHeader/>
+        <ModalHeader />
         <ModalCloseButton
           borderRadius="50%"
           outline="solid"
@@ -249,6 +279,8 @@ export const NewUserModal = ({ focusRef, isOpen, onClose }: NewUserProps) => {
             variant="outline"
             mr="15px"
             fontFamily="oswald"
+            onClick={handleDelete}
+            isDisabled={create}
           >
             DELETE
           </Button>
