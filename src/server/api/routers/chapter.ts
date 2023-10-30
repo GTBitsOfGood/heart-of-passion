@@ -18,6 +18,8 @@ export const chapterRouter = createTRPCRouter({
       });
 
       await chapter.save();
+      const retreat = new RetreatModel({ chapterId: chapter.id, year: new Date().getFullYear() });
+      await retreat.save();
     }),
 
   getChapter: publicProcedure
@@ -28,7 +30,17 @@ export const chapterRouter = createTRPCRouter({
       }).exec())!;
       return processChapter(chapter);
     }),
-
+  getChapterWithRetreat: publicProcedure
+    .input(z.string())
+    .query(async (opts): Promise<Chapter> => {
+      const retreat = (await RetreatModel.findOne({
+        _id: opts.input,
+      }).exec())!;
+      const chapter = (await ChapterModel.findOne({
+        _id: retreat.chapterId,
+      }).exec())!;
+      return processChapter(chapter);
+    }),
   getChapters: publicProcedure.query(async (opts): Promise<Chapter[]> => {
     const chapters = (await ChapterModel.find().exec())!;
     return await Promise.all(chapters.map(processChapter));
@@ -40,7 +52,7 @@ async function processChapter(chapterModel: IChapter): Promise<Chapter> {
   let retreat: IRetreat | null = (await RetreatModel.findOne({ chapterId: chapterModel._id }).sort("-year").exec())!
   let cost = 0
   if (retreat) {
-    const events = (await EventModel.find({ retreatId: retreat?.id }).exec())!
+    const events = (await EventModel.find({ retreatId: retreat?._id }).exec())!
     events?.forEach((event: IEvent) => {
       let expenses: [IExpense] = event.expenses
       expenses?.forEach((expense) => {
@@ -57,5 +69,7 @@ async function processChapter(chapterModel: IChapter): Promise<Chapter> {
     totalCost: cost,
     fundExpected: 5100,
     fundActual: 2600,
+    id: chapterModel._id,
+    retreat: retreat
   };
 }

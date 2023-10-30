@@ -28,12 +28,20 @@ export const userListSchema = z.object({
 });
 export type UserList = z.infer<typeof userListSchema>;
 
+export const retreatSchema = z.object({
+  _id: z.string(),
+  year: z.number(),
+})
+export type Retreat = z.infer<typeof retreatSchema>;
+
 // Chapter
 export const chapterSchema = z.object({
   name: z.string(),
   totalCost: z.number(),
   fundExpected: z.number(),
   fundActual: z.number(),
+  id: z.string(),
+  retreat: retreatSchema
 });
 export type Chapter = z.infer<typeof chapterSchema>;
 

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 export interface IRetreat {
-  id: string,
+  _id: string,
   year: number;
   chapterId: mongoose.Types.ObjectId;
 }

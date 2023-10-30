@@ -49,15 +49,15 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
               fontFamily="oswald"
               fontWeight="bold"
             >
-              {chapter.name.toUpperCase()}
+              {chapter?.name.toUpperCase()}
             </Text>
             <Select
               defaultValue={{
-                value: year.toString(),
-                label: year.toString(),
+                value: year?.toString(),
+                label: year?.toString(),
               }}
               options={options}
-              onChange={() => {}}
+              onChange={() => { }}
               isSearchable={false}
               styles={{
                 control: (base) => ({

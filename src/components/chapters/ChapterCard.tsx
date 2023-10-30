@@ -7,7 +7,6 @@ import ChapterProgress from "./ChapterProgress";
 interface ChapterCardProps {
   chapter: Chapter;
 }
-
 const ChapterCard = ({ chapter }: ChapterCardProps) => {
   const progress = Math.floor(
     (chapter.fundActual / chapter.fundExpected) * 100,
@@ -27,7 +26,7 @@ const ChapterCard = ({ chapter }: ChapterCardProps) => {
           variant="ghost"
           height="40px"
           width="40px"
-          icon={<BiSolidEdit size="20px" onClick={() => {}} />}
+          icon={<BiSolidEdit size="20px" onClick={() => { window.location.href = `/retreat/${chapter.retreat?._id}` }} />}
         />
       </Flex>
 

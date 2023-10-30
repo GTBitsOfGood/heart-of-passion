@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-import { RetreatModel } from "~/server/models/Retreat";
+import { IRetreat, RetreatModel } from "~/server/models/Retreat";
 import { EventModel, IEvent, IExpense } from "~/server/models/Event";
 
 export const retreatRouter = createTRPCRouter({

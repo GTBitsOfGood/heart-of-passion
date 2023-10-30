@@ -13,7 +13,8 @@ import "@fontsource/oswald/700.css";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { trpc } from "~/utils/api";
-import { DateObject } from "~/common/types";
+import { DateObject, Chapter } from "~/common/types";
+import Sidebar from "~/components/Sidebar";
 
 // const sampleData: Event[] = [
 //   {
@@ -158,14 +159,16 @@ export default function Calendar() {
   const router = useRouter();
   const { id }: { id?: string } = router.query;
 
-  const { data: currEventData } = trpc.event.getEvents.useQuery(id || "123");
-
+  const { data: currEventData } = trpc.event.getEvents.useQuery(id || "65170ad990ce3718cf5a35a9");
+  const chapter: Chapter = trpc.chapter.getChapterWithRetreat.useQuery(id || "65170ad990ce3718cf5a35a9")?.data!;
   useEffect(() => {
     setEvent(currEventData);
   }, [currEventData, id]);
 
   return (
     <Box>
+      {<Sidebar chapter={chapter} year={2023} />
+      }
       {event && (
         <Flex justifyContent="center" alignItems="center">
           <Box>{/*Sidebar*/}</Box>
