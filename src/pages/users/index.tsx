@@ -166,6 +166,8 @@ export default function Users() {
               focusRef={finalRef}
               isOpen={isOpenAddUserModal}
               onClose={onCloseAddUserModal}
+              userData={{ name: "", email: "", role: "student", chapter: "" }}
+              create={true}
             />
           </Box>
           <SettingsIcon
