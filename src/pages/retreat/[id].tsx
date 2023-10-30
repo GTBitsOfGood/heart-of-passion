@@ -1,12 +1,4 @@
-import {
-  Box,
-  Flex,
-  Text,
-  Grid,
-  HStack,
-  StackDivider,
-  GridItem,
-} from "@chakra-ui/react";
+import { Box, Flex, Text } from "@chakra-ui/react";
 import CalendarCard from "src/components/Calendar/CalendarCard";
 
 import "@fontsource/oswald/700.css";
@@ -159,11 +151,14 @@ export default function Calendar() {
   const router = useRouter();
   const { id }: { id?: string } = router.query;
 
-  const { data: currEventData } = trpc.event.getEvents.useQuery(id || "123");
   const chapter: Chapter = trpc.chapter.getChapterWithRetreat.useQuery(id || "123")?.data!;
+  const { data: currEventData } = trpc.event.getEvents.useQuery(id!, {
+    enabled: !!id,
+  });
+
   useEffect(() => {
     setEvent(currEventData);
-  }, [currEventData, id]);
+  }, [currEventData]);
 
   return (
     <Box>
@@ -171,7 +166,7 @@ export default function Calendar() {
       }
       {event && (
         <Flex justifyContent="center" alignItems="center">
-          <Box>{/*Sidebar*/}</Box>
+          <Box></Box>
           <Box display={"flex"} gap={"34px"}>
             {[1, 2, 3, 4].map((num, index) => {
               return (
@@ -204,15 +199,20 @@ export default function Calendar() {
                             to: date.to,
                           };
 
-                          return dayDifference === 0 ? (
-                            <CalendarCard
-                              key={einfo.name}
-                              {...einfo}
-                              date={dateObject}
-                              event={einfo}
-                            />
-                          ) : (
-                            ""
+                          const totalExpense = einfo.expenses.reduce(
+                            (acc: any, cv: any) => acc + cv.cost,
+                            0,
+                          );
+
+                          return (
+                            dayDifference === 0 && (
+                              <CalendarCard
+                                key={einfo.name}
+                                expenseTotal={totalExpense}
+                                date={dateObject}
+                                event={einfo}
+                              />
+                            )
                           );
                         });
                       })}

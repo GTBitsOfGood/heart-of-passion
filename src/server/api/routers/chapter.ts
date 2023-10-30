@@ -8,7 +8,6 @@ import { EventModel, IEvent, IExpense } from "~/server/models/Event";
 import { RetreatModel, IRetreat } from "~/server/models/Retreat";
 import { exec } from "child_process";
 
-
 export const chapterRouter = createTRPCRouter({
   createChapter: publicProcedure
     .input(z.string())
@@ -45,24 +44,38 @@ export const chapterRouter = createTRPCRouter({
     const chapters = (await ChapterModel.find().exec())!;
     return await Promise.all(chapters.map(processChapter));
   }),
+
+  updateChapter: publicProcedure
+    .input(z.object({ oldChapterName: z.string(), newChapterName: z.string() }))
+    .mutation(async (opts) => {
+      const chapter = await ChapterModel.findOneAndUpdate(
+        { name: opts.input.oldChapterName },
+        { name: opts.input.newChapterName },
+      ).exec();
+      return chapter;
+    }),
 });
 
 // TODO: We need to calculate this information based on expenses
 async function processChapter(chapterModel: IChapter): Promise<Chapter> {
-  let retreat: IRetreat | null = (await RetreatModel.findOne({ chapterId: chapterModel._id }).sort("-year").exec())!
-  let cost = 0
+  let retreat: IRetreat | null = (await RetreatModel.findOne({
+    chapterId: chapterModel._id,
+  })
+    .sort("-year")
+    .exec())!;
+  let cost = 0;
   if (retreat) {
-    const events = (await EventModel.find({ retreatId: retreat?._id }).exec())!
+    const events = (await EventModel.find({ retreatId: retreat?.id }).exec())!;
     events?.forEach((event: IEvent) => {
-      let expenses: [IExpense] = event.expenses
+      let expenses: [IExpense] = event.expenses;
       expenses?.forEach((expense) => {
         if (expense.costType == "flat cost") {
-          cost += expense.cost
+          cost += expense.cost;
         } else {
           cost += expense.cost * expense.numberOfUnits;
         }
       });
-    })
+    });
   }
   return {
     name: chapterModel.name,

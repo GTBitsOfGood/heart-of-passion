@@ -51,6 +51,8 @@ export default function Home() {
             focusRef={finalRef}
             isOpen={isOpenAddChapterModal}
             onClose={onCloseAddChapterModal}
+            chapterName=""
+            create={true}
           />
         </GridItem>
         <GridItem alignSelf="flex-end">
