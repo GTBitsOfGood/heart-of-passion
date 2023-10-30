@@ -3,8 +3,8 @@ import { Role } from ".";
 export type User = {
   name: string;
   email: string;
-  role: Role;
-  chapter: string;
+  role: string;
+  chapter?: string;
 };
 
 export type Chapter = {
