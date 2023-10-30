@@ -28,6 +28,28 @@ export const userListSchema = z.object({
 });
 export type UserList = z.infer<typeof userListSchema>;
 
+// Role
+export const typeSchema = z.enum(["Entertainment", "Food", "Transportation", "Hotel", "Decorations", "Miscellaneous"]);
+export type Type = z.infer<typeof typeSchema>;
+
+// Expense
+export const expenseSchema = z.object({
+  name: z.string(),
+  event: z.string().optional(),
+  dates: z.array(z.string()),
+  type: typeSchema,
+  cost: z.number(),
+  numUnits: z.number().optional()
+})
+export type Expense = z.infer<typeof expenseSchema>;
+
+// Expense List
+export const expenseListSchema = z.object({
+  title: z.string(),
+  expenses: z.array(expenseSchema),
+});
+export type ExpenseList = z.infer<typeof expenseListSchema>;
+
 // Chapter
 export const chapterSchema = z.object({
   name: z.string(),
