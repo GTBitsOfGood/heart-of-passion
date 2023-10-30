@@ -21,6 +21,9 @@ import fonts from "src/common/theme/fonts";
 import { NewUserModal } from "~/components/NewUserModal";
 import { trpc } from "~/utils/api";
 
+//Adding
+import Link from 'next/link'
+
 export default function Users() {
   const [filter, setFilter] = useState("chapter"); // value decides grouping behavior
 
@@ -92,7 +95,9 @@ export default function Users() {
         w={{ base: "6em", "2xl": "10em" }}
         m={{ base: "1em", "2xl": "2em" }}
       >
-        <Image src={logo} alt="logo" />
+        <Link href="/chapters">
+          <Image src={logo} alt="logo" />
+        </Link>
       </Box>
       <Stack w="100%" alignItems="center">
         <Flex

@@ -31,3 +31,9 @@ export type Expense = {
   units: number;
   notes: string;
 };
+
+export type Retreat = {
+  id: string,
+  year: number;
+  chapterId: string;
+};

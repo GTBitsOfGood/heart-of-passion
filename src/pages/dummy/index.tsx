@@ -30,12 +30,17 @@ export default function DummyPage() {
   } = useDisclosure();
 
   const finalRef = React.useRef(null);
-
+  let dummyRetreat = {
+    _id: "65170ad990ce3718cf5a35a9",
+    year: 2023
+  }
   let dummyChapter = {
     name: "Atlanta",
     totalCost: 5100,
     fundExpected: 5180,
     fundActual: 2600,
+    id: "64fb59fbf5a924e891395df6",
+    retreat: dummyRetreat
   };
 
   const dummyExpenses: Expense[] = [];
