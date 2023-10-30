@@ -159,8 +159,8 @@ export default function Calendar() {
   const router = useRouter();
   const { id }: { id?: string } = router.query;
 
-  const { data: currEventData } = trpc.event.getEvents.useQuery(id || "65170ad990ce3718cf5a35a9");
-  const chapter: Chapter = trpc.chapter.getChapterWithRetreat.useQuery(id || "65170ad990ce3718cf5a35a9")?.data!;
+  const { data: currEventData } = trpc.event.getEvents.useQuery(id || "123");
+  const chapter: Chapter = trpc.chapter.getChapterWithRetreat.useQuery(id || "123")?.data!;
   useEffect(() => {
     setEvent(currEventData);
   }, [currEventData, id]);
