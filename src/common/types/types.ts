@@ -1,3 +1,5 @@
+import { Role } from ".";
+
 export type User = {
   name: string;
   email: string;

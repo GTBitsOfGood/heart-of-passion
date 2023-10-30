@@ -42,6 +42,13 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async (opts) => {
+      let chapter;
+      if (opts.input.updateData.chapter) {
+        chapter = (await ChapterModel.findOne({
+          name: opts.input.updateData.chapter,
+        }).exec())!;
+      }
+      opts.input.updateData.chapter = chapter ? chapter.id : null;
       const user = await UserModel.findOneAndUpdate(
         { email: opts.input.email },
         opts.input.updateData,
