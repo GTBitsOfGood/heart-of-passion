@@ -37,6 +37,13 @@ export const chapterSchema = z.object({
 });
 export type Chapter = z.infer<typeof chapterSchema>;
 
+// Retreat
+export const retreatSchema = z.object({
+  chapterId: z.string(),
+  year: z.number(),
+});
+export type Retreat = z.infer<typeof retreatSchema>;
+
 // Energy Level
 export const energyLevelSchema = z.enum(["low", "medium", "high"]);
 export type EnergyLevel = z.infer<typeof energyLevelSchema>;

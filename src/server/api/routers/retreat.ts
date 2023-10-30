@@ -31,6 +31,20 @@ export const retreatRouter = createTRPCRouter({
       });
       return retreat;
     }),
+  existsRetreat: publicProcedure
+    .input(
+      z.object({
+        chapterId: z.string(),
+        year: z.number(),
+      }),
+    )
+    .query(async (opts) => {
+      const retreat = await RetreatModel.exists({
+        chapterId: opts.input.chapterId,
+        year: opts.input.year,
+      });
+      return !!retreat;
+    }),
   getRetreatYears: publicProcedure.input(z.string()).query(async (opts) => {
     const retreats = await RetreatModel.find({ chapterId: opts.input })
       .select("year")

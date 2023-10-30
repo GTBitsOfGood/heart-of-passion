@@ -2,6 +2,7 @@ import { Button, Stack, useDisclosure } from "@chakra-ui/react";
 import React from "react";
 import { NewChapterModal } from "~/components/NewChapterModal";
 import { NewEventModal } from "~/components/NewEventModal";
+import { NewRetreatYearModal } from "~/components/NewRetreatYearModal";
 import { NewUserModal } from "~/components/NewUserModal";
 import Sidebar from "~/components/Sidebar";
 
@@ -21,6 +22,11 @@ export default function DummyPage() {
     onOpen: onOpenAddEventModal,
     onClose: onCloseAddEventModal,
   } = useDisclosure();
+  const {
+    isOpen: isOpenAddYearModal,
+    onOpen: onOpenAddYearModal,
+    onClose: onCloseAddYearModal,
+  } = useDisclosure();
 
   const finalRef = React.useRef(null);
 
@@ -35,7 +41,7 @@ export default function DummyPage() {
 
   return (
     <>
-      <Sidebar chapter={dummyChapter} year={dummyYear} />
+      <Sidebar chapter={dummyChapter} year={dummyYear} focusRef={finalRef}/>
       <Stack
         direction="row"
         spacing={4}
