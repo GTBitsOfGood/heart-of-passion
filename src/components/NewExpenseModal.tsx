@@ -1,26 +1,10 @@
 import {
-  Box,
-  Button,
-  Divider,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
   HStack,
-  Input,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
-  ModalHeader,
   ModalOverlay,
-  Text,
-  VStack,
   useDisclosure,
 } from "@chakra-ui/react";
 import { useState } from "react";
@@ -79,8 +63,6 @@ export const NewExpenseModal = ({
           outline="solid"
           width="28px"
           height="28px"
-          // top="20px"
-          // left="442px"
         />
         <HStack width="100%" height="100%" spacing="none">
           <ModalBody

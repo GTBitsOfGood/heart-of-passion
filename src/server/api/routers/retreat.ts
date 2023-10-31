@@ -31,6 +31,14 @@ export const retreatRouter = createTRPCRouter({
       });
       return retreat;
     }),
+  getRetreatById: publicProcedure
+    .input(z.string())
+    .query(async (opts): Promise<IRetreat> => {
+      const retreat = await RetreatModel.findOne({
+        _id: opts.input,
+      });
+      return retreat!;
+    }),
   existsRetreat: publicProcedure
     .input(
       z.object({
