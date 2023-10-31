@@ -19,7 +19,6 @@ import { useRouter } from "next/router";
 interface SidebarProps {
   chapter: Chapter;
   year: number;
-  focusRef: React.MutableRefObject<null>;
 }
 
 type OptionType = {
@@ -27,7 +26,7 @@ type OptionType = {
   label: string;
 };
 
-const Sidebar = ({ chapter, year, focusRef }: SidebarProps) => {
+const Sidebar = ({ chapter, year }: SidebarProps) => {
   const id = useId();
   const {
     isOpen: isOpenAddYearModal,
@@ -100,7 +99,6 @@ const Sidebar = ({ chapter, year, focusRef }: SidebarProps) => {
     actionMeta: ActionMeta<OptionType>,
   ) => {
     setSelectedOption(option ?? archiveOption);
-    // console.log("OPTION"+option.value);
     if (option?.value === "Add Archive") {
       onOpenAddYearModal();
     }
@@ -365,7 +363,6 @@ const Sidebar = ({ chapter, year, focusRef }: SidebarProps) => {
         </Box>
       </Box>
       <NewRetreatYearModal
-        focusRef={focusRef}
         isOpen={isOpenAddYearModal}
         onClose={onCloseAddYearModal}
         chapterName={chapter.name}

@@ -20,7 +20,6 @@ import { trpc } from "~/utils/api";
 import { FloatingAlert } from "./FloatingAlert";
 
 type NewChapterProps = {
-  focusRef: React.MutableRefObject<null>;
   isOpen: boolean;
   onClose: () => void;
   chapterName: string;
@@ -28,7 +27,6 @@ type NewChapterProps = {
 };
 
 export const NewChapterModal = ({
-  focusRef,
   isOpen,
   onClose,
   chapterName,
@@ -98,12 +96,7 @@ export const NewChapterModal = ({
   };
 
   return (
-    <Modal
-      finalFocusRef={focusRef}
-      isOpen={isOpen}
-      onClose={onCloseModal}
-      isCentered
-    >
+    <Modal isOpen={isOpen} onClose={onCloseModal} isCentered>
       <ModalOverlay />
       <ModalContent
         width="327px"

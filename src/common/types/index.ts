@@ -28,12 +28,6 @@ export const userListSchema = z.object({
 });
 export type UserList = z.infer<typeof userListSchema>;
 
-export const retreatSchema = z.object({
-  _id: z.string(),
-  year: z.number(),
-});
-export type Retreat = z.infer<typeof retreatSchema>;
-
 // Role
 export const typeSchema = z.enum([
   "Entertainment",

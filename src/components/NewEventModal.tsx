@@ -32,12 +32,11 @@ import { NewExpenseForm } from "./NewExpenseForm";
 import { NewExpenseModal } from "./NewExpenseModal";
 
 type NewEventProps = {
-  focusRef: React.MutableRefObject<null>;
   isOpen: boolean;
   onClose: () => void;
 };
 
-export const NewEventModal = ({ focusRef, isOpen, onClose }: NewEventProps) => {
+export const NewEventModal = ({ isOpen, onClose }: NewEventProps) => {
   const energyLevelOptions = ["High", "Medium", "Low"];
   const [energyLevel, setEnergyLevel] = useState("Select");
   const [location, setLocation] = useState("");
@@ -115,7 +114,6 @@ export const NewEventModal = ({ focusRef, isOpen, onClose }: NewEventProps) => {
 
   return (
     <Modal
-      finalFocusRef={focusRef}
       isOpen={isOpen}
       onClose={onCloseModal}
       isCentered
@@ -421,7 +419,7 @@ export const NewEventModal = ({ focusRef, isOpen, onClose }: NewEventProps) => {
                     fontSize="18px"
                     fontWeight="400"
                     lineHeight="25px"
-                  >{`$${expenses.reduce((acc, cv)=>acc+cv.cost,0)}`}</Text>
+                  >{`$${expenses.reduce((acc, cv) => acc + cv.cost, 0)}`}</Text>
                 </HStack>
               </VStack>
               {!isSideOpen && (

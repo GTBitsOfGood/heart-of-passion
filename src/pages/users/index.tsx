@@ -22,7 +22,7 @@ import { NewUserModal } from "~/components/NewUserModal";
 import { trpc } from "~/utils/api";
 
 //Adding
-import Link from 'next/link'
+import Link from "next/link";
 
 export default function Users() {
   const [filter, setFilter] = useState("chapter"); // value decides grouping behavior
@@ -168,7 +168,6 @@ export default function Users() {
               </Text>
             </Button>
             <NewUserModal
-              focusRef={finalRef}
               isOpen={isOpenAddUserModal}
               onClose={onCloseAddUserModal}
               userData={{ name: "", email: "", role: "student", chapter: "" }}

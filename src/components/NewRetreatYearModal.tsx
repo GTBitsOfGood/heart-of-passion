@@ -18,14 +18,12 @@ import { Retreat } from "~/common/types";
 import { trpc } from "~/utils/api";
 
 type Props = {
-  focusRef: React.MutableRefObject<null>;
   isOpen: boolean;
   onClose: () => void;
   chapterName: string;
 };
 
 export const NewRetreatYearModal = ({
-  focusRef,
   isOpen,
   onClose,
   chapterName,
@@ -54,7 +52,7 @@ export const NewRetreatYearModal = ({
     { chapterId: chapterId ?? "", year: parseInt(year) },
     { enabled: false },
   );
-  
+
   const createRetreat = trpc.retreat.createRetreat.useMutation({
     onSuccess: () => {
       trpcUtils.retreat.invalidate();
@@ -66,7 +64,7 @@ export const NewRetreatYearModal = ({
       setYearError(1);
       return;
     }
-    const {data: exists} = await existsRetreat.refetch();
+    const { data: exists } = await existsRetreat.refetch();
 
     if (exists) {
       setYearError(2);
@@ -85,7 +83,6 @@ export const NewRetreatYearModal = ({
 
   return (
     <Modal
-      finalFocusRef={focusRef}
       isOpen={isOpen}
       onClose={onCloseModal}
       isCentered
