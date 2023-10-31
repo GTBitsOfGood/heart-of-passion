@@ -10,13 +10,18 @@ export interface IExpense {
   numberOfUnits: number;
   notes: string;
 }
+export interface EventDate {
+  date: Date;
+  from: string;
+  to: string;
+}
 export interface IEvent {
   retreatId: mongoose.Types.ObjectId;
   name: string;
   location: string; //optional
   energyLevel: "low" | "medium" | "high"; //optoional
   category: "entertainment" | "educational" | "other"; //optoional
-  dates: [mongoose.Schema.Types.Mixed];
+  dates: EventDate[];
   expenses: [IExpense];
 }
 
@@ -41,7 +46,13 @@ export const EventSchema = new Schema<IEvent>({
     enum: ["entertainment", "educational", "other"],
   },
   dates: {
-    type: [Schema.Types.Mixed], // [{date: Date, from: time, to: time}]
+    type: [
+      {
+        date: Date,
+        from: String,
+        to: String,
+      },
+    ], // [{date: Date, from: time, to: time}]
     required: true,
   },
   expenses: {

@@ -48,7 +48,6 @@ export default function Home() {
             ADD CHAPTER
           </Button>
           <NewChapterModal
-            focusRef={finalRef}
             isOpen={isOpenAddChapterModal}
             onClose={onCloseAddChapterModal}
             chapterName=""
@@ -61,7 +60,7 @@ export default function Home() {
             variant="ghost"
             height="50px"
             width="50px"
-            icon={<IoMdSettings size="50px" onClick={() => { }} />}
+            icon={<IoMdSettings size="50px" onClick={() => {}} />}
           />
         </GridItem>
       </Grid>

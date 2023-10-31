@@ -51,7 +51,6 @@ export default function Users({ name, email, role, chapter }: User) {
           icon={<EditIcon onClick={onOpenAddUserModal} />}
         />
         <NewUserModal
-          focusRef={finalRef}
           isOpen={isOpenAddUserModal}
           onClose={onCloseAddUserModal}
           userData={{ name: name, email: email, role: role, chapter: chapter }}

@@ -42,7 +42,6 @@ const ChapterCard = ({ chapter }: ChapterCardProps) => {
             icon={<BiSolidEdit size="20px" onClick={onOpenAddChapterModal} />}
           />
           <NewChapterModal
-            focusRef={finalRef}
             isOpen={isOpenAddChapterModal}
             onClose={onCloseAddChapterModal}
             chapterName={chapter.name}

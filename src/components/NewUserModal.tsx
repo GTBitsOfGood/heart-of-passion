@@ -14,7 +14,7 @@ import {
   ModalHeader,
   ModalOverlay,
   VStack,
-  useDisclosure
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
@@ -23,7 +23,6 @@ import { trpc } from "~/utils/api";
 import { FloatingAlert } from "./FloatingAlert";
 
 type NewUserProps = {
-  focusRef: React.MutableRefObject<null>;
   isOpen: boolean;
   onClose: () => void;
   userData: User;
@@ -44,7 +43,6 @@ enum UserError {
 const roleOptions = Object.values(roleSchema.enum);
 
 export const NewUserModal = ({
-  focusRef,
   isOpen,
   onClose,
   userData,
@@ -149,8 +147,8 @@ export const NewUserModal = ({
       role,
       chapter,
     };
-    setNameError(name === "" ? UserError.Empty : UserError.None)
-    setEmailError(email === "" ? EmailError.Empty : EmailError.None)
+    setNameError(name === "" ? UserError.Empty : UserError.None);
+    setEmailError(email === "" ? EmailError.Empty : EmailError.None);
     return userSchema.safeParse(user).success;
   };
 
@@ -169,12 +167,7 @@ export const NewUserModal = ({
     setEmail(event.currentTarget.value);
 
   return (
-    <Modal
-      finalFocusRef={focusRef}
-      isOpen={isOpen}
-      onClose={onCloseModal}
-      isCentered
-    >
+    <Modal isOpen={isOpen} onClose={onCloseModal} isCentered>
       <ModalOverlay />
       <ModalContent
         width="515px"

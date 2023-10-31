@@ -31,6 +31,7 @@ export const chapterRouter = createTRPCRouter({
       }).exec())!;
       return processChapter(chapter);
     }),
+
   getChapterByRetreatId: publicProcedure
     .input(z.string())
     .query(async (opts): Promise<Chapter> => {
@@ -42,6 +43,12 @@ export const chapterRouter = createTRPCRouter({
       }).exec())!;
       return processChapter(chapter);
     }),
+  getChapterIdByName: publicProcedure.input(z.string()).query(async (opts) => {
+    const chapter = await ChapterModel.findOne({
+      name: opts.input,
+    }).exec();
+    return chapter?._id ?? "";
+  }),
   getChapters: publicProcedure.query(async (opts): Promise<Chapter[]> => {
     const chapters = (await ChapterModel.find().exec())!;
     return await Promise.all(chapters.map(processChapter));

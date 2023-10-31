@@ -33,7 +33,7 @@ export type Expense = {
 };
 
 export type Retreat = {
-  id: string,
+  id: string;
   year: number;
   chapterId: string;
 };

@@ -5,9 +5,10 @@ import "@fontsource/oswald/700.css";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { trpc } from "~/utils/api";
-import { DateObject, Chapter } from "~/common/types";
 import Sidebar from "~/components/Sidebar";
+import { DateObject, Chapter } from "~/common/types";
 import { IEvent } from "~/server/models/Event";
+import { Event } from "~/common/types";
 
 function Content({ events }: { events: IEvent[] }) {
   return (
@@ -28,8 +29,8 @@ function Content({ events }: { events: IEvent[] }) {
               </Text>
               <Box display={"flex"}>
                 <Box marginRight={"34px"}>
-                  {events.map((einfo: any) => {
-                    return einfo.dates.map((date: any) => {
+                  {events.map((einfo) => {
+                    return einfo.dates.map((date) => {
                       const day1 = new Date();
                       day1.setHours(0, 0, 0, 0);
                       day1.setDate(new Date().getDate() + num);
@@ -48,13 +49,18 @@ function Content({ events }: { events: IEvent[] }) {
                         0,
                       );
 
+                      const event: Event = {
+                        ...einfo,
+                        dates: [dateObject],
+                      };
+
                       return (
                         dayDifference === 0 && (
                           <CalendarCard
                             key={einfo.name}
                             expenseTotal={totalExpense}
                             date={dateObject}
-                            event={einfo}
+                            event={event}
                           />
                         )
                       );
@@ -77,29 +83,20 @@ export default function Calendar() {
   const router = useRouter();
   const { id }: { id?: string } = router.query;
 
-  const chapter: Chapter = trpc.chapter.getChapterByRetreatId.useQuery(id!, {
-    enabled: !!id,
-  })?.data!;
-
   const events = trpc.event.getEvents.useQuery(id!, {
     enabled: !!id,
   }).data;
-  return <Container chapter={chapter} year={2023} events={events} />;
-  // return (
-  //   <Box>
-  //     {<Sidebar chapter={chapter} year={2023} />}
-  //     {events && <Content events={events} />}
-  //   </Box>
-  // );
-}
+  const chapter = trpc.chapter.getChapterByRetreatId.useQuery(id!, {
+    enabled: !!id,
+  })?.data;
+  const retreat = trpc.retreat.getRetreatById.useQuery(id!, {
+    enabled: !!id,
+  })?.data;
 
-function Container({ chapter, year, events }: any) {
   return (
-    <Grid templateAreas={`'sidebar main'`} gridTemplateColumns={"auto 1fr"}>
-      <GridItem area="sidebar">
-        <Sidebar chapter={chapter} year={year} />
-      </GridItem>
-      <GridItem area="main">{events && <Content events={events} />}</GridItem>
-    </Grid>
+    <Box>
+      {chapter && retreat && <Sidebar chapter={chapter} year={retreat.year} />}
+      {events && <Content events={events} />}
+    </Box>
   );
 }
