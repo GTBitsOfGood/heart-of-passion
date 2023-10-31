@@ -24,9 +24,9 @@ type NewExpenseFormProps = {
   setExpenses: (e: Expense[]) => void;
   onOpenError: () => void;
   onCloseError: () => void;
-  onCloseSide: () => void;
+  onCloseSide?: () => void;
   selectedExpense: Expense | undefined;
-  setSelectedExpense: (t: Expense | undefined) => void;
+  setSelectedExpense?: (t: Expense | undefined) => void;
 };
 
 export const NewExpenseForm = ({
@@ -37,6 +37,7 @@ export const NewExpenseForm = ({
   onCloseSide,
   selectedExpense,
   setSelectedExpense,
+  ...rest
 }: NewExpenseFormProps) => {
   const [expenseName, setExpenseName] = useState(selectedExpense?.name ?? "");
   const [expenseType, setExpenseType] = useState(
@@ -87,7 +88,9 @@ export const NewExpenseForm = ({
       return;
     }
     onCloseError();
-    onCloseSide();
+    if (onCloseSide) {
+      onCloseSide();
+    }
     const newExpense: Expense = {
       name: expenseName,
       type: expenseType,
@@ -101,7 +104,9 @@ export const NewExpenseForm = ({
         e === selectedExpense ? newExpense : e,
       );
       setExpenses(updatedExpenses);
-      setSelectedExpense(undefined);
+      if (setSelectedExpense) {
+        setSelectedExpense(undefined);
+      }
       return;
     }
     setExpenses([...expenses, newExpense]);
@@ -139,8 +144,8 @@ export const NewExpenseForm = ({
   };
 
   return (
-    <VStack height="100%" justifyContent="space-between">
-      <VStack alignItems="start" spacing="0px">
+    <VStack height="100%" justifyContent="space-between" >
+      <VStack alignItems="start" spacing="0px" w="100%">
         <FormControl isRequired isInvalid={expenseNameError}>
           <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
             Name of Expense
@@ -149,7 +154,7 @@ export const NewExpenseForm = ({
             color="black"
             border="1px solid #D9D9D9"
             borderRadius="0px"
-            width="220px"
+            width="100%"
             // height="30px"
             value={expenseName}
             onChange={handleExpenseNameChange}
@@ -166,7 +171,7 @@ export const NewExpenseForm = ({
           <Menu>
             <MenuButton
               as={Button}
-              width="220px"
+              width="100%"
               textAlign="left"
               borderRadius="none"
               bg="white"
@@ -191,7 +196,7 @@ export const NewExpenseForm = ({
             <MenuList
               boxShadow={"0px 4px 15px 0px #00000040"}
               borderRadius="none"
-              width="220px"
+              width="100%"
             >
               {expenseTypeOptions.map((type) => {
                 return (
@@ -217,7 +222,7 @@ export const NewExpenseForm = ({
             color="black"
             border="1px solid #D9D9D9"
             borderRadius="0px"
-            width="220px"
+            width="100%"
             // height="30px"
             value={cost}
             onChange={handleCostChange}
@@ -254,7 +259,7 @@ export const NewExpenseForm = ({
             color="black"
             border="1px solid #D9D9D9"
             borderRadius="0px"
-            width="220px"
+            width="100%"
             // height="30px"
             value={units}
             onChange={handleUnitsChange}
@@ -274,7 +279,7 @@ export const NewExpenseForm = ({
             color="black"
             border="1px solid #D9D9D9"
             borderRadius="0px"
-            width="220px"
+            width="100%"
             height="120px"
             maxHeight="120px"
             // height="30px"

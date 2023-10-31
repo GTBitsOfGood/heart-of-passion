@@ -19,6 +19,7 @@ export default function Backlog() {
     enabled: !!id,
   });
   let dummyChapter = {
+    id: "1",
     name: "Atlanta",
     totalCost: 5100,
     fundExpected: 5180,

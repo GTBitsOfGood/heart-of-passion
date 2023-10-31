@@ -1,3 +1,5 @@
+import { Role } from ".";
+
 export type User = {
   name: string;
   email: string;
@@ -28,4 +30,10 @@ export type Expense = {
   costType: string;
   units: number;
   notes: string;
+};
+
+export type Retreat = {
+  id: string;
+  year: number;
+  chapterId: string;
 };

@@ -9,7 +9,7 @@ interface ChapterProgressProps {
 
 const ChapterProgress = ({ chapter }: ChapterProgressProps) => {
   const progress = Math.floor(
-    (chapter.fundActual / chapter.fundExpected) * 100,
+    (chapter?.fundActual / chapter?.fundExpected) * 100,
   );
   return (
     <>
@@ -44,7 +44,7 @@ const ChapterProgress = ({ chapter }: ChapterProgressProps) => {
             fontSize="36px"
             fontFamily="oswald"
           >
-            ${chapter.totalCost}
+            ${chapter?.totalCost}
           </Text>
           <Text align="center" fontSize="13px">
             Total Cost
@@ -57,7 +57,7 @@ const ChapterProgress = ({ chapter }: ChapterProgressProps) => {
             fontSize="36px"
             fontFamily="oswald"
           >
-            ${chapter.fundExpected}
+            ${chapter?.fundExpected}
           </Text>
           <Text align="center" fontSize="13px">
             Fundraising Expected
@@ -70,7 +70,7 @@ const ChapterProgress = ({ chapter }: ChapterProgressProps) => {
             fontSize="36px"
             fontFamily="oswald"
           >
-            ${chapter.fundActual}
+            ${chapter?.fundActual}
           </Text>
           <Text align="center" fontSize="13px">
             Fundraising Actual

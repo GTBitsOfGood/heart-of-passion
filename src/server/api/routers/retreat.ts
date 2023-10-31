@@ -83,7 +83,7 @@ export const retreatRouter = createTRPCRouter({
         events[retreat.year] = [];
       }
 
-      const event = await EventModel.findOne({ retreatId: retreat.id });
+      const event = await EventModel.findOne({ retreatId: retreat._id });
       events[retreat.year].push(event);
     }
 
