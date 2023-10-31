@@ -11,7 +11,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   // Using RetreatModel, get the latest retreat from the chapter
   const retreat = await RetreatModel.findOne({ chapterId: id })
     .sort({
-      startDate: -1,
+      year: -1,
     })
     .exec();
 
