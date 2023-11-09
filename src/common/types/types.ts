@@ -42,4 +42,5 @@ export type Fund = {
   name: string;
   date: string;
   amount: number;
+  source: string;
 };
