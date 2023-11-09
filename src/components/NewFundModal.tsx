@@ -19,7 +19,6 @@ import {
   import { useEffect, useState } from "react";
   import { RadioDropdown } from "./RadioDropdown";
   import { User, Role, userSchema, roleSchema, Chapter } from "~/common/types";
-  import { trpc } from "~/utils/api";
   import { FloatingAlert } from "./FloatingAlert";
   
   type NewUserProps = {
@@ -62,16 +61,6 @@ import {
   
     // Create the user in the backend and update the frontend with dummy data temporarily on success
     const handleSave = () => {
-      if (!validateFields()) {
-        onOpenError();
-        return false;
-      }
-      const user: User = {
-        name,
-        email,
-        role,
-        chapter,
-      };
       onCloseModal();
       return true;
     };
@@ -81,26 +70,14 @@ import {
       onCloseError();
       return true;
     };
-  
-    const validateFields = () => {
-      let user: User = {
-        name,
-        email,
-        role,
-        chapter,
-      };
-      setNameError(name === "" ? UserError.Empty : UserError.None);
-      return userSchema.safeParse(user).success;
-    };
+
+
   
     const handleRoleChange = (role: string) => {
       if (role === "admin") {
         setChapter("");
       }
       setRole(roleSchema.parse(role));
-    };
-    const handleChapterChange = (chapter: string) => {
-      setChapter(chapter);
     };
     const handleNameChange = (event: React.FormEvent<HTMLInputElement>) =>
       setName(event.currentTarget.value);
