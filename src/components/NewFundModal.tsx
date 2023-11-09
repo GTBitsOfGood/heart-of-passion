@@ -56,48 +56,7 @@ import {
       onOpen: onOpenError,
     } = useDisclosure({ defaultIsOpen: false });
   
-    // TRPC Queries and Mutations
-    const trpcUtils = trpc.useContext();
-    const chapters = trpc.chapter.getChapters.useQuery();
-    const createUser = trpc.user.createUser.useMutation({
-      onSuccess: () => {
-        trpcUtils.user.invalidate();
-      },
-    });
-  
-    const updateUser = trpc.user.updateUser.useMutation({
-      onSuccess: () => {
-        trpcUtils.user.invalidate();
-      },
-    });
-  
-    const deleteUser = trpc.user.deleteUser.useMutation({
-      onSuccess: () => {
-        trpcUtils.user.invalidate();
-      },
-    });
-  
-    useEffect(() => {
-      if (
-        chapter === "" &&
-        role !== "admin" &&
-        chapters.data &&
-        chapters.data.length > 0
-      ) {
-        setChapter(chapters.data[0]!.name);
-      }
-    }, [chapter, chapters, role]);
-  
     const onCloseModal = () => {
-      if (create) {
-        setRole("student");
-        if (chapters.data && chapters.data.length > 0) {
-          setChapter(chapters.data[0]!.name);
-        }
-        setName("");
-        setEmail("");
-      }
-      setNameError(UserError.None);
       onClose();
     };
   
@@ -113,17 +72,11 @@ import {
         role,
         chapter,
       };
-      if (create) {
-        createUser.mutate(user);
-      } else {
-        updateUser.mutate({ email: userData.email, updateData: user });
-      }
       onCloseModal();
       return true;
     };
   
     const handleDelete = () => {
-      deleteUser.mutate(userData.email);
       onCloseModal();
       onCloseError();
       return true;
