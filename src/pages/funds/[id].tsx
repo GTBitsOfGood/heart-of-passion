@@ -277,7 +277,7 @@ import {
               <NewFundModal
                 isOpen={isOpenAddFundModal}
                 onClose={onCloseAddFundModal}
-                userData={{ name: "", email: "", role: "student", chapter: "" }}
+                fundData={{ name: "", date: "", amount: 0}}
                 create={true}
                 />
             </Box>

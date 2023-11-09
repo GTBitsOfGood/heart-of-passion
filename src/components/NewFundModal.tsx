@@ -21,34 +21,53 @@ import {
   import { User, Role, userSchema, roleSchema, Chapter } from "~/common/types";
   import { FloatingAlert } from "./FloatingAlert";
   
-  type NewUserProps = {
+  type NewFundProps = {
     isOpen: boolean;
     onClose: () => void;
-    userData: User;
+    fundData: Fund;
     create: boolean;
   };
+
+  type Fund = {
+    name: string;
+    date: string;
+    amount: number;
+  };
+
+  // Validate and parse date
+    function isValidDate(dateString: string): boolean {
+    const datePattern = /^(0?[1-9]|1[0-2])\/(0?[1-9]|[12][0-9]|3[01])\/\d{4}$/;
+    return datePattern.test(dateString);
+  }
+
+  // Parse amount as a number (dollars with two decimal places)
+    function parseAmount(amountString: string): number {
+        const amount = parseFloat(amountString.replace(/[$,]/g, ''));
+        return isNaN(amount) ? 0 : amount;
+    }
   
-  enum UserError {
+  enum FundError {
     None, // No error
     Empty, // Empty user
   }
   
-  const eventOptions = ["Donation", "Event 1", "Event 2", "Event 3"]
+  const eventOptions = ["Select Source", "Donation", "Event 1", "Event 2", "Event 3"]
   
   export const NewFundModal = ({
     isOpen,
     onClose,
-    userData,
+    fundData,
     create,
-  }: NewUserProps) => {
+  }: NewFundProps) => {
     // Form Data
-    const [name, setName] = useState(userData.name);
-    const [email, setEmail] = useState(userData.email);
-    const [role, setRole] = useState<Role>(userData.role);
-    const [chapter, setChapter] = useState(userData.chapter);
+    const [name, setName] = useState("");
+    const [date, setDate] = useState("");
+    const [amount, setAmount] = useState("");
+    const [source, setSource] = useState("Select Source");
   
-    // Errors
-    const [nameError, setNameError] = useState<UserError>(UserError.None);
+    // Error
+    const [amountError, setAmountError] = useState<FundError>(FundError.None);
+
     const {
       isOpen: isError,
       onClose: onCloseError,
@@ -61,6 +80,10 @@ import {
   
     // Create the user in the backend and update the frontend with dummy data temporarily on success
     const handleSave = () => {
+    if (!amount) {
+        setAmountError(FundError.Empty);
+        return false; // Return false to prevent saving
+        }
       onCloseModal();
       return true;
     };
@@ -71,18 +94,23 @@ import {
       return true;
     };
 
-
-  
-    const handleRoleChange = (role: string) => {
-      if (role === "admin") {
-        setChapter("");
-      }
-      setRole(roleSchema.parse(role));
-    };
     const handleNameChange = (event: React.FormEvent<HTMLInputElement>) =>
       setName(event.currentTarget.value);
-    const handleEmailChange = (event: React.FormEvent<HTMLInputElement>) =>
-      setEmail(event.currentTarget.value);
+    const handleDateChange = (event: React.FormEvent<HTMLInputElement>) =>
+      setDate(event.currentTarget.value);
+    const handleSourceChange = (selectedOption: string) =>
+        setSource(selectedOption);
+    const handleAmountChange = (event: React.FormEvent<HTMLInputElement>) => {
+        const inputValue = event.currentTarget.value;
+        setAmount(inputValue);
+    
+        // Validate the input and update the error state
+        if (!inputValue) {
+            setAmountError(FundError.Empty);
+        } else {
+            setAmountError(FundError.None);
+        }
+    };
   
     return (
       <Modal isOpen={isOpen} onClose={onCloseModal} isCentered>
@@ -142,8 +170,8 @@ import {
                   </FormLabel>
                   <RadioDropdown
                     options={eventOptions}
-                    selectedOption={"Select Event"}
-                    setSelectedOption={handleRoleChange}
+                    selectedOption={source}
+                    setSelectedOption={handleSourceChange}
                   />
                   <FormErrorMessage minHeight="20px" />
                 </FormControl>
@@ -161,8 +189,8 @@ import {
                     borderRadius="0px"
                     width="182px"
                     height="30px"
-                    //value={email}
-                    onChange={handleEmailChange}
+                    value={date}
+                    onChange={handleDateChange}
                     type="email"
                     required
                   />
@@ -171,7 +199,7 @@ import {
                     </FormErrorMessage>
                   </Box>
                 </FormControl>
-                <FormControl isInvalid={nameError !== UserError.None}>
+                <FormControl isInvalid={amountError !== FundError.None}>
                   <FormLabel
                     fontFamily="body"
                     fontSize="16px"
@@ -188,9 +216,9 @@ import {
                     borderRadius="0px"
                     width="182px"
                     height="30px"
-                    //value={email}
-                    onChange={handleEmailChange}
-                    type="email"
+                    value={amount}
+                    onChange={handleAmountChange}
+                    type="text"
                     required
                   />
                   <Box minHeight="20px" mt={2}>
