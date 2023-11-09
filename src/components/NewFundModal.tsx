@@ -18,7 +18,7 @@ import {
   } from "@chakra-ui/react";
   import { useEffect, useState } from "react";
   import { RadioDropdown } from "./RadioDropdown";
-  import { User, Role, userSchema, roleSchema, Chapter } from "~/common/types";
+  import { Fund } from "~/common/types/types";
   import { FloatingAlert } from "./FloatingAlert";
   
   type NewFundProps = {
@@ -28,11 +28,6 @@ import {
     create: boolean;
   };
 
-  type Fund = {
-    name: string;
-    date: string;
-    amount: number;
-  };
 
   // Validate and parse date
     function isValidDate(dateString: string): boolean {
