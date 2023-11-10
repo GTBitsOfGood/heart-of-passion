@@ -7,7 +7,7 @@ import { Fund, FundList as FundListType } from "src/common/types";
 export default function FundList({ title, funds }: FundListType) {
   const [open, setOpen] = useState(true);
   const fundsRendered = funds.map((fund: Fund) => (
-    <FundEntry key={fund.name} {...fund} />
+    <FundEntry key={fund.name} {...fund} /> //key needs to be from backend once we wire it up, cannot have duplicates
   ));
   return (
     <>

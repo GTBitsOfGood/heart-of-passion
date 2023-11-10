@@ -28,7 +28,7 @@ import {
     const {
       isOpen: isOpenFilterPopover,
       onOpen: onOpenFilterPopover,
-      onClose: onCloseFilterPopeover,
+      onClose: onCloseFilterPopover,
     } = useDisclosure();
     const {
         isOpen: isOpenAddFundModal,
@@ -38,7 +38,7 @@ import {
   
     function handleFilterClick(filter: string) {
       setFilter(filter);
-      onCloseFilterPopeover();
+      onCloseFilterPopover();
     }
   
     let dummyChapter = {
@@ -52,89 +52,80 @@ import {
     let dummyYear = 2023;
     
     const dummy_funds = [
-            {
-              name: 'Jane Goodall',
-              date: '11/01/2023',
-              amount: 500,
-              source: 'Donation'
-            },
-            {
-              name: 'Albert Einstein',
-              date: '10/15/2023',
-              amount: 120,
-              source: 'Event 1'
-            },
-            {
-              name: 'Isaac Newton',
-              date: '09/20/2023',
-              amount: 200,
-              source: 'Event 1'
-            },
-            {
-              name: 'Marie Curie',
-              date: '08/05/2023',
-              amount: 750,
-              source: 'Event 2'
-            },
-            {
-                name: 'Jane Goodall',
-                date: '11/01/2023',
-                amount: 500,
-                source: 'Donation'
-              },
-              {
-                name: 'Albert Einstein',
-                date: '10/15/2023',
-                amount: 120,
-                source: 'Event 1'
-              },
-              {
-                name: 'Isaac Newton',
-                date: '09/20/2023',
-                amount: 200,
-                source: 'Event 1'
-              },
-              {
-                name: 'Marie Curie',
-                date: '08/05/2023',
-                amount: 750,
-                source: 'Event 2'
-              },
-              {
-                name: 'Jane Goodall',
-                date: '11/01/2023',
-                amount: 500,
-                source: 'Donation'
-              },
-              {
-                name: 'Albert Einstein',
-                date: '10/15/2023',
-                amount: 120,
-                source: 'Event 1'
-              },
-              {
-                name: 'Isaac Newton',
-                date: '09/20/2023',
-                amount: 200,
-                source: 'Event 1'
-              },
-              {
-                name: 'Marie Curie',
-                date: '08/05/2023',
-                amount: 750,
-                source: 'Event 2'
-              }
-      ];
+        {
+          name: 'Nikola Tesla',
+          date: '11/01/2023',
+          amount: 500,
+          source: 'Donation'
+        },
+        {
+          name: 'Rosalind Franklin',
+          date: '10/15/2023',
+          amount: 120,
+          source: 'Event 1'
+        },
+        {
+          name: 'Stephen Hawking',
+          date: '09/20/2023',
+          amount: 200,
+          source: 'Event 1'
+        },
+        {
+          name: 'Ada Lovelace',
+          date: '08/05/2023',
+          amount: 750,
+          source: 'Event 2'
+        },
+        {
+          name: 'Albert Einstein',
+          date: '11/01/2023',
+          amount: 500,
+          source: 'Donation'
+        },
+        {
+          name: 'Galileo Galilei',
+          date: '10/15/2023',
+          amount: 120,
+          source: 'Event 1'
+        },
+        {
+          name: 'Grace Hopper',
+          date: '09/20/2023',
+          amount: 200,
+          source: 'Event 1'
+        },
+        {
+          name: 'Carl Sagan',
+          date: '08/05/2023',
+          amount: 750,
+          source: 'Event 2'
+        },
+        {
+          name: 'Marie Curie',
+          date: '11/01/2023',
+          amount: 500,
+          source: 'Donation'
+        },
+        {
+          name: 'Gregor Mendel',
+          date: '10/15/2023',
+          amount: 120,
+          source: 'Event 1'
+        },
+        {
+          name: 'Leonardo da Vinci',
+          date: '08/05/2023',
+          amount: 750,
+          source: 'Event 2'
+        }
+      ];      
 
       
 
       const [funds, setFunds] = useState([] as Fund[]);
-      const totalAmount = funds.reduce(
-        (total, fund) => total + fund.amount,
-        0,
-      ); 
+      
       useEffect(() => {
-        // clear expenses so it doesn't add every time the page is re-rendered
+        // clear funds so it doesn't add every time the page is re-rendered
         setFunds([]);
         dummy_funds?.forEach((fund: any) => {
             setFunds((funds) => [
@@ -147,12 +138,32 @@ import {
               },
             ]);
           });
-      }, []);
+      }, [dummy_funds]);
     
+      const totalAmount = funds.reduce(
+        (total, fund) => total + fund.amount,
+        0,
+      ); 
 
     const groups = (function () {
     if (funds && funds.length > 0) {
-        if (filter === "highest amount") {
+        if (filter === "source") {
+            const uniques = [...new Set(funds?.map((u: any) => u["source"]))]; // array of unique vals
+            const emap = new Map(uniques.map((e: any) => [e, new Array()])); // map of val to empty array
+            funds?.forEach(
+              (e: any) =>
+                emap.get(e["source"])?.push({
+                  name: e["name"],
+                  date: e["date"],
+                  amount: e["amount"],
+                  source: e["source"],
+                }),
+            );
+            return uniques?.map((e: string) => ({
+              title: e,
+              funds: emap.get(e),
+            })).sort((a, b) => a.title.localeCompare(b.title));
+          } else if (filter === "highest amount") {
         // Sort by amount descending (highest to lowest)
             funds.sort((a, b) => b.amount - a.amount);
             return [{title: "Highest to Lowest", funds:funds}];
@@ -160,24 +171,6 @@ import {
         // Sort by amount ascending (lowest to highest)
             funds.sort((a, b) => a.amount - b.amount);
             return [{title: "Lowest to Highest", funds:funds}];
-        } else if (filter === "source") {
-            
-          const uniques = [...new Set(funds?.map((u: any) => u["source"]))]; // array of unique vals
-          const emap = new Map(uniques.map((e: any) => [e, new Array()])); // map of val to empty array
-          funds?.forEach(
-            (e: any) =>
-              emap.get(e["source"])?.push({
-                name: e["name"],
-                date: e["date"],
-                amount: e["amount"],
-                source: e["source"],
-              }),
-          );
-          var groups_temp = uniques?.map((e: string) => ({
-            title: e,
-            funds: emap.get(e),
-          }))
-          return groups_temp.sort((a, b) => a.title.localeCompare(b.title));
         } else {
             // Sort by date ascending (earliest to latest)
             funds.sort((a, b) => {
@@ -217,7 +210,7 @@ import {
               <Popover
                 placement="bottom-end"
                 isOpen={isOpenFilterPopover}
-                onClose={onCloseFilterPopeover}
+                onClose={onCloseFilterPopover}
               >
                 <PopoverTrigger>
                   <Button
@@ -226,15 +219,13 @@ import {
                     gap="0.5em"
                   >
                     <Text align="right" fontFamily={fonts.nunito} fontSize="sm">
-                      {filter == "highest amount"
-                        ? "View by Highest Amount"
+                      {filter == "date"
+                        ? "View by Date"
                         : filter == "source"
                         ? "View by Source"
-                        : filter == "lowest amount"
-                        ? "View by Lowest Amount"
-                        : filter == "date"
-                        ? "View by Date"
-                        : "View by Date"}
+                        : filter == "highest amount"
+                        ? "View by Highest Amount"
+                        : "View by Lowest Amount"}
                     </Text>
                     <TriangleDownIcon />
                   </Button>
