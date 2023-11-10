@@ -21,7 +21,7 @@ export type Times = {
   [key: string]: Time[];
 };
 
-export type Expense = {
+export type ExpenseType = {
   name: string;
   type: string;
   cost: number;
