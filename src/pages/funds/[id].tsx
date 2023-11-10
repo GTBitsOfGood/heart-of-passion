@@ -50,87 +50,89 @@ import {
     };
   
     let dummyYear = 2023;
-  /* 
-    const router = useRouter();
-    const { id }: { id?: string } = router.query;
-    const eventData = trpc.event.getEvents.useQuery(id || "123").data;
-    const [expenses, setExpenses] = useState([] as Expense[]);
-    useEffect(() => {
-      // clear expenses so it doesn't add every time the page is re-rendered
-      setExpenses([]);
-      eventData?.forEach((event: any) => {
-        event.expenses?.forEach((expense: any) => {
-          setExpenses((expenses) => [
-            ...expenses,
-            {
-              name: expense.name,
-              event: event.name,
-              dates: event.dates,
-              type: expense.type === "other" ? "Miscellaneous" : expense.type,
-              cost: expense.cost,
-              numUnits:
-                expense.costType === "flat cost" ? 1 : expense.numberOfUnits,
-            },
-          ]);
-        });
-      });
-    }, [eventData]);
-  
-    const totalCost = expenses.reduce(
-      (total, expense) => total + expense.cost * (expense.numUnits || 1),
-      0,
-    ); */
-  
-/*     const groups = (function () {
-      if (expenses && expenses.length > 0) {
-        if (filter === "category") {
-          const uniques = [...new Set(expenses?.map((u: any) => u["type"]))]; // array of unique vals
-          const emap = new Map(uniques.map((e: any) => [e, new Array()])); // map of val to empty array
-          expenses?.forEach(
-            (e: any) =>
-              emap.get(e["type"])?.push({
-                name: e["name"],
-                event: e["event"],
-                type: e["type"],
-                cost: e["cost"],
-                numUnits: e["numUnits"],
-              }),
-          );
-          return uniques?.map((e: string) => ({
-            title: e,
-            expenses: emap.get(e),
-        }));
-        */
-
+    
     const dummy_funds = [
             {
-              name: 'Scholarship Grant',
+              name: 'Jane Goodall',
               date: '11/01/2023',
-              amount: 5000,
+              amount: 500,
               source: 'Donation'
             },
             {
-              name: 'Research Funding',
+              name: 'Albert Einstein',
               date: '10/15/2023',
-              amount: 12000,
+              amount: 120,
               source: 'Event 1'
             },
             {
-              name: 'Hospital Donation',
+              name: 'Isaac Newton',
               date: '09/20/2023',
-              amount: 20000,
+              amount: 200,
               source: 'Event 1'
             },
             {
-              name: 'Health Initiative',
+              name: 'Marie Curie',
               date: '08/05/2023',
-              amount: 7500,
+              amount: 750,
               source: 'Event 2'
-            }
-        // ... add more group objects as needed
+            },
+            {
+                name: 'Jane Goodall',
+                date: '11/01/2023',
+                amount: 500,
+                source: 'Donation'
+              },
+              {
+                name: 'Albert Einstein',
+                date: '10/15/2023',
+                amount: 120,
+                source: 'Event 1'
+              },
+              {
+                name: 'Isaac Newton',
+                date: '09/20/2023',
+                amount: 200,
+                source: 'Event 1'
+              },
+              {
+                name: 'Marie Curie',
+                date: '08/05/2023',
+                amount: 750,
+                source: 'Event 2'
+              },
+              {
+                name: 'Jane Goodall',
+                date: '11/01/2023',
+                amount: 500,
+                source: 'Donation'
+              },
+              {
+                name: 'Albert Einstein',
+                date: '10/15/2023',
+                amount: 120,
+                source: 'Event 1'
+              },
+              {
+                name: 'Isaac Newton',
+                date: '09/20/2023',
+                amount: 200,
+                source: 'Event 1'
+              },
+              {
+                name: 'Marie Curie',
+                date: '08/05/2023',
+                amount: 750,
+                source: 'Event 2'
+              }
       ];
 
+      
+
       const [funds, setFunds] = useState([] as Fund[]);
+      const totalAmount = funds.reduce(
+        (total, fund) => total + fund.amount,
+        0,
+      ); 
       useEffect(() => {
         // clear expenses so it doesn't add every time the page is re-rendered
         setFunds([]);
@@ -312,7 +314,7 @@ import {
               Total Raised Funds:
             </Text>
             <Text fontFamily={fonts.oswald} fontSize="64px" fontWeight="700">
-              {/* ${totalCost} */}
+              ${totalAmount}
             </Text>
           </Flex>
         </Stack>
