@@ -73,7 +73,6 @@ import {
       onClose();
     };
   
-    // Create the user in the backend and update the frontend with dummy data temporarily on success
     const handleSave = () => {
     if (!amount) {
         setAmountError(FundError.Empty);

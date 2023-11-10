@@ -16,9 +16,9 @@ import {
   import fonts from "src/common/theme/fonts";
   import Sidebar from "~/components/Sidebar";
   import { useEffect, useState } from "react";
-  import ExpenseList from "~/components/expenses/ExpenseList";
+  import FundList from "~/components/funds/FundList";
   import { trpc } from "~/utils/api";
-  import { Expense } from "~/common/types";
+  import { Fund } from "~/common/types";
   import { useRouter } from "next/router";
   import { NewFundModal } from "~/components/NewFundModal";
   
@@ -50,7 +50,7 @@ import {
     };
   
     let dummyYear = 2023;
-  
+  /* 
     const router = useRouter();
     const { id }: { id?: string } = router.query;
     const eventData = trpc.event.getEvents.useQuery(id || "123").data;
@@ -79,9 +79,9 @@ import {
     const totalCost = expenses.reduce(
       (total, expense) => total + expense.cost * (expense.numUnits || 1),
       0,
-    );
+    ); */
   
-    const groups = (function () {
+/*     const groups = (function () {
       if (expenses && expenses.length > 0) {
         if (filter === "category") {
           const uniques = [...new Set(expenses?.map((u: any) => u["type"]))]; // array of unique vals
@@ -99,76 +99,97 @@ import {
           return uniques?.map((e: string) => ({
             title: e,
             expenses: emap.get(e),
-          }));
-        } else if (filter === "highest cost") {
-          expenses.sort((a, b) => b.cost - a.cost);
-          return [{ title: "Highest to Lowest", expenses: expenses }];
-        } else if (filter === "lowest cost") {
-          expenses.sort((a, b) => a.cost - b.cost);
-          return [{ title: "Lowest to Highest", expenses: expenses }];
-        } else {
-          // filter === "date"
-          const uniques = [
-            ...new Set(
-              expenses
-                .filter((u: any) => u["dates"].length === 1)
-                .map((u: any) => u["dates"][0]["date"]),
-            ),
-          ];
-          uniques.push("Other Expenses"); // for expenses with multiple dates
-          const emap = new Map(uniques.map((e: any) => [e, new Array()])); // map of val to empty array
-          expenses?.forEach((e: any) => {
-            emap
-              .get(
-                e["dates"].length > 1 ? "Other Expenses" : e["dates"][0]["date"],
-              )
-              ?.push({
-                name: e["name"],
-                event: e["event"],
-                type: e["type"],
-                cost: e["cost"],
-                numUnits: e["numUnits"],
-              });
-          });
-          const categories = uniques?.map((e: string) => ({
-            title: e,
-            expenses: emap.get(e),
-          }));
-          // sort by date
-          categories.sort((a, b) => {
-            if (a.title === "Other Expenses") {
-              return 1;
-            } else if (b.title === "Other Expenses") {
-              return -1;
-            } else {
-              return new Date(a.title).getTime() - new Date(b.title).getTime();
+        }));
+        */
+
+    const dummy_funds = [
+            {
+              name: 'Scholarship Grant',
+              date: '11/01/2023',
+              amount: 5000,
+              source: 'Donation'
+            },
+            {
+              name: 'Research Funding',
+              date: '10/15/2023',
+              amount: 12000,
+              source: 'Event 1'
+            },
+            {
+              name: 'Hospital Donation',
+              date: '09/20/2023',
+              amount: 20000,
+              source: 'Event 1'
+            },
+            {
+              name: 'Health Initiative',
+              date: '08/05/2023',
+              amount: 7500,
+              source: 'Event 2'
             }
+        // ... add more group objects as needed
+      ];
+
+      const [funds, setFunds] = useState([] as Fund[]);
+      useEffect(() => {
+        // clear expenses so it doesn't add every time the page is re-rendered
+        setFunds([]);
+        dummy_funds?.forEach((fund: any) => {
+            setFunds((funds) => [
+              ...funds,
+              {
+                name: fund.name,
+                date: fund.date,
+                amount: fund.amount,
+                source: fund.source,
+              },
+            ]);
           });
-          // convert from date format to Day 1/2/3/4 format
-          const firstDate = new Date(categories?.[0]?.title || "");
-          if (categories && categories.length > 0) {
-            categories.forEach((category) => {
-              if (category.title === "Other Expenses") {
-                return;
-              }
-              const currentDate = new Date(category.title);
-              const dayDifference = Math.ceil(
-                (currentDate.getTime() - firstDate.getTime()) /
-                  (1000 * 3600 * 24) +
-                  1,
-              );
-              category.title = `Day ${dayDifference}`;
+      }, []);
+    
+
+    const groups = (function () {
+    if (funds && funds.length > 0) {
+        if (filter === "highest amount") {
+        // Sort by amount descending (highest to lowest)
+            funds.sort((a, b) => b.amount - a.amount);
+            return [{title: "Highest to Lowest", funds:funds}];
+        } else if (filter === "lowest amount") {
+        // Sort by amount ascending (lowest to highest)
+            funds.sort((a, b) => a.amount - b.amount);
+            return [{title: "Lowest to Highest", funds:funds}];
+        } else if (filter === "source") {
+            
+          const uniques = [...new Set(funds?.map((u: any) => u["source"]))]; // array of unique vals
+          const emap = new Map(uniques.map((e: any) => [e, new Array()])); // map of val to empty array
+          funds?.forEach(
+            (e: any) =>
+              emap.get(e["source"])?.push({
+                name: e["name"],
+                date: e["date"],
+                amount: e["amount"],
+                source: e["source"],
+              }),
+          );
+          var groups_temp = uniques?.map((e: string) => ({
+            title: e,
+            funds: emap.get(e),
+          }))
+          return groups_temp.sort((a, b) => a.title.localeCompare(b.title));
+        } else {
+            // Sort by date ascending (earliest to latest)
+            funds.sort((a, b) => {
+                // Convert dates to timestamps explicitly
+                return new Date(a.date).getTime() - new Date(b.date).getTime();
             });
-          }
-          return categories;
+            return [{title: "Date", funds:funds}];
         }
-      } else {
-        return [];
-      }
-    })();
-  
+    } else {return [];}
+})();
+
+
     const groupsRendered = groups.map((gr: any) => (
-      <ExpenseList key={gr.title} {...gr} />
+      <FundList key={gr.title} {...gr} />
     ));
   
     return (
@@ -203,13 +224,15 @@ import {
                     gap="0.5em"
                   >
                     <Text align="right" fontFamily={fonts.nunito} fontSize="sm">
-                      {filter == "date"
+                      {filter == "highest amount"
+                        ? "View by Highest Amount"
+                        : filter == "source"
+                        ? "View by Source"
+                        : filter == "lowest amount"
+                        ? "View by Lowest Amount"
+                        : filter == "date"
                         ? "View by Date"
-                        : filter == "category"
-                        ? "View by Category"
-                        : filter == "lowest cost"
-                        ? "View by Lowest Cost"
-                        : "View by Highest Cost"}
+                        : "View by Date"}
                     </Text>
                     <TriangleDownIcon />
                   </Button>
@@ -227,34 +250,34 @@ import {
                           Date
                         </Text>
                       </Box>
-                      <Box onClick={() => handleFilterClick("category")}>
+                      <Box onClick={() => handleFilterClick("source")}>
                         <Text
                           align="right"
                           cursor="pointer"
                           fontFamily={fonts.nunito}
                           fontSize="sm"
                         >
-                          Category
+                          Source
                         </Text>
                       </Box>
-                      <Box onClick={() => handleFilterClick("lowest cost")}>
+                      <Box onClick={() => handleFilterClick("lowest amount")}>
                         <Text
                           align="right"
                           cursor="pointer"
                           fontFamily={fonts.nunito}
                           fontSize="sm"
                         >
-                          Lowest Cost
+                          Lowest Amount
                         </Text>
                       </Box>
-                      <Box onClick={() => handleFilterClick("highest cost")}>
+                      <Box onClick={() => handleFilterClick("highest amount")}>
                         <Text
                           align="right"
                           cursor="pointer"
                           fontFamily={fonts.nunito}
                           fontSize="sm"
                         >
-                          Highest Cost
+                          Highest Amount
                         </Text>
                       </Box>
                     </Stack>
@@ -289,7 +312,7 @@ import {
               Total Raised Funds:
             </Text>
             <Text fontFamily={fonts.oswald} fontSize="64px" fontWeight="700">
-              ${totalCost}
+              {/* ${totalCost} */}
             </Text>
           </Flex>
         </Stack>
