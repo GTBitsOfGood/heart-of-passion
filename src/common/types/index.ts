@@ -10,7 +10,7 @@ export const userSchema = z
     name: z.string(),
     email: z.string().email(),
     role: roleSchema,
-    chapter: z.string().optional(),
+    chapter: z.string(),
   })
   .refine((data) => {
     if (data.role === "student" || data.role === "mentor") {
@@ -28,14 +28,51 @@ export const userListSchema = z.object({
 });
 export type UserList = z.infer<typeof userListSchema>;
 
+// Role
+export const typeSchema = z.enum([
+  "Entertainment",
+  "Food",
+  "Transportation",
+  "Hotel",
+  "Decorations",
+  "Miscellaneous",
+]);
+export type Type = z.infer<typeof typeSchema>;
+
+// Expense
+export const expenseSchema = z.object({
+  name: z.string(),
+  event: z.string().optional(),
+  dates: z.array(z.string()),
+  type: typeSchema,
+  cost: z.number(),
+  numUnits: z.number().optional(),
+});
+export type Expense = z.infer<typeof expenseSchema>;
+
+// Expense List
+export const expenseListSchema = z.object({
+  title: z.string(),
+  expenses: z.array(expenseSchema),
+});
+export type ExpenseList = z.infer<typeof expenseListSchema>;
+
 // Chapter
 export const chapterSchema = z.object({
   name: z.string(),
   totalCost: z.number(),
   fundExpected: z.number(),
   fundActual: z.number(),
+  id: z.string(),
 });
 export type Chapter = z.infer<typeof chapterSchema>;
+
+// Retreat
+export const retreatSchema = z.object({
+  chapterId: z.string(),
+  year: z.number(),
+});
+export type Retreat = z.infer<typeof retreatSchema>;
 
 // Energy Level
 export const energyLevelSchema = z.enum(["low", "medium", "high"]);

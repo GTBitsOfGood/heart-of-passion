@@ -13,19 +13,32 @@ import {
   ModalHeader,
   ModalOverlay,
   VStack,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { trpc } from "~/utils/api";
+import { FloatingAlert } from "./FloatingAlert";
 
 type NewChapterProps = {
-  focusRef: React.MutableRefObject<null>;
   isOpen: boolean;
   onClose: () => void;
+  chapterName: string;
+  create: boolean;
 };
 
-export const NewChapterModal = ({ focusRef, isOpen, onClose }: NewChapterProps) => {
-  const [chapter, setChapter] = useState("");
+export const NewChapterModal = ({
+  isOpen,
+  onClose,
+  chapterName,
+  create, // This is to check if we are creating a new chapter or editing a new chapter
+}: NewChapterProps) => {
+  const [chapter, setChapter] = useState(chapterName);
   const [chapterError, setChapterError] = useState(false);
+  const {
+    isOpen: isError,
+    onClose: onCloseError,
+    onOpen: onOpenError,
+  } = useDisclosure({ defaultIsOpen: false });
 
   const trpcUtils = trpc.useContext();
   const createChapter = trpc.chapter.createChapter.useMutation({
@@ -34,8 +47,16 @@ export const NewChapterModal = ({ focusRef, isOpen, onClose }: NewChapterProps) 
     },
   });
 
+  const updateChapter = trpc.chapter.updateChapter.useMutation({
+    onSuccess: () => {
+      trpcUtils.chapter.invalidate();
+    },
+  });
+
   const onCloseModal = () => {
-    setChapter("");
+    if (create) {
+      setChapter("");
+    }
     setChapterError(false);
     onClose();
   };
@@ -48,7 +69,14 @@ export const NewChapterModal = ({ focusRef, isOpen, onClose }: NewChapterProps) 
     if (!validateFields()) {
       return false;
     }
-    await createChapter.mutate(chapter);
+    if (create) {
+      await createChapter.mutate(chapter);
+    } else {
+      await updateChapter.mutate({
+        oldChapterName: chapterName,
+        newChapterName: chapter,
+      });
+    }
     onCloseModal();
     return true;
   };
@@ -58,20 +86,17 @@ export const NewChapterModal = ({ focusRef, isOpen, onClose }: NewChapterProps) 
 
     if (chapter === "") {
       setChapterError(true);
+      onOpenError();
       valid = false;
     } else {
       setChapterError(false);
+      onCloseError();
     }
     return valid;
   };
 
   return (
-    <Modal
-      finalFocusRef={focusRef}
-      isOpen={isOpen}
-      onClose={onCloseModal}
-      isCentered
-    >
+    <Modal isOpen={isOpen} onClose={onCloseModal} isCentered>
       <ModalOverlay />
       <ModalContent
         width="327px"
@@ -129,6 +154,7 @@ export const NewChapterModal = ({ focusRef, isOpen, onClose }: NewChapterProps) 
             APPLY
           </Button>
         </ModalFooter>
+        {isError && <FloatingAlert onClose={onCloseError} />}
       </ModalContent>
     </Modal>
   );

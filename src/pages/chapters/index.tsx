@@ -15,6 +15,7 @@ import { NewChapterModal } from "~/components/NewChapterModal";
 import { useRef } from "react";
 import { trpc } from "~/utils/api";
 import { Chapter } from "~/common/types";
+import { Retreat } from "~/common/types/types";
 
 export default function Home() {
   const {
@@ -26,7 +27,6 @@ export default function Home() {
 
   // Get all the chapters from the backend and populate the frontend afterwards
   let chapters = trpc.chapter.getChapters.useQuery();
-
   return (
     <Box m="2%">
       <Grid templateColumns="repeat(8, 1fr)" mb="3%">
@@ -48,9 +48,10 @@ export default function Home() {
             ADD CHAPTER
           </Button>
           <NewChapterModal
-            focusRef={finalRef}
             isOpen={isOpenAddChapterModal}
             onClose={onCloseAddChapterModal}
+            chapterName=""
+            create={true}
           />
         </GridItem>
         <GridItem alignSelf="flex-end">
