@@ -23,8 +23,8 @@ export default function CalendarCard({
   expenseTotal: number;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const height = computeHeight(date.from, date.to);
-  const top = computeHeight("9:00 am", date.from);
+  const height = computeHeight(date.from, date.to, screen.height);
+  const top = computeHeight("9:00 am", date.from, screen.height);
   const parentRef: any = useRef();
   // const [cardHt, setCardHeight] = useState(-1); // debugging only, can remove
   const [variant, setVariant] = useState(3);
@@ -93,7 +93,7 @@ export default function CalendarCard({
           whiteSpace="nowrap"
           color={"#C32127"}
         >
-          ${date.from} <b>{event?.name}</b> {event?.location}{" "}
+          {date.from} <b>{event?.name}</b> {event?.location}{" "}
           <b>${expenseTotal}</b>
         </Text>
       </Flex>
@@ -116,18 +116,23 @@ export default function CalendarCard({
       <Grid
         templateColumns="207px 27px"
         width={"207px"}
+        minH={"15px"}
         height={`${height}px`}
-        mt={`${top}px`}
         display={"flex"}
         border="1px solid #D9D9D9"
-        marginBottom={10}
+        marginBottom={"16px"}
         onClick={onOpen}
         overflow={variant < -1 ? "visible" : "hidden"}
         ref={parentRef}
         as={GridItem}
         area="stack"
       >
-        <GridItem fontSize="14px" width={"100%"} padding={"7px"}>
+        <GridItem
+          fontSize="14px"
+          width={"100%"}
+          paddingY={variant >= 1 ? "7px" : "0px"}
+          paddingX={"7px"}
+        >
           {variant >= 0 ? <PositiveVariant /> : <NegativeVariant />}
         </GridItem>
         <GridItem

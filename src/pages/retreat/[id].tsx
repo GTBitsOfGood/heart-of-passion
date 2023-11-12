@@ -1,18 +1,23 @@
-import { Box, Flex, Grid, GridItem, Text } from "@chakra-ui/react";
+import { Box, Flex, Text } from "@chakra-ui/react";
 import CalendarCard from "src/components/Calendar/CalendarCard";
 
 import "@fontsource/oswald/700.css";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { RefObject, useRef, useState } from "react";
 import { trpc } from "~/utils/api";
 import Sidebar from "~/components/Sidebar";
-import { DateObject, Chapter } from "~/common/types";
+import { DateObject } from "~/common/types";
 import { IEvent } from "~/server/models/Event";
 import { Event } from "~/common/types";
 
 function Content({ events }: { events: IEvent[] }) {
   return (
-    <Flex justifyContent="center" alignItems="center">
+    <Flex
+      justifyContent="center"
+      alignItems="center"
+      flex={2}
+      width={"max-content"}
+    >
       <Box display={"flex"} gap={"14px"}>
         {[1, 2, 3, 4].map((num, index) => {
           return (
@@ -95,8 +100,16 @@ export default function Calendar() {
 
   return (
     <Box>
-      {chapter && retreat && <Sidebar chapter={chapter} year={retreat.year} />}
-      {events && <Content events={events} />}
+      <Box display="flex">
+        <Box zIndex={1000}>
+          {chapter && retreat && (
+            <Sidebar chapter={chapter} year={retreat.year} />
+          )}
+        </Box>
+        <Box position="relative" left="436px" overflowX={"visible"}>
+          {events && <Content events={events} />}
+        </Box>
+      </Box>
     </Box>
   );
 }

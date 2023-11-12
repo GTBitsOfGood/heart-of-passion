@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-import { EventModel } from "~/server/models/Event";
+import { EventModel, IEvent } from "~/server/models/Event";
 export const eventRouter = createTRPCRouter({
   createEvent: publicProcedure
     .input(
@@ -36,5 +36,20 @@ export const eventRouter = createTRPCRouter({
   getEvents: publicProcedure.input(z.string()).query(async (opts) => {
     const events = await EventModel.find({ retreatId: opts.input });
     return events;
+  }),
+  getEventsByDay: publicProcedure.input(z.string()).query(async (opts) => {
+    const events: IEvent[] = await EventModel.find({ retreatId: opts.input });
+    const eventMap = { 1: [], 2: [], 3: [], 4: [] };
+
+    const currDay = new Date();
+    currDay.setHours(0, 0, 0, 0);
+
+    for (let event in events) {
+      for (let date in event.dates) {
+        var tempDay = new Date(date.date);
+        const dayDifference = currDay.getDate() - tempDay.getDate() - 1;
+        eventMap;
+      }
+    }
   }),
 });
