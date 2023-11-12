@@ -33,7 +33,7 @@ const generateData = async (chapterId: string) => {
     energyLevel: "high",
     category: "educational",
     dates: [
-      { date: day1, from: "7:30 pm", to: "8:30 pm" },
+      { date: day1, from: "2:30 pm", to: "4:30 pm" },
       { date: day2, from: "5:30 pm", to: "6:30 pm" },
       { date: day3, from: "4:30 pm", to: "5:30 pm" },
       { date: day4, from: "11:30 am", to: "12:00 pm" },
@@ -73,6 +73,8 @@ const generateData = async (chapterId: string) => {
     category: "educational",
     dates: [
       { date: day1, from: "1:30 pm", to: "8:30 pm" },
+      { date: day1, from: "1:45 pm", to: "2:00 pm" },
+      { date: day1, from: "8:00 pm", to: "8:30 pm" },
       { date: day2, from: "3:30 pm", to: "6:30 pm" },
       { date: day3, from: "4:30 pm", to: "5:30 pm" },
       { date: day4, from: "11:30 am", to: "12:00 pm" },

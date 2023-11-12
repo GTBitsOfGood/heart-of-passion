@@ -17,10 +17,14 @@ export default function CalendarCard({
   event,
   date,
   expenseTotal,
+  width,
+  topY,
 }: {
   event: Event;
   date: DateObject;
   expenseTotal: number;
+  width: number;
+  topY?: number;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const height = computeHeight(date.from, date.to, screen.height);
@@ -65,7 +69,7 @@ export default function CalendarCard({
       >
         <Box>
           <Text color={"#C32127"}>{date.from}</Text>
-          <Text color={"#C32127"} fontWeight={700}>
+          <Text color={"#C32127"} fontWeight={700} textOverflow="ellipsis">
             {event?.name}
           </Text>
           {variant > 0 && <Text color={"#C32127"}>{event?.location}</Text>}
@@ -85,17 +89,30 @@ export default function CalendarCard({
         justify="center"
         h={variant < -1 ? "20px" : "100%"}
         overflow="visible"
+        textOverflow="ellipsis"
       >
-        <Text
-          width="158px"
-          overflow="hidden"
-          textOverflow="ellipsis"
-          whiteSpace="nowrap"
-          color={"#C32127"}
-        >
-          {date.from} <b>{event?.name}</b> {event?.location}{" "}
-          <b>${expenseTotal}</b>
-        </Text>
+        {width <= 103 ? (
+          <Text
+            width={width - 40}
+            overflow="hidden"
+            textOverflow="ellipsis"
+            whiteSpace="nowrap"
+            color={"#C32127"}
+          >
+            <b>{event?.name}</b>
+          </Text>
+        ) : (
+          <Text
+            width={width - 40}
+            overflow="hidden"
+            textOverflow="ellipsis"
+            whiteSpace="nowrap"
+            color={"#C32127"}
+          >
+            {date.from} <b>{event?.name}</b> {event?.location}{" "}
+            <b>${expenseTotal}</b>
+          </Text>
+        )}
       </Flex>
     );
   }
@@ -114,8 +131,8 @@ export default function CalendarCard({
   return (
     <>
       <Grid
-        templateColumns="207px 27px"
-        width={"207px"}
+        templateColumns={`${width}px 7px`}
+        width={width}
         minH={"15px"}
         height={`${height}px`}
         display={"flex"}
@@ -126,16 +143,19 @@ export default function CalendarCard({
         ref={parentRef}
         as={GridItem}
         area="stack"
+        textOverflow="ellipsis"
+        marginTop={!topY ? 0 : topY}
       >
         <GridItem
           fontSize="14px"
-          width={"100%"}
+          width={"calc(100% - 25px)"}
           paddingY={variant >= 1 ? "7px" : "0px"}
           paddingX={"7px"}
         >
           {variant >= 0 ? <PositiveVariant /> : <NegativeVariant />}
         </GridItem>
         <GridItem
+          width={"25px"}
           background={"rgba(38, 172, 226, 0.20)"}
           aria-orientation="vertical"
           color={"#26ACE2"}

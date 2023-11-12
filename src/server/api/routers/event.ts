@@ -39,17 +39,54 @@ export const eventRouter = createTRPCRouter({
   }),
   getEventsByDay: publicProcedure.input(z.string()).query(async (opts) => {
     const events: IEvent[] = await EventModel.find({ retreatId: opts.input });
-    const eventMap = { 1: [], 2: [], 3: [], 4: [] };
+    const eventMap: { [dayNum: number]: any[] } = {
+      1: [],
+      2: [],
+      3: [],
+      4: [],
+    };
 
     const currDay = new Date();
     currDay.setHours(0, 0, 0, 0);
 
-    for (let event in events) {
-      for (let date in event.dates) {
+    for (let event of events) {
+      for (let date of event.dates) {
         var tempDay = new Date(date.date);
-        const dayDifference = currDay.getDate() - tempDay.getDate() - 1;
-        eventMap;
+        const dayDifference: number = tempDay.getDate() - currDay.getDate() + 1;
+        if (dayDifference > 0) {
+          if (eventMap[dayDifference] === undefined) {
+            eventMap[dayDifference] = [
+              {
+                event,
+                from: date.from,
+                to: date.to,
+              },
+            ];
+          } else {
+            eventMap[dayDifference]!.push({
+              event,
+              from: date.from,
+              to: date.to,
+            });
+          }
+        }
       }
     }
+
+    Object.keys(eventMap).map((key: any) => {
+      eventMap[key]!.sort((a: any, b: any) => {
+        const date1 = new Date(`2000-01-01 ${a.from}`);
+        const date2 = new Date(`2000-01-01 ${b.from}`);
+        return date1 < date2
+          ? -1
+          : date1 === date2
+          ? 0
+          : date1 > date2
+          ? 1
+          : -1;
+      });
+    });
+
+    return eventMap;
   }),
 });

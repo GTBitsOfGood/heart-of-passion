@@ -118,7 +118,7 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
 
   return (
     <>
-      <Box pos="fixed" w={"400px"} h="100vh">
+      <Box pos="fixed" w="400px" h="100%">
         <Box
           bg={"#F9F9F9"}
           borderRight="1px"
