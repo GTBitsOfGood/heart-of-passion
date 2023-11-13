@@ -124,7 +124,7 @@ const Sidebar = ({ chapter, year, retreatId }: SidebarProps) => {
 
   return (
     <>
-      <Box pos="fixed" w="400px" h="100%" overflow="hidden">
+      <Box pos="fixed" w="400px" h="100%">
         <Box
           bg={"#F9F9F9"}
           borderRight="1px"
