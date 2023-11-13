@@ -232,7 +232,11 @@ export default function Calendar() {
       <Box display="flex">
         <Box zIndex={1000}>
           {chapter && retreat && (
-            <Sidebar chapter={chapter} year={retreat.year} />
+            <Sidebar
+              chapter={chapter}
+              year={retreat.year}
+              retreatId={retreat._id}
+            />
           )}
         </Box>
         <Box position="relative" left="436px" overflowX={"visible"}>
