@@ -110,7 +110,7 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
       if (selectedOption.value !== "Add Archive") {
         (async () => {
           const { data: retreat } = await getRetreat.refetch();
-          router.push(`retreat/${retreat?._id}`);
+          router.push(`${retreat?._id}`);
         })();
       }
     }
