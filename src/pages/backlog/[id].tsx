@@ -50,7 +50,7 @@ export default function Backlog() {
       {currRetreatData && chapterEvents && (
         <Box display={"flex"}>
           <Box>
-            <Sidebar chapter={dummyChapter} year={dummyYear} />
+            <Sidebar chapter={dummyChapter} year={dummyYear} retreatId={id} />
           </Box>
           <Box
             display={"flex"}
