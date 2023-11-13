@@ -12,8 +12,8 @@ import { Event } from "~/common/types";
 
 function Content({ events }: { events: IEvent[] }) {
   return (
-    <Flex justifyContent="center" alignItems="center">
-      <Box display={"flex"} gap={"14px"}>
+    <Flex justifyContent="center" alignItems="center" overflowX="scroll" minWidth="200px">
+      <Box width="auto" display={"flex"} gap={"14px"}>
         {[1, 2, 3, 4].map((num, index) => {
           return (
             <Box key={index}>
@@ -94,9 +94,14 @@ export default function Calendar() {
   })?.data;
 
   return (
-    <Box>
+    <>
+    <Flex direction="row">
       {chapter && retreat && <Sidebar chapter={chapter} year={retreat.year} />}
+      <Box pl="400px" w="full">
       {events && <Content events={events} />}
-    </Box>
+      </Box>
+    </Flex>
+      
+    </>
   );
 }
