@@ -1,4 +1,8 @@
-export const computeHeight = (startTime: string, endTime: string): number => {
+export const computeHeight = (
+  startTime: string,
+  endTime: string,
+  screenHeight: number,
+): number => {
   var start = 0;
   var end = 0;
   startTime = startTime.toLowerCase();
@@ -35,5 +39,5 @@ export const computeHeight = (startTime: string, endTime: string): number => {
     }
     end += parseInt(endMins || "0");
   }
-  return Math.round(((end - start) / 60) * 126); //
+  return Math.round(((end - start) / 60) * (screenHeight / 24)); //
 };
