@@ -17,16 +17,16 @@ import {
 } from "@chakra-ui/react";
 import { ChangeEvent, useEffect, useState } from "react";
 import { DropdownIcon } from "~/common/theme/icons";
-import { Expense, Time, Times } from "~/common/types/types";
+import { ExpenseType, Time, Times } from "~/common/types/types";
 
 type NewExpenseFormProps = {
-  expenses: Expense[];
-  setExpenses: (e: Expense[]) => void;
+  expenses: ExpenseType[];
+  setExpenses: (e: ExpenseType[]) => void;
   onOpenError: () => void;
   onCloseError: () => void;
   onCloseSide?: () => void;
-  selectedExpense: Expense | undefined;
-  setSelectedExpense?: (t: Expense | undefined) => void;
+  selectedExpense: ExpenseType | undefined;
+  setSelectedExpense?: (t: ExpenseType | undefined) => void;
 };
 
 export const NewExpenseForm = ({
@@ -44,7 +44,7 @@ export const NewExpenseForm = ({
     selectedExpense?.type ?? "Select",
   );
   const [cost, setCost] = useState(
-    selectedExpense === undefined ? "" : selectedExpense.cost+"",
+    selectedExpense === undefined ? "" : selectedExpense.cost + "",
   );
   const [costType, setCostType] = useState(selectedExpense?.costType ?? "1");
   const [units, setUnits] = useState(selectedExpense?.units ?? 0);
@@ -76,7 +76,7 @@ export const NewExpenseForm = ({
   useEffect(() => {
     setExpenseName(selectedExpense?.name ?? "");
     setExpenseType(selectedExpense?.type ?? "Select");
-    setCost(selectedExpense === undefined ? "" : selectedExpense.cost+"");
+    setCost(selectedExpense === undefined ? "" : selectedExpense.cost + "");
     setCostType(selectedExpense?.costType ?? "1");
     setUnits(selectedExpense?.units ?? 0);
     setNotes(selectedExpense?.notes ?? "");
@@ -91,7 +91,7 @@ export const NewExpenseForm = ({
     if (onCloseSide) {
       onCloseSide();
     }
-    const newExpense: Expense = {
+    const newExpense: ExpenseType = {
       name: expenseName,
       type: expenseType,
       cost: parseFloat(cost),
@@ -144,7 +144,7 @@ export const NewExpenseForm = ({
   };
 
   return (
-    <VStack height="100%" justifyContent="space-between" >
+    <VStack height="100%" justifyContent="space-between">
       <VStack alignItems="start" spacing="0px" w="100%">
         <FormControl isRequired isInvalid={expenseNameError}>
           <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">

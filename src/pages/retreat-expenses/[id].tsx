@@ -19,7 +19,9 @@ import { useEffect, useState } from "react";
 import ExpenseList from "~/components/expenses/ExpenseList";
 import { trpc } from "~/utils/api";
 import { Expense } from "~/common/types";
+import { ExpenseType } from "~/common/types/types";
 import { useRouter } from "next/router";
+import { NewExpenseModal } from "~/components/NewExpenseModal";
 
 export default function RetreatExpenses() {
   const [filter, setFilter] = useState("category");
@@ -28,6 +30,12 @@ export default function RetreatExpenses() {
     isOpen: isOpenFilterPopover,
     onOpen: onOpenFilterPopover,
     onClose: onCloseFilterPopeover,
+  } = useDisclosure();
+
+  const {
+    isOpen: isOpenAddExpenseModal,
+    onOpen: onOpenAddExpenseModal,
+    onClose: onCloseAddExpenseModal,
   } = useDisclosure();
 
   function handleFilterClick(filter: string) {
@@ -49,6 +57,11 @@ export default function RetreatExpenses() {
   const { id }: { id?: string } = router.query;
   const eventData = trpc.event.getEvents.useQuery(id || "123").data;
   const [expenses, setExpenses] = useState([] as Expense[]);
+
+  const dummyExpenses: ExpenseType[] = [];
+  const [expense, setExpense] = useState<ExpenseType[]>(dummyExpenses);
+  const [selectedExpense, setSelectedExpense] = useState<ExpenseType>();
+
   useEffect(() => {
     // clear expenses so it doesn't add every time the page is re-rendered
     setExpenses([]);
@@ -167,7 +180,7 @@ export default function RetreatExpenses() {
 
   return (
     <Box>
-      <Sidebar chapter={dummyChapter} year={dummyYear} />
+      <Sidebar chapter={dummyChapter} year={dummyYear} retreatId={id} />
       <Stack
         spacing={4}
         alignItems={"right"}
@@ -257,7 +270,7 @@ export default function RetreatExpenses() {
             </Popover>
             <Button
               colorScheme="twitter"
-              onClick={() => {}}
+              onClick={onOpenAddExpenseModal}
               fontWeight="400"
               color="white"
               bg="hop_blue.500"
@@ -268,6 +281,13 @@ export default function RetreatExpenses() {
             >
               ADD EXPENSE
             </Button>
+            <NewExpenseModal
+              isOpen={isOpenAddExpenseModal}
+              onClose={onCloseAddExpenseModal}
+              setExpenses={setExpense}
+              expenses={expense}
+              thisExpense={selectedExpense}
+            />
           </Box>
         </Flex>
         {groupsRendered}
