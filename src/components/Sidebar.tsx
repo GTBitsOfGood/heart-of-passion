@@ -118,16 +118,17 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
 
   return (
     <>
-      <Box pos="fixed" w="400px" h="100%">
+      <Box pos="fixed" w="420px" h="100%" zIndex={1000}>
         <Box
           bg={"#F9F9F9"}
           borderRight="1px"
           borderRightColor={"#EDEDED"}
-          marginRight="-20px"
+          // marginRight="-20px"
+          
           paddingRight="20px"
           h="100%"
-          scrollBehavior={"smooth"}
-          overflowY={"scroll"}
+          // scrollBehavior={"smooth"}
+          // overflowY={"scroll"}
           p="20px"
         >
           <Grid templateColumns="repeat(2, 1fr)" mb="3%">
