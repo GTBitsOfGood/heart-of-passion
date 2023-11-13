@@ -19,6 +19,7 @@ import { useRouter } from "next/router";
 interface SidebarProps {
   chapter: Chapter;
   year: number;
+  retreatId: string | undefined;
 }
 
 type OptionType = {
@@ -26,7 +27,7 @@ type OptionType = {
   label: string;
 };
 
-const Sidebar = ({ chapter, year }: SidebarProps) => {
+const Sidebar = ({ chapter, year, retreatId }: SidebarProps) => {
   const id = useId();
   const {
     isOpen: isOpenAddYearModal,
@@ -101,20 +102,25 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
     setSelectedOption(option ?? archiveOption);
     if (option?.value === "Add Archive") {
       onOpenAddYearModal();
+    } else {
+      updateYear();
     }
   };
 
-  useEffect(() => {
-    // console.log(selectedOption);
+  function updateYear() {
     if (selectedOption) {
       if (selectedOption.value !== "Add Archive") {
         (async () => {
           const { data: retreat } = await getRetreat.refetch();
-          router.push(`retreat/${retreat?._id}`);
+          router.push(`/retreat/${retreat?._id}`);
         })();
       }
     }
-  }, [getRetreat, router, selectedOption]);
+  }
+
+  function handleClick(path: String) {
+    router.push(`/${path}/${retreatId}`);
+  }
 
   return (
     <>
@@ -199,7 +205,7 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
             mb="2px"
             p="10px"
             onClick={() => {
-              setClicked(1);
+              handleClick("retreat");
             }}
           >
             Retreat Planning
@@ -227,7 +233,7 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
                 justifyContent="left"
                 backgroundColor={clicked == 2 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
-                  setClicked(2);
+                  handleClick("retreat-expenses");
                 }}
               >
                 Expenses
@@ -242,7 +248,7 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
                 justifyContent="left"
                 backgroundColor={clicked == 3 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
-                  setClicked(3);
+                  handleClick("backlog");
                 }}
               >
                 Previous Retreat Events

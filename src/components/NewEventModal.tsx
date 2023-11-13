@@ -27,7 +27,7 @@ import { useState } from "react";
 import { DropdownIcon } from "~/common/theme/icons";
 import { NewTimeForm } from "./NewTimeForm";
 import { FloatingAlert } from "./FloatingAlert";
-import { Expense, Time, Times } from "~/common/types/types";
+import { ExpenseType, Time, Times } from "~/common/types/types";
 import { NewExpenseForm } from "./NewExpenseForm";
 import { NewExpenseModal } from "./NewExpenseModal";
 
@@ -52,10 +52,10 @@ export const NewEventModal = ({ isOpen, onClose }: NewEventProps) => {
     "Day 3": [],
     "Day 4": [],
   });
-  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [expenses, setExpenses] = useState<ExpenseType[]>([]);
 
   const [selectedTime, setSelectedTime] = useState<Time>();
-  const [selectedExpense, setSelectedExpense] = useState<Expense>();
+  const [selectedExpense, setSelectedExpense] = useState<ExpenseType>();
 
   const [energyError, setEnergyError] = useState(false);
 
@@ -476,12 +476,12 @@ export const NewEventModal = ({ isOpen, onClose }: NewEventProps) => {
               )}
               <NewExpenseForm
                 expenses={expenses}
-                setExpenses={(e: Expense[]) => setExpenses(e)}
+                setExpenses={(e: ExpenseType[]) => setExpenses(e)}
                 onOpenError={onOpenError}
                 onCloseError={onCloseError}
                 onCloseSide={onCloseExpenseForm}
                 selectedExpense={selectedExpense}
-                setSelectedExpense={(e: Expense | undefined) =>
+                setSelectedExpense={(e: ExpenseType | undefined) =>
                   setSelectedExpense(e)
                 }
               />

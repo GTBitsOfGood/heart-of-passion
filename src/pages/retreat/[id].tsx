@@ -218,7 +218,6 @@ export default function Calendar() {
 
   const counter = 0; // used to check if next element was within the "from" and "to" time range, if it is then preents duplicate entries
   return (
-
     // <>
     // <Flex direction="row">
     //   {chapter && retreat && <Sidebar chapter={chapter} year={retreat.year} />}
@@ -226,14 +225,18 @@ export default function Calendar() {
     //   {events && <Content events={events} />}
     //   </Box>
     // </Flex>
-      
+
     // </>
 
     <Box>
       <Box display="flex">
         <Box zIndex={1000}>
           {chapter && retreat && (
-            <Sidebar chapter={chapter} year={retreat.year} />
+            <Sidebar
+              chapter={chapter}
+              year={retreat.year}
+              retreatId={retreat._id}
+            />
           )}
         </Box>
         <Box position="relative" left="436px" overflowX={"visible"}>
