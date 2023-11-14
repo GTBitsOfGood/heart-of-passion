@@ -1,14 +1,12 @@
 import mongoose from "mongoose";
-import { EventSchema, IExpense } from "./Event";
-import { eventSchema } from "~/common/types";
+import { EventSchema } from "./Event";
+import { eventSchema, retreatSchema } from "~/common/types";
+import { z } from "zod";
 
 const { Schema } = mongoose;
 
-export interface IRetreat {
+export interface IRetreat extends z.infer<typeof retreatSchema> {
   _id: string;
-  year: number;
-  chapterId: mongoose.Types.ObjectId;
-  expenses: IExpense;
 }
 
 const RetreatSchema = new Schema<IRetreat>({
@@ -18,10 +16,9 @@ const RetreatSchema = new Schema<IRetreat>({
   },
   chapterId: {
     ref: "Chapter",
-    type: Schema.Types.ObjectId,
+    type: String,
     required: true,
   },
-  expenses: [EventSchema],
 });
 
 export const RetreatModel =

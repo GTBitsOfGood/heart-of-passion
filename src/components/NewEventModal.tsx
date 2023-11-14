@@ -35,6 +35,7 @@ import { DateObject, Event, Expense } from "~/common/types";
 type NewEventProps = {
   isOpen: boolean;
   onClose: () => void;
+  event?: Event;
 };
 
 type Action<T extends keyof Event = keyof Event> =
@@ -83,7 +84,7 @@ const initialState: State = {
   expenseFormOpen: false,
 };
 
-export const NewEventModal = ({ isOpen, onClose }: NewEventProps) => {
+export const NewEventModal = ({ event, isOpen, onClose }: NewEventProps) => {
   let [state, dispatch] = useReducer(reducer, initialState);
   const [selectedTime, setSelectedTime] = useState<DateObject>();
   const [selectedExpense, setSelectedExpense] = useState<Expense>();

@@ -1,29 +1,30 @@
 import mongoose, { mongo } from "mongoose";
-import { number } from "zod";
+import { number, z } from "zod";
+import { dateObjectSchema, eventSchema, expenseSchema } from "~/common/types";
 
 const { Schema } = mongoose;
-export interface IExpense {
-  name: string;
-  cost: number;
-  type: "entertainment" | "transportation" | "other";
-  costType: "per unit" | "flat cost";
-  numberOfUnits: number;
-  notes: string;
-}
-export interface EventDate {
-  date: Date;
-  from: string;
-  to: string;
-}
-export interface IEvent {
+
+interface IExpense extends z.infer<typeof expenseSchema> {}
+interface IEventDate extends z.infer<typeof dateObjectSchema> {}
+
+export interface IEvent extends z.infer<typeof eventSchema> {
   retreatId: mongoose.Types.ObjectId;
-  name: string;
-  location: string; //optional
-  energyLevel: "low" | "medium" | "high"; //optional
-  category: "entertainment" | "educational" | "other"; //optoional
-  dates: EventDate[];
-  expenses: [IExpense];
 }
+
+const DateSchema = new Schema<IEventDate>({
+  day: { type: Number, required: true },
+  from: { type: String, required: true },
+  to: { type: String, required: true },
+});
+
+export const ExpenseSchema = new Schema<IExpense>({
+  name: { type: String, required: true },
+  event: { type: String },
+  dates: { type: [DateSchema], required: true },
+  type: { type: String, required: true },
+  cost: { type: Number, required: true },
+  numUnits: { type: Number },
+});
 
 export const EventSchema = new Schema<IEvent>({
   retreatId: {
@@ -48,45 +49,14 @@ export const EventSchema = new Schema<IEvent>({
   dates: {
     type: [
       {
-        date: Date,
+        day: Number,
         from: String,
         to: String,
       },
     ], // [{date: Date, from: time, to: time}]
     required: true,
   },
-  expenses: {
-    type: [
-      {
-        name: {
-          type: String,
-          required: true,
-        },
-        cost: {
-          type: Number,
-          required: true,
-        },
-        type: {
-          type: String,
-          enum: ["entertainment", "transportation", "other"],
-          required: true,
-        },
-        costType: {
-          type: String,
-          enum: ["per unit", "flat cost"],
-          required: true,
-        },
-        numberOfUnits: {
-          type: Number,
-          default: 1,
-          required: true,
-        },
-        notes: {
-          type: String,
-        },
-      },
-    ],
-  },
+  expenses: [ExpenseSchema],
 });
 
 export const EventModel =

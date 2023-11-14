@@ -8,7 +8,7 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import { computeHeight } from "./helper";
+import { computeHeight } from "./computeHeight";
 import { DateObject, Event } from "~/common/types";
 import { useRef, useEffect, useState } from "react";
 import { NewEventModal } from "../NewEventModal";
@@ -166,7 +166,7 @@ export default function CalendarCard({
           {EnergyText()}
         </GridItem>
       </Grid>
-      <NewEventModal isOpen={isOpen} onClose={onClose} />
+      <NewEventModal event={event} isOpen={isOpen} onClose={onClose} />
     </>
   );
 }

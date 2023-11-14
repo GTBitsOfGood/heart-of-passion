@@ -3,10 +3,9 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 import { ChapterModel, IChapter } from "~/server/models/Chapter";
-import { Chapter } from "~/common/types";
-import { EventModel, IEvent, IExpense } from "~/server/models/Event";
+import { Chapter, Expense } from "~/common/types";
+import { EventModel, IEvent } from "~/server/models/Event";
 import { RetreatModel, IRetreat } from "~/server/models/Retreat";
-import { exec } from "child_process";
 
 export const chapterRouter = createTRPCRouter({
   createChapter: publicProcedure
@@ -71,17 +70,14 @@ async function processChapter(chapterModel: IChapter): Promise<Chapter> {
   })
     .sort("-year")
     .exec())!;
+
   let cost = 0;
   if (retreat) {
     const events = (await EventModel.find({ retreatId: retreat?._id }).exec())!;
     events?.forEach((event: IEvent) => {
-      let expenses: [IExpense] = event.expenses;
+      let expenses: Expense[] = event.expenses;
       expenses?.forEach((expense) => {
-        if (expense.costType == "flat cost") {
-          cost += expense.cost;
-        } else {
-          cost += expense.cost * expense.numberOfUnits;
-        }
+        cost += expense.cost * (expense.numUnits ?? 1);
       });
     });
   }

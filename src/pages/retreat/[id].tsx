@@ -8,15 +8,24 @@ import Sidebar from "~/components/Sidebar";
 import { DateObject } from "~/common/types";
 import { Event } from "~/common/types";
 import { useState } from "react";
-import { computeHeight } from "~/components/Calendar/helper";
+import { computeHeight } from "~/components/Calendar/computeHeight";
 
-function Content({
-  eventsByDay,
-  counter,
-}: {
-  eventsByDay: any;
-  counter: number;
-}) {
+type EventWithStamp = {
+  event: Event;
+  from: string;
+  to: string;
+};
+
+function Content({ events, counter }: { events: Event[]; counter: number }) {
+  let eventsByDay: EventWithStamp[][] = [[], [], [], []];
+  for (const event of events) {
+    const { dates } = event;
+    for (const date of dates) {
+      const { from, to, day } = date;
+      eventsByDay[day - 1]!.push({ event, from, to });
+    }
+  }
+
   return (
     <Flex
       justifyContent="center"
@@ -27,7 +36,7 @@ function Content({
       paddingBottom={"50px"}
     >
       <Box display={"flex"} gap={"14px"}>
-        {[1, 2, 3, 4].map((num, index) => {
+        {[1, 2, 3, 4].map((day, index) => {
           return (
             <Box key={index}>
               <Text
@@ -38,11 +47,11 @@ function Content({
                 textAlign={"center"}
                 fontFamily={"oswald"}
               >
-                Day {num}
+                Day {day}
               </Text>
               <Box display={"flex"}>
                 <Box marginRight={"34px"} minW={"180px"}>
-                  {eventsByDay[num]!.map(
+                  {eventsByDay[day - 1]!.map(
                     (einfo: any, index: number, array: any[]) => {
                       if (counter > 0) {
                         counter--;
@@ -50,7 +59,7 @@ function Content({
                       }
                       const { event: currEvent, from, to } = einfo;
                       const dateObject: DateObject = {
-                        day: 0,
+                        day: 1,
                         from,
                         to,
                       };
@@ -70,7 +79,7 @@ function Content({
                           event: afterEvent,
                           from: nextFrom,
                           to: nextTo,
-                        } = eventsByDay[num][index + 1];
+                        } = eventsByDay[day - 1]![index + 1]!;
                         // Check if the next event's "from" time is between the current event's from and to
                         // appends every additional case where next event's time is between original "from" and "to"
                         while (
@@ -80,7 +89,7 @@ function Content({
                           nextFrom <= to
                         ) {
                           const nextDateObject: DateObject = {
-                            day: 0,
+                            day: 1,
                             from: nextFrom,
                             to: nextTo,
                           };
@@ -129,7 +138,7 @@ function Content({
                             event: afterEvent,
                             from: nextFrom,
                             to: nextTo,
-                          } = eventsByDay[num][index + 1];
+                          } = eventsByDay[day - 1]![index + 1]!;
                         }
                         return (
                           <Box display={"flex"} key={index}>
@@ -185,7 +194,7 @@ function Content({
                     },
                   )}
                 </Box>
-                {num !== 4 && (
+                {day !== 4 && (
                   <Box
                     width={"1px"}
                     background={"#989898"}
@@ -212,22 +221,12 @@ export default function Calendar() {
     enabled: !!id,
   })?.data;
 
-  const eventsByDay = trpc.event.getEventsByDay.useQuery(id!, {
+  const events = trpc.event.getEvents.useQuery(id!, {
     enabled: !!id,
   }).data;
 
   const counter = 0; // used to check if next element was within the "from" and "to" time range, if it is then preents duplicate entries
   return (
-    // <>
-    // <Flex direction="row">
-    //   {chapter && retreat && <Sidebar chapter={chapter} year={retreat.year} />}
-    //   <Box pl="400px" w="full">
-    //   {events && <Content events={events} />}
-    //   </Box>
-    // </Flex>
-
-    // </>
-
     <Box>
       <Box display="flex">
         <Box zIndex={1000}>
@@ -240,9 +239,7 @@ export default function Calendar() {
           )}
         </Box>
         <Box position="relative" left="436px" overflowX={"visible"}>
-          {eventsByDay && (
-            <Content eventsByDay={eventsByDay} counter={counter} />
-          )}
+          {events && <Content events={events} counter={counter} />}
         </Box>
       </Box>
     </Box>
