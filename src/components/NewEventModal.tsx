@@ -154,6 +154,19 @@ export const NewEventModal = ({
     },
   });
 
+  const deleteEvent = trpc.event.deleteEvent.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+    },
+  });
+
+  const deleteEventHandler = () => {
+    if (eventToEdit) {
+      deleteEvent.mutate(eventToEdit._id);
+    }
+    onCloseModal();
+  };
+
   const toast = useToast();
   const submit = () => {
     if (!validate()) {
@@ -463,6 +476,7 @@ export const NewEventModal = ({
                     colorScheme="red"
                     color="hop_red.500"
                     variant="outline"
+                    onClick={deleteEventHandler}
                     borderRadius="6px"
                     mr="13px"
                   >

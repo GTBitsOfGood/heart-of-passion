@@ -29,6 +29,10 @@ export const eventRouter = createTRPCRouter({
       await event.save();
     }),
 
+  deleteEvent: publicProcedure.input(z.string()).mutation(async ({ input }) => {
+    await EventModel.findByIdAndDelete(input).exec();
+  }),
+
   getEvent: publicProcedure.input(z.string()).query(async (opts) => {
     const event = await EventModel.findOne({ _id: opts.input }).exec();
     return event;
