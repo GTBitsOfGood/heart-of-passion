@@ -7,20 +7,16 @@ import {
   ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useState } from "react";
-import { DropdownIcon } from "~/common/theme/icons";
-import { NewTimeForm } from "./NewTimeForm";
 import { FloatingAlert } from "./FloatingAlert";
-import { ExpenseType, Time, Times } from "~/common/types/types";
 import { NewExpenseForm } from "./NewExpenseForm";
-import { NewExpense } from "./NewExpense";
+import { Expense } from "~/common/types";
 
 type NewExpenseProps = {
   isOpen: boolean;
   onClose: () => void;
-  expenses: ExpenseType[];
-  setExpenses: (e: ExpenseType[]) => void;
-  thisExpense: ExpenseType | undefined;
+  expenses: Expense[];
+  setExpenses: (e: Expense[]) => void;
+  thisExpense: Expense | undefined;
 };
 
 export const NewExpenseModal = ({
@@ -81,7 +77,7 @@ export const NewExpenseModal = ({
           >
             <NewExpenseForm
               expenses={expenses}
-              setExpenses={(e: ExpenseType[]) => setExpenses(e)}
+              setExpenses={(e: Expense[]) => setExpenses(e)}
               onOpenError={onOpenError}
               onCloseError={onCloseError}
               selectedExpense={thisExpense}

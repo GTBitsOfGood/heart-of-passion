@@ -15,7 +15,6 @@ import { NewChapterModal } from "~/components/NewChapterModal";
 import { useRef } from "react";
 import { trpc } from "~/utils/api";
 import { Chapter } from "~/common/types";
-import { Retreat } from "~/common/types/types";
 
 export default function Home() {
   const {

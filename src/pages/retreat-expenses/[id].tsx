@@ -19,7 +19,6 @@ import { useEffect, useState } from "react";
 import ExpenseList from "~/components/expenses/ExpenseList";
 import { trpc } from "~/utils/api";
 import { Expense } from "~/common/types";
-import { ExpenseType } from "~/common/types/types";
 import { useRouter } from "next/router";
 import { NewExpenseModal } from "~/components/NewExpenseModal";
 
@@ -58,9 +57,9 @@ export default function RetreatExpenses() {
   const eventData = trpc.event.getEvents.useQuery(id || "123").data;
   const [expenses, setExpenses] = useState([] as Expense[]);
 
-  const dummyExpenses: ExpenseType[] = [];
-  const [expense, setExpense] = useState<ExpenseType[]>(dummyExpenses);
-  const [selectedExpense, setSelectedExpense] = useState<ExpenseType>();
+  const dummyExpenses: Expense[] = [];
+  const [expense, setExpense] = useState<Expense[]>(dummyExpenses);
+  const [selectedExpense, setSelectedExpense] = useState<Expense>();
 
   useEffect(() => {
     // clear expenses so it doesn't add every time the page is re-rendered

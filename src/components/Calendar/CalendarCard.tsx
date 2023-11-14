@@ -9,9 +9,9 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { computeHeight } from "./helper";
-import CalendarCardModal from "./CalendarCardModal";
 import { DateObject, Event } from "~/common/types";
 import { useRef, useEffect, useState } from "react";
+import { NewEventModal } from "../NewEventModal";
 
 export default function CalendarCard({
   event,
@@ -30,7 +30,6 @@ export default function CalendarCard({
   const height = computeHeight(date.from, date.to, screen.height);
   const top = computeHeight("9:00 am", date.from, screen.height);
   const parentRef: any = useRef();
-  // const [cardHt, setCardHeight] = useState(-1); // debugging only, can remove
   const [variant, setVariant] = useState(3);
   useEffect(() => {
     if (parentRef.current) {
@@ -56,7 +55,6 @@ export default function CalendarCard({
         }
       })();
       setVariant(findVariant);
-      // setCardHeight(htPx);
     }
   }, [parentRef]);
 
@@ -168,7 +166,7 @@ export default function CalendarCard({
           {EnergyText()}
         </GridItem>
       </Grid>
-      <CalendarCardModal event={event} isOpen={isOpen} onClose={onClose} />
+      <NewEventModal isOpen={isOpen} onClose={onClose} />
     </>
   );
 }

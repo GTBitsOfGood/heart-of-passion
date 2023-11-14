@@ -1,34 +1,29 @@
 import { z } from "zod";
+import { eventSchema } from "~/common/types";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 import { EventModel, IEvent } from "~/server/models/Event";
 export const eventRouter = createTRPCRouter({
-  createEvent: publicProcedure
+  updateEvent: publicProcedure
     .input(
-      z.object({
-        retreatId: z.string(),
-        name: z.string(),
-        location: z.string().optional(),
-        energyLevel: z.string().optional(),
-        category: z.string().optional(),
-        dates: z.array(z.date()),
-        expenses: z.array(
-          z.object({
-            cost: z.number(),
-            name: z.string(),
-            type: z.string(),
-            costType: z.string(),
-            numberOfUnits: z.number(),
-            notes: z.string().optional(),
-          }),
-        ),
-      }),
+      z
+        .object({
+          id: z.string(),
+        })
+        .merge(eventSchema),
     )
+    .mutation(async ({ input }) => {
+      const { id, ...update } = input;
+      await EventModel.findByIdAndUpdate(id, update).exec();
+    }),
+  createEvent: publicProcedure
+    .input(eventSchema)
     .mutation(async ({ input }) => {
       const event = new EventModel(input);
       await event.save();
     }),
+
   getEvent: publicProcedure.input(z.string()).query(async (opts) => {
     const event = await EventModel.findOne({ _id: opts.input }).exec();
     return event;

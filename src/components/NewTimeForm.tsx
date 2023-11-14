@@ -11,19 +11,19 @@ import {
   VStack,
   Input,
   useDisclosure,
+  Select,
 } from "@chakra-ui/react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { DropdownIcon } from "~/common/theme/icons";
-import { Time, Times } from "~/common/types/types";
+import { useEffect, useRef, useState } from "react";
+import { DateObject } from "~/common/types";
 
 type NewTimeFormProps = {
-  times: Times;
-  setTimes: (updateFunction: (prevTimes: Times) => Times) => void;
+  times: DateObject[];
+  setTimes: (updateFunction: (prevTimes: DateObject[]) => DateObject[]) => void;
   onOpenError: () => void;
   onCloseError: () => void;
   onCloseSide: () => void;
-  selectedTime: Time | undefined;
-  setSelectedTime: (t: Time | undefined) => void;
+  selectedTime: DateObject | undefined;
+  setSelectedTime: (t: DateObject | undefined) => void;
 };
 
 export const NewTimeForm = ({
@@ -35,18 +35,8 @@ export const NewTimeForm = ({
   selectedTime,
   setSelectedTime,
 }: NewTimeFormProps) => {
-  const timeList = ["9:00 am", "9:30 am", "10:00 am", "10:30 am", "11:00 am"];
-  const [day, setDay] = useState(selectedTime?.day ?? "Day 1");
+  const [day, setDay] = useState(selectedTime?.day ?? 1);
   const editing = selectedTime !== undefined;
-
-  const getTimeIndex = useCallback(
-    (s: string, d: number) => {
-      const ind = timeList.findIndex((e) => e === s);
-      // console.log(ind);
-      return ind === -1 ? d : ind;
-    },
-    [timeList],
-  );
 
   const startTimeRef = useRef<any>();
   const endTimeRef = useRef<any>();
@@ -55,49 +45,49 @@ export const NewTimeForm = ({
     let [hours, minutes] = time.split(/[:\s]/);
     let period = time.slice(-2);
     hours =
-      period === 'pm' && hours !== '12' ?
-        String(Number(hours) + 12)
-      : period === 'am' && hours === '12' ?
-        '00'
-      :
-        hours;
+      period === "pm" && hours !== "12"
+        ? String(Number(hours) + 12)
+        : period === "am" && hours === "12"
+        ? "00"
+        : hours;
     return `${hours}:${minutes}`;
-  }
+  };
 
   const to12hrs = (time: string): string => {
-    let [hours, minutes] = time.split(':');
-    let period = Number(hours) >= 12 ? 'pm' : 'am';
+    let [hours, minutes] = time.split(":");
+    let period = Number(hours) >= 12 ? "pm" : "am";
     hours =
-      hours === '00' ?
-        '12'
-      : Number(hours) > 12 ?
-        String(Number(hours) - 12)
-      :
-        hours;
+      hours === "00"
+        ? "12"
+        : Number(hours) > 12
+        ? String(Number(hours) - 12)
+        : hours;
     return `${hours}:${minutes} ${period}`;
-  }
+  };
 
   const toMinutes = (time: string): number => {
-    let [hours, minutes] = to24hrs(time).split(':');
+    let [hours, minutes] = to24hrs(time).split(":");
     return Number(hours) * 60 + Number(minutes);
-}
-
+  };
 
   const handleStartTime = () => {
     setStartTime(to12hrs(startTimeRef.current.value));
-  }
+  };
   const handleEndTime = () => {
     setEndTime(to12hrs(endTimeRef.current.value));
     setEndTimeError(false);
-  }
+  };
 
-
-  const [startTime, setStartTime] = useState<string>("10:00 am");
-  const [endTime, setEndTime] = useState<string>("11:00 am");
+  const [startTime, setStartTime] = useState<string>(
+    selectedTime?.from ?? "09:00 am",
+  );
+  const [endTime, setEndTime] = useState<string>(
+    selectedTime?.to ?? "10:00 am",
+  );
   const [endTimeError, setEndTimeError] = useState(false);
 
   useEffect(() => {
-    setDay(selectedTime?.day ?? "Day 1");
+    setDay(selectedTime?.day ?? 1);
     // setStartTime(getTimeIndex(selectedTime?.start ?? "-1", 0));
     // setEndTime(getTimeIndex(selectedTime?.end ?? "-1", 2));
   }, [selectedTime]);
@@ -110,31 +100,26 @@ export const NewTimeForm = ({
     onCloseError();
     onCloseSide();
     //settimes
-    const newTime: Time = {
+    const newTime: DateObject = {
       day: day,
-      start: startTime,
-      end: endTime,
+      from: startTime,
+      to: endTime,
     };
     setTimes((prevTimes) => {
-      const updatedTimes = { ...prevTimes };
+      let updatedTimes = prevTimes;
       if (editing) {
-        updatedTimes[selectedTime.day] = (
-          updatedTimes[selectedTime.day] ?? []
-        ).filter((time) => {
+        updatedTimes = updatedTimes.filter((time) => {
           return (
-            time.start !== selectedTime.start || time.end !== selectedTime.end
+            time.day !== selectedTime.day ||
+            time.from !== selectedTime.from ||
+            time.to !== selectedTime.to
           );
         });
-        updatedTimes[newTime.day] = [
-          ...(updatedTimes[newTime.day] ?? []),
-          newTime,
-        ];
+        updatedTimes = [...updatedTimes, newTime];
       } else {
-        updatedTimes[newTime.day] = [
-          ...(prevTimes[newTime.day] ?? []),
-          newTime,
-        ];
+        updatedTimes = [...updatedTimes, newTime];
       }
+
       return updatedTimes;
     });
     setSelectedTime(undefined);
@@ -146,8 +131,8 @@ export const NewTimeForm = ({
       return false;
     }
 
-    const duplicate = times[day]?.some(
-      (t) => t.end === endTime && t.start === startTime,
+    const duplicate = times?.some(
+      (t) => t.day == day && t.from === startTime && t.to === endTime,
     );
     if (duplicate) {
       setEndTimeError(true);
@@ -164,134 +149,50 @@ export const NewTimeForm = ({
           <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
             Day
           </FormLabel>
-          <Menu>
-            <MenuButton
-              as={Button}
-              width="220px"
-              height="51px"
-              textAlign="left"
-              borderRadius="none"
-              bg="white"
-              border="1px solid #D9D9D9"
-              rightIcon={<DropdownIcon width="31px" height="31px" />}
-              fontSize="18px"
-              fontWeight="400"
-              lineHeight="24px"
-              padding="0px"
-              paddingLeft="10px"
-            >
-              {day}
-            </MenuButton>
-            <MenuList
-              boxShadow={"0px 4px 15px 0px #00000040"}
-              borderRadius="none"
-              width="220px"
-            >
-              <MenuItem onClick={() => setDay("Day 1")}>Day 1</MenuItem>
-              <MenuItem onClick={() => setDay("Day 2")}>Day 2</MenuItem>
-              <MenuItem onClick={() => setDay("Day 3")}>Day 3</MenuItem>
-              <MenuItem onClick={() => setDay("Day 4")}>Day 4</MenuItem>
-            </MenuList>
-          </Menu>
+          <Select
+            value={day}
+            onChange={(e) => setDay(Number(e.target.value))}
+            width="220px"
+            height="51px"
+            borderRadius="none"
+            bg="white"
+            border="1px solid #D9D9D9"
+            fontSize="18px"
+            fontWeight="400"
+            lineHeight="24px"
+            padding="0px"
+            paddingLeft="10px"
+          >
+            <option value="1">Day 1</option>
+            <option value="2">Day 2</option>
+            <option value="3">Day 3</option>
+            <option value="4">Day 4</option>
+          </Select>
         </FormControl>
-        {/* <FormControl mt="23px" isRequired>
-          <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
-            Start
-          </FormLabel>
-          <Menu>
-            <MenuButton
-              as={Button}
-              width="220px"
-              textAlign="left"
-              borderRadius="none"
-              bg="white"
-              border="1px solid #D9D9D9"
-              rightIcon={<DropdownIcon width="31px" height="31px" />}
-              fontSize="18px"
-              fontWeight="400"
-              lineHeight="24px"
-              padding="0px"
-              paddingLeft="10px"
-            >
-              {startTime}
-            </MenuButton>
-            <MenuList
-              boxShadow={"0px 4px 15px 0px #00000040"}
-              borderRadius="none"
-              width="220px"
-            >
-              {timeList.map((time, i) => {
-                return (
-                  <MenuItem key={i} onClick={() => setStartTime(i)}>
-                    {time}
-                  </MenuItem>
-                );
-              })}
-            </MenuList>
-          </Menu>
-        </FormControl> */}
         <FormControl mt="23px" isRequired>
           <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
             Start
           </FormLabel>
-          <Input ref={startTimeRef} type="time" step={900} value={to24hrs(startTime)} onChange={handleStartTime} />
+          <Input
+            ref={startTimeRef}
+            type="time"
+            step={900}
+            value={to24hrs(startTime)}
+            onChange={handleStartTime}
+          />
         </FormControl>
         <FormControl mt="16px" isInvalid={endTimeError} isRequired>
           <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
             End
           </FormLabel>
-          <Input ref={endTimeRef} type="time" step={900} value={to24hrs(endTime)} onChange={handleEndTime} />
+          <Input
+            ref={endTimeRef}
+            type="time"
+            step={900}
+            value={to24hrs(endTime)}
+            onChange={handleEndTime}
+          />
         </FormControl>
-        {/* <FormControl mt="16px" isInvalid={endTimeError} isRequired>
-          <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
-            End
-          </FormLabel>
-          <Menu>
-            <MenuButton
-              as={Button}
-              width="220px"
-              textAlign="left"
-              borderRadius="none"
-              bg="white"
-              border="1px solid"
-              rightIcon={
-                <DropdownIcon
-                  color={endTimeError ? "#C63636" : "black"}
-                  width="31px"
-                  height="31px"
-                />
-              }
-              fontSize="18px"
-              fontWeight="400"
-              lineHeight="24px"
-              padding="0px"
-              paddingLeft="10px"
-              textColor={endTimeError ? "#C63636" : "black"}
-              borderColor={endTimeError ? "#C63636" : "#D9D9D9"}
-            >
-              {endTime}
-            </MenuButton>
-            <MenuList
-              boxShadow={"0px 4px 15px 0px #00000040"}
-              borderRadius="none"
-              width="220px"
-            >
-              {timeList.map((time, i) => {
-                return (
-                  <MenuItem
-                    key={i}
-                    onClick={() => {
-                      setEndTime(i);
-                      setEndTimeError(false);
-                    }}
-                  >
-                    {time}
-                  </MenuItem>
-                );
-              })}
-            </MenuList>
-          </Menu>
-        </FormControl> */}
       </VStack>
       <HStack width="100%" justifyContent="end" mb="34px">
         <Button

@@ -19,7 +19,7 @@ export interface IEvent {
   retreatId: mongoose.Types.ObjectId;
   name: string;
   location: string; //optional
-  energyLevel: "low" | "medium" | "high"; //optoional
+  energyLevel: "low" | "medium" | "high"; //optional
   category: "entertainment" | "educational" | "other"; //optoional
   dates: EventDate[];
   expenses: [IExpense];

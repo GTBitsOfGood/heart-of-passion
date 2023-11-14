@@ -17,9 +17,7 @@ import fonts from "src/common/theme/fonts";
 import Sidebar from "~/components/Sidebar";
 import { useEffect, useState } from "react";
 import FundList from "~/components/funds/FundList";
-import { trpc } from "~/utils/api";
 import { Fund } from "~/common/types";
-import { useRouter } from "next/router";
 import { NewFundModal } from "~/components/NewFundModal";
 
 const dummyFunds = [

@@ -4,29 +4,50 @@ import {
   FormControl,
   FormLabel,
   HStack,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   VStack,
-  useDisclosure,
   Input,
   RadioGroup,
+  Select,
   Radio,
-  Textarea,
 } from "@chakra-ui/react";
-import { ChangeEvent, useEffect, useState } from "react";
-import { DropdownIcon } from "~/common/theme/icons";
-import { ExpenseType, Time, Times } from "~/common/types/types";
+import { useEffect } from "react";
+import { Expense, expenseTypeSchema } from "~/common/types";
+
+import { useReducer } from "react";
 
 type NewExpenseFormProps = {
-  expenses: ExpenseType[];
-  setExpenses: (e: ExpenseType[]) => void;
+  expenses: Expense[];
+  setExpenses: (e: Expense[]) => void;
   onOpenError: () => void;
   onCloseError: () => void;
   onCloseSide?: () => void;
-  selectedExpense: ExpenseType | undefined;
-  setSelectedExpense?: (t: ExpenseType | undefined) => void;
+  selectedExpense: Expense | undefined;
+  setSelectedExpense?: (t: Expense | undefined) => void;
+};
+
+type Action<T extends keyof Expense = keyof Expense> =
+  | { type: "UPDATE_EXPENSE"; field: T; value: Expense[T] }
+  | { type: "RESET"; expense?: Expense };
+
+type State = Expense;
+
+const initialState: State = {
+  name: "Expense Name",
+  dates: [],
+  type: "Entertainment",
+  cost: 0,
+};
+
+const reducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case "UPDATE_EXPENSE":
+      return { ...state, [action.field]: action.value };
+    case "RESET":
+      if (action.expense) return { ...action.expense };
+      return initialState;
+    default:
+      return state;
+  }
 };
 
 export const NewExpenseForm = ({
@@ -39,48 +60,35 @@ export const NewExpenseForm = ({
   setSelectedExpense,
   ...rest
 }: NewExpenseFormProps) => {
-  const [expenseName, setExpenseName] = useState(selectedExpense?.name ?? "");
-  const [expenseType, setExpenseType] = useState(
-    selectedExpense?.type ?? "Select",
-  );
-  const [cost, setCost] = useState(
-    selectedExpense === undefined ? "" : selectedExpense.cost + "",
-  );
-  const [costType, setCostType] = useState(selectedExpense?.costType ?? "1");
-  const [units, setUnits] = useState(selectedExpense?.units ?? 0);
-  const [notes, setNotes] = useState(selectedExpense?.notes ?? "");
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-  const [expenseNameError, setExpenseNameError] = useState(false);
-  const [expenseTypeError, setExpenseTypeError] = useState(false);
-  const [costError, setCostError] = useState(false);
-
-  const expenseTypeOptions = [
-    "Entertainment",
-    "Food",
-    "Transportation",
-    "Hotel",
-    "Decorations",
-    "Miscellaenous",
-  ];
   const editing = selectedExpense !== undefined;
 
   const handleExpenseNameChange = (event: React.FormEvent<HTMLInputElement>) =>
-    setExpenseName(event.currentTarget.value);
+    dispatch({
+      type: "UPDATE_EXPENSE",
+      field: "name",
+      value: event.currentTarget.value,
+    });
   const handleCostChange = (event: React.FormEvent<HTMLInputElement>) =>
-    setCost(event.currentTarget.value);
+    dispatch({
+      type: "UPDATE_EXPENSE",
+      field: "cost",
+      value: parseFloat(event.currentTarget.value || "0"),
+    });
   const handleUnitsChange = (event: React.FormEvent<HTMLInputElement>) =>
-    setUnits(parseInt(event.currentTarget.value));
-  const handleNotesChange = (e: ChangeEvent<HTMLTextAreaElement>) =>
-    setNotes(e.target.value);
+    dispatch({
+      type: "UPDATE_EXPENSE",
+      field: "numUnits",
+      value: parseInt(event.currentTarget.value || "1"),
+    });
+  // const handleNotesChange = (e: ChangeEvent<HTMLTextAreaElement>) =>
+  //   dispatch({ type: "UPDATE_EXPENSE", field: "notes", value: e.target.value });
 
-  useEffect(() => {
-    setExpenseName(selectedExpense?.name ?? "");
-    setExpenseType(selectedExpense?.type ?? "Select");
-    setCost(selectedExpense === undefined ? "" : selectedExpense.cost + "");
-    setCostType(selectedExpense?.costType ?? "1");
-    setUnits(selectedExpense?.units ?? 0);
-    setNotes(selectedExpense?.notes ?? "");
-  }, [selectedExpense]);
+  const validateFields = () => {
+    //todo
+    return true;
+  };
 
   const handleApply = () => {
     if (!validateFields()) {
@@ -91,62 +99,34 @@ export const NewExpenseForm = ({
     if (onCloseSide) {
       onCloseSide();
     }
-    const newExpense: ExpenseType = {
-      name: expenseName,
-      type: expenseType,
-      cost: parseFloat(cost),
-      costType: costType,
-      units: units,
-      notes: notes,
-    };
+
     if (editing) {
       const updatedExpenses = expenses.map((e) =>
-        e === selectedExpense ? newExpense : e,
+        e === selectedExpense ? state : e,
       );
       setExpenses(updatedExpenses);
       if (setSelectedExpense) {
         setSelectedExpense(undefined);
       }
+      dispatch({ type: "RESET" });
       return;
     }
-    setExpenses([...expenses, newExpense]);
+    setExpenses([...expenses, state]);
+    dispatch({ type: "RESET" });
     return;
   };
 
-  const validateFields = () => {
-    let valid = true;
-    if (expenseName === "") {
-      setExpenseNameError(true);
-      valid = false;
-    } else {
-      setExpenseNameError(false);
-    }
-    if (expenseType === "Select") {
-      setExpenseTypeError(true);
-      valid = false;
-    } else {
-      setExpenseTypeError(false);
-    }
-    // setNameError(expenseName==="");
-    // setExpenseTypeError(expenseType === "Select");
+  useEffect(() => {
+    dispatch({ type: "RESET", expense: selectedExpense });
+  }, [selectedExpense]);
 
-    let parseCost = cost;
-    if (cost[0] === "$") {
-      parseCost = cost.substring(1);
-    }
-    if (parseCost === "" || !/^[0-9]*(\.[0-9]{0,2})?$/.test(parseCost)) {
-      setCostError(true);
-      valid = false;
-    } else {
-      setCostError(false);
-    }
-    return valid;
-  };
+  const valid = true; // TODO
+  let expenseTypeOptions = Object.values(expenseTypeSchema.enum);
 
   return (
     <VStack height="100%" justifyContent="space-between">
       <VStack alignItems="start" spacing="0px" w="100%">
-        <FormControl isRequired isInvalid={expenseNameError}>
+        <FormControl isRequired isInvalid={!valid}>
           <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
             Name of Expense
           </FormLabel>
@@ -155,66 +135,45 @@ export const NewExpenseForm = ({
             border="1px solid #D9D9D9"
             borderRadius="0px"
             width="100%"
-            // height="30px"
-            value={expenseName}
+            value={state.name}
             onChange={handleExpenseNameChange}
             padding="10px"
-            // textColor={expenseNameError ? "#C63636" : "black"}
-            borderColor={expenseNameError ? "#C63636" : "#D9D9D9"}
-            // required
+            borderColor={!valid ? "#C63636" : "#D9D9D9"}
           />
         </FormControl>
-        <FormControl mt="23px" isRequired isInvalid={expenseTypeError}>
+        <FormControl mt="23px" isRequired isInvalid={!valid}>
           <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
             Expense Type
           </FormLabel>
-          <Menu>
-            <MenuButton
-              as={Button}
-              width="100%"
-              textAlign="left"
-              borderRadius="none"
-              bg="white"
-              border="1px solid #D9D9D9"
-              rightIcon={
-                <DropdownIcon
-                  color={expenseTypeError ? "#C63636" : "black"}
-                  width="31px"
-                  height="31px"
-                />
-              }
-              fontSize="18px"
-              fontWeight="400"
-              lineHeight="24px"
-              padding="0px"
-              paddingLeft="10px"
-              textColor={expenseTypeError ? "#C63636" : "black"}
-              borderColor={expenseTypeError ? "#C63636" : "#D9D9D9"}
-            >
-              {expenseType}
-            </MenuButton>
-            <MenuList
-              boxShadow={"0px 4px 15px 0px #00000040"}
-              borderRadius="none"
-              width="100%"
-            >
-              {expenseTypeOptions.map((type) => {
-                return (
-                  <MenuItem
-                    key={type}
-                    onClick={() => {
-                      setExpenseType(type);
-                      setExpenseTypeError(false);
-                    }}
-                  >
-                    {type}
-                  </MenuItem>
-                );
-              })}
-            </MenuList>
-          </Menu>
+          <Select
+            value={state.type}
+            onChange={(e) =>
+              dispatch({
+                type: "UPDATE_EXPENSE",
+                field: "type",
+                value: e.target.value,
+              })
+            }
+            bg="white"
+            border="1px solid #D9D9D9"
+            fontSize="18px"
+            fontWeight="400"
+            lineHeight="24px"
+            padding="0px"
+            paddingLeft="10px"
+            textColor={!valid ? "#C63636" : "black"}
+            borderColor={!valid ? "#C63636" : "#D9D9D9"}
+            borderRadius="none"
+            width="100%"
+          >
+            {expenseTypeOptions.map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </Select>
         </FormControl>
-        <FormControl mt="18px" isRequired isInvalid={costError}>
+        <FormControl mt="18px" isRequired isInvalid={!valid}>
           <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
             Cost in USD
           </FormLabel>
@@ -223,101 +182,84 @@ export const NewExpenseForm = ({
             border="1px solid #D9D9D9"
             borderRadius="0px"
             width="100%"
-            // height="30px"
-            value={cost}
+            type="number"
+            value={state.cost}
             onChange={handleCostChange}
             padding="10px"
-            // type="number"
-            // pattern="^\d*(\.\d{0,2})?$"
-            // type="text"
-            // required
-            textColor={expenseTypeError ? "#C63636" : "black"}
-            borderColor={expenseTypeError ? "#C63636" : "#D9D9D9"}
+            borderColor={!valid ? "#C63636" : "#D9D9D9"}
           />
         </FormControl>
-        <FormControl mt="18px" isRequired>
+        <FormControl mt="18px">
           <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
-            Per Unit or Flat Cost?
+            Cost Type
           </FormLabel>
           <RadioGroup
-            onChange={setCostType}
-            value={costType}
-            defaultValue="1"
-            defaultChecked
+            onChange={(e) => {
+              let numUnits;
+              if (e == "unit") numUnits = state.numUnits ?? 1;
+              else numUnits = undefined;
+
+              dispatch({
+                type: "UPDATE_EXPENSE",
+                field: "numUnits",
+                value: numUnits,
+              });
+            }}
+            value={state.numUnits ? "unit" : "flat"}
           >
-            <VStack paddingLeft="24px" alignItems="start" spacing="14px">
-              <Radio value="1">Per Unit</Radio>
-              <Radio value="2">Flat Cost</Radio>
-            </VStack>
+            <HStack spacing="24px">
+              <Radio value="flat">Flat Cost</Radio>
+              <Radio value="unit">Per Unit</Radio>
+            </HStack>
           </RadioGroup>
         </FormControl>
-        <FormControl mt="23px">
+        <FormControl mt="18px">
           <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
-            Number of Units
+            Units
           </FormLabel>
           <Input
             color="black"
             border="1px solid #D9D9D9"
             borderRadius="0px"
+            value={state.numUnits ?? 1}
+            isDisabled={state.numUnits === undefined}
             width="100%"
-            // height="30px"
-            value={units}
+            type="number"
+            required={state.numUnits !== undefined}
             onChange={handleUnitsChange}
             padding="10px"
-            type="number"
-            // pattern="^\d*(\.\d{0,2})?$"
-            // type="text"
-            // required
           />
         </FormControl>
-        <FormControl mt="23px">
+        {/* <FormControl mt="18px">
           <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
             Notes
           </FormLabel>
           <Textarea
-            // textAlign="start"
             color="black"
             border="1px solid #D9D9D9"
             borderRadius="0px"
             width="100%"
-            height="120px"
-            maxHeight="120px"
-            // height="30px"
-            value={notes}
+            value={state.notes}
             onChange={handleNotesChange}
             padding="10px"
-            // type="number"
-            // pattern="^\d*(\.\d{0,2})?$"
-            // type="text"
-            // required
+            resize="none"
+            height="100px"
           />
-        </FormControl>
+        </FormControl> */}
       </VStack>
-      <HStack width="100%" justifyContent="end" mb="34px">
-        <Button
-          fontFamily="heading"
-          fontSize="20px"
-          fontWeight="400"
-          colorScheme="red"
-          color="hop_red.500"
-          variant="outline"
-          borderRadius="6px"
-          mr="13px"
-        >
-          DELETE
-        </Button>
-        <Button
-          colorScheme="twitter"
-          bg="hop_blue.500"
-          onClick={handleApply}
-          borderRadius="6px"
-          fontFamily="heading"
-          fontSize="20px"
-          fontWeight="400"
-        >
-          APPLY
-        </Button>
-      </HStack>
+      <Button
+        width="100%"
+        height="50px"
+        bg="#FF6B6B"
+        color="white"
+        fontSize="18px"
+        fontWeight="500"
+        lineHeight="24px"
+        borderRadius="none"
+        onClick={handleApply}
+      >
+        {editing ? "Update Expense" : "Add Expense"}
+      </Button>
     </VStack>
   );
 };

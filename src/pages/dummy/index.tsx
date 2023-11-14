@@ -9,13 +9,13 @@ import {
   Center,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { ExpenseType } from "~/common/types/types";
 import { NewChapterModal } from "~/components/NewChapterModal";
 import { NewEventModal } from "~/components/NewEventModal";
 import { NewRetreatYearModal } from "~/components/NewRetreatYearModal";
 import { NewExpenseModal } from "~/components/NewExpenseModal";
 import { NewUserModal } from "~/components/NewUserModal";
 import Sidebar from "~/components/Sidebar";
+import { Expense } from "~/common/types";
 
 export default function DummyPage() {
   const {
@@ -59,9 +59,9 @@ export default function DummyPage() {
     retreat: dummyRetreat,
   };
 
-  const dummyExpenses: ExpenseType[] = [];
-  const [expenses, setExpenses] = useState<ExpenseType[]>(dummyExpenses);
-  const [selectedExpense, setSelectedExpense] = useState<ExpenseType>();
+  const dummyExpenses: Expense[] = [];
+  const [expenses, setExpenses] = useState<Expense[]>(dummyExpenses);
+  const [selectedExpense, setSelectedExpense] = useState<Expense>();
 
   let dummyYear = 2023;
 
