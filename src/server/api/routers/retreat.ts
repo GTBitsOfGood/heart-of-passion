@@ -4,6 +4,7 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 import { IRetreat, RetreatModel } from "~/server/models/Retreat";
 import { EventModel, IEvent } from "~/server/models/Event";
+import { Event } from "~/common/types";
 
 export const retreatRouter = createTRPCRouter({
   createRetreat: publicProcedure
@@ -16,6 +17,8 @@ export const retreatRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       const retreat = new RetreatModel(input);
       await retreat.save();
+
+      return retreat;
     }),
   getRetreat: publicProcedure
     .input(
@@ -53,12 +56,21 @@ export const retreatRouter = createTRPCRouter({
       });
       return !!retreat;
     }),
-  getRetreatYears: publicProcedure.input(z.string()).query(async (opts) => {
-    const retreats = await RetreatModel.find({ chapterId: opts.input })
-      .select("year")
-      .exec();
-    return retreats.map((e) => e.year).sort();
-  }),
+  getRetreatYearsAndIds: publicProcedure
+    .input(z.string())
+    .query(async (opts) => {
+      const retreats = await RetreatModel.find({ chapterId: opts.input })
+        .select("year")
+        .exec();
+      return retreats
+        .map((r) => {
+          return {
+            year: r.year,
+            id: r._id,
+          };
+        })
+        .sort();
+    }),
   getRetreatCost: publicProcedure.input(z.string()).query(async ({ input }) => {
     const events = await EventModel.find({ retreatId: input });
     let cost = 0;
@@ -76,21 +88,26 @@ export const retreatRouter = createTRPCRouter({
     return retreats;
   }),
 
-  getAllEvents: publicProcedure.input(z.string()).query(async (opts) => {
-    const retreats: IRetreat[] = await RetreatModel.find({
-      chapterId: opts.input,
-    }).exec();
+  getAllEventsForChapter: publicProcedure
+    .input(z.string())
+    .query(async (opts) => {
+      const retreats: IRetreat[] = await RetreatModel.find({
+        chapterId: opts.input,
+      }).exec();
 
-    const events: any = {};
-    for (const retreat of retreats) {
-      if (!events[retreat.year]) {
-        events[retreat.year] = [];
+      let eventsByYear: { [year: number]: Event[] } = {};
+
+      for (const retreat of retreats) {
+        if (!eventsByYear[retreat.year]) {
+          eventsByYear[retreat.year] = [];
+        }
+
+        const events = await EventModel.find({ retreatId: retreat._id }).exec();
+        for (const event of events) {
+          eventsByYear[retreat.year]!.push(event);
+        }
       }
 
-      const event = await EventModel.findOne({ retreatId: retreat._id });
-      events[retreat.year].push(event);
-    }
-
-    return events;
-  }),
+      return eventsByYear;
+    }),
 });

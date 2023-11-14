@@ -7,6 +7,7 @@ import { NewChapterModal } from "../NewChapterModal";
 import { useDisclosure } from "@chakra-ui/react";
 import { useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 interface ChapterCardProps {
   chapter: Chapter;
@@ -23,44 +24,56 @@ const ChapterCard = ({ chapter }: ChapterCardProps) => {
   } = useDisclosure();
   const finalRef = useRef(null);
 
+  const router = useRouter();
+
   return (
-    <Link href={`/chapters/${chapter.id}`}>
-      <Box
-        bgColor="#F9F9F9"
-        border={"2px #EDEDED solid"}
-        sx={{ borderRadius: "4%" }}
-        h="350px"
-        _hover={{ bg: "white", boxShadow: "lg" }}
+    <Box
+      bgColor="#F9F9F9"
+      border={"2px #EDEDED solid"}
+      sx={{ borderRadius: "4%" }}
+      h="350px"
+      _hover={{ bg: "white", boxShadow: "lg" }}
+      cursor={"pointer"}
+      onClick={() => {
+        router.push(`/chapters/${chapter.id}`);
+      }}
+    >
+      <Flex mt="2" mr="2">
+        <Spacer />
+        <IconButton
+          aria-label="settings"
+          variant="ghost"
+          height="40px"
+          width="40px"
+          icon={
+            <BiSolidEdit
+              size="20px"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenAddChapterModal();
+              }}
+            />
+          }
+        />
+        <NewChapterModal
+          isOpen={isOpenAddChapterModal}
+          onClose={onCloseAddChapterModal}
+          chapterName={chapter.name}
+          create={false}
+        />
+      </Flex>
+
+      <Text
+        align="center"
+        fontSize="40px"
+        fontWeight="bold"
+        fontFamily="oswald"
       >
-        <Flex mt="2" mr="2">
-          <Spacer />
-          <IconButton
-            aria-label="settings"
-            variant="ghost"
-            height="40px"
-            width="40px"
-            icon={<BiSolidEdit size="20px" onClick={onOpenAddChapterModal} />}
-          />
-          <NewChapterModal
-            isOpen={isOpenAddChapterModal}
-            onClose={onCloseAddChapterModal}
-            chapterName={chapter.name}
-            create={false}
-          />
-        </Flex>
+        {chapter.name.toUpperCase()}
+      </Text>
 
-        <Text
-          align="center"
-          fontSize="40px"
-          fontWeight="bold"
-          fontFamily="oswald"
-        >
-          {chapter.name.toUpperCase()}
-        </Text>
-
-        <ChapterProgress chapter={chapter} />
-      </Box>
-    </Link>
+      <ChapterProgress chapter={chapter} />
+    </Box>
   );
 };
 

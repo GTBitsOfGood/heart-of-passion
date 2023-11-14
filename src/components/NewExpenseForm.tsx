@@ -159,7 +159,6 @@ export const NewExpenseForm = ({
             fontWeight="400"
             lineHeight="24px"
             padding="0px"
-            paddingLeft="10px"
             textColor={!valid ? "#C63636" : "black"}
             borderColor={!valid ? "#C63636" : "#D9D9D9"}
             borderRadius="none"

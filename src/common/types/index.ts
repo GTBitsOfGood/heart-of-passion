@@ -84,13 +84,17 @@ export type Retreat = z.infer<typeof retreatSchema>;
 export const energyLevelSchema = z.enum(["low", "medium", "high"]);
 export type EnergyLevel = z.infer<typeof energyLevelSchema>;
 
-export const eventSchema = z.object({
-  name: z.string(),
-  location: z.string().optional(),
-  energyLevel: energyLevelSchema.optional(),
-  dates: z.array(dateObjectSchema),
-  expenses: z.array(expenseSchema),
-});
+export const eventSchema = z
+  .object({
+    name: z.string().nonempty(),
+    location: z.string().optional(),
+    energyLevel: energyLevelSchema.optional(),
+    dates: z.array(dateObjectSchema),
+    expenses: z.array(expenseSchema),
+  })
+  .refine((data) => data.dates.length > 0, {
+    message: "Event must have at least one date.",
+  });
 export type Event = z.infer<typeof eventSchema>;
 
 // Fund

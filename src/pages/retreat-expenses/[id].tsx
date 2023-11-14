@@ -10,6 +10,7 @@ import {
   Box,
   useDisclosure,
   Text,
+  Spinner,
 } from "@chakra-ui/react";
 import React from "react";
 import { TriangleDownIcon } from "@chakra-ui/icons";
@@ -42,24 +43,16 @@ export default function RetreatExpenses() {
     onCloseFilterPopeover();
   }
 
-  let dummyChapter = {
-    id: "1",
-    name: "Atlanta",
-    totalCost: 5100,
-    fundExpected: 5180,
-    fundActual: 2600,
-  };
-
-  let dummyYear = 2023;
-
   const router = useRouter();
   const { id }: { id?: string } = router.query;
-  const eventData = trpc.event.getEvents.useQuery(id || "123").data;
+  const eventData = trpc.event.getEvents.useQuery(id!).data;
+
   const [expenses, setExpenses] = useState([] as Expense[]);
 
-  const dummyExpenses: Expense[] = [];
-  const [expense, setExpense] = useState<Expense[]>(dummyExpenses);
+  const [expense, setExpense] = useState<Expense[]>([]);
   const [selectedExpense, setSelectedExpense] = useState<Expense>();
+
+  const chapter = trpc.chapter.getChapterByRetreatId.useQuery(id!).data;
 
   useEffect(() => {
     // clear expenses so it doesn't add every time the page is re-rendered
@@ -178,7 +171,7 @@ export default function RetreatExpenses() {
 
   return (
     <Box>
-      <Sidebar chapter={dummyChapter} year={dummyYear} retreatId={id} />
+      {chapter ? <Sidebar chapter={chapter!} retreatId={id} /> : <Spinner />}
       <Stack
         spacing={4}
         alignItems={"right"}
@@ -292,7 +285,7 @@ export default function RetreatExpenses() {
         <Flex borderBottom="1px #AEAEAE solid"></Flex>
         <Flex paddingBottom="30px" justifyContent="end" alignItems="flex-end">
           <Text paddingBottom="0.5em" paddingRight="0.5em">
-            Total Travel Cost:
+            Total Cost:
           </Text>
           <Text fontFamily={fonts.oswald} fontSize="64px" fontWeight="700">
             ${totalCost}

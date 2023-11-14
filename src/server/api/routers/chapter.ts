@@ -30,7 +30,14 @@ export const chapterRouter = createTRPCRouter({
       }).exec())!;
       return processChapter(chapter);
     }),
-
+  getChapterById: publicProcedure
+    .input(z.string())
+    .query(async (opts): Promise<Chapter> => {
+      const chapter = (await ChapterModel.findOne({
+        _id: opts.input,
+      }).exec())!;
+      return processChapter(chapter);
+    }),
   getChapterByRetreatId: publicProcedure
     .input(z.string())
     .query(async (opts): Promise<Chapter> => {
@@ -62,6 +69,13 @@ export const chapterRouter = createTRPCRouter({
       ).exec();
       return chapter;
     }),
+
+  getLatestRetreatId: publicProcedure.input(z.string()).query(async (opts) => {
+    const retreat = await RetreatModel.findOne({ chapterId: opts.input })
+      .sort("-year")
+      .exec();
+    return retreat?._id;
+  }),
 });
 
 async function processChapter(chapterModel: IChapter): Promise<Chapter> {
@@ -77,7 +91,7 @@ async function processChapter(chapterModel: IChapter): Promise<Chapter> {
     events?.forEach((event: IEvent) => {
       let expenses: Expense[] = event.expenses;
       expenses?.forEach((expense) => {
-        cost += expense.cost * (expense.numUnits ?? 1);
+        cost += expense.cost * (expense.numUnits || 1);
       });
     });
   }

@@ -1,4 +1,12 @@
-import { Box, Flex, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  HStack,
+  Spacer,
+  Text,
+  useDisclosure,
+} from "@chakra-ui/react";
 import CalendarCard from "src/components/Calendar/CalendarCard";
 
 import "@fontsource/oswald/700.css";
@@ -10,6 +18,7 @@ import { Event } from "~/common/types";
 import { useState } from "react";
 import { computeHeight } from "~/components/Calendar/computeHeight";
 import { IEvent } from "~/server/models/Event";
+import { NewEventModal } from "~/components/NewEventModal";
 
 type EventWithStamp = {
   event: IEvent;
@@ -17,7 +26,15 @@ type EventWithStamp = {
   to: string;
 };
 
-function Content({ events, counter }: { events: IEvent[]; counter: number }) {
+function Content({
+  events,
+  counter,
+  retreatId,
+}: {
+  events: IEvent[];
+  counter: number;
+  retreatId: string;
+}) {
   let eventsByDay: EventWithStamp[][] = [[], [], [], []];
   for (const event of events) {
     const { dates } = event;
@@ -50,7 +67,7 @@ function Content({ events, counter }: { events: IEvent[]; counter: number }) {
               >
                 Day {day}
               </Text>
-              <Box display={"flex"}>
+              <Box display={"flex"} position={"relative"}>
                 <Box marginRight={"34px"} minW={"180px"}>
                   {eventsByDay[day - 1]!.map((einfo, index: number, arr) => {
                     if (counter > 0) {
@@ -141,6 +158,7 @@ function Content({ events, counter }: { events: IEvent[]; counter: number }) {
                         <Box display={"flex"} key={index}>
                           {nextEventsArray.length === 0 ? (
                             <CalendarCard
+                              retreatId={retreatId}
                               expenseTotal={totalExpense}
                               date={dateObject}
                               event={event.event}
@@ -153,13 +171,15 @@ function Content({ events, counter }: { events: IEvent[]; counter: number }) {
                                 date={dateObject}
                                 event={event.event}
                                 width={103}
+                                retreatId={retreatId}
                               />
                               <Box>
                                 {nextEventsArray.map(
                                   (nextEvent: any, index) => {
-                                    console.log(nextEvent);
                                     return (
                                       <CalendarCard
+                                        right={true}
+                                        retreatId={retreatId}
                                         key={index}
                                         expenseTotal={
                                           nextEvent.nextTotalExpense
@@ -167,7 +187,6 @@ function Content({ events, counter }: { events: IEvent[]; counter: number }) {
                                         date={nextEvent.nextDateObject}
                                         event={nextEvent.nextEventObject}
                                         width={103}
-                                        topY={-nextEvent.topY}
                                       />
                                     );
                                   },
@@ -181,6 +200,7 @@ function Content({ events, counter }: { events: IEvent[]; counter: number }) {
 
                     return (
                       <CalendarCard
+                        retreatId={retreatId}
                         key={index}
                         expenseTotal={totalExpense}
                         date={dateObject}
@@ -210,13 +230,22 @@ export default function Calendar() {
   const router = useRouter();
   const { id }: { id?: string } = router.query;
 
+  const {
+    isOpen: isAddEventOpen,
+    onClose: onAddEventClose,
+    onOpen: onAddEventOpen,
+  } = useDisclosure();
+
+  const openAddEventModal = () => {
+    onAddEventOpen();
+  };
+
   const chapter = trpc.chapter.getChapterByRetreatId.useQuery(id!, {
     enabled: !!id,
   })?.data;
   const retreat = trpc.retreat.getRetreatById.useQuery(id!, {
     enabled: !!id,
   })?.data;
-
   const events = trpc.event.getEvents.useQuery(id!, {
     enabled: !!id,
   }).data;
@@ -235,7 +264,35 @@ export default function Calendar() {
           )}
         </Box>
         <Box position="relative" left="436px" overflowX={"visible"}>
-          {events && <Content events={events} counter={counter} />}
+          {events && (
+            <Content
+              retreatId={retreat?._id ?? ""}
+              events={events}
+              counter={counter}
+            />
+          )}
+          <Flex alignItems={"right"}>
+            <Spacer />
+            <Button
+              colorScheme="twitter"
+              marginLeft="auto"
+              fontWeight="400"
+              color="white"
+              bg="hop_blue.500"
+              fontFamily="oswald"
+              height="50px"
+              fontSize="20px"
+              marginBottom="10px"
+              onClick={openAddEventModal}
+            >
+              ADD EVENT
+            </Button>
+            <NewEventModal
+              retreatId={retreat?._id ?? ""}
+              isOpen={isAddEventOpen}
+              onClose={onAddEventClose}
+            />
+          </Flex>
         </Box>
       </Box>
     </Box>

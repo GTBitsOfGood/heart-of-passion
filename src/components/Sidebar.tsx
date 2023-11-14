@@ -18,16 +18,15 @@ import { useRouter } from "next/router";
 
 interface SidebarProps {
   chapter: Chapter;
-  year: number;
-  retreatId: string | undefined;
+  year?: number;
+  retreatId?: string;
 }
 
-type OptionType = {
-  value: string;
-  label: string;
-};
-
-const Sidebar = ({ chapter, year, retreatId }: SidebarProps) => {
+const Sidebar = ({
+  chapter,
+  year: yearProp,
+  retreatId: retreatIdProp,
+}: SidebarProps) => {
   const id = useId();
   const {
     isOpen: isOpenAddYearModal,
@@ -36,91 +35,70 @@ const Sidebar = ({ chapter, year, retreatId }: SidebarProps) => {
   } = useDisclosure();
   const [clicked, setClicked] = useState(0);
 
-  const chapterId = trpc.chapter.getChapterIdByName.useQuery(chapter.name);
+  const chapterId = trpc.chapter.getChapterIdByName.useQuery(chapter.name).data;
 
-  const retreatYears = trpc.retreat.getRetreatYears.useQuery(
-    chapterId.data ?? "",
-    { enabled: !!chapterId.data },
-  );
+  const allRetreats = trpc.retreat.getRetreatYearsAndIds.useQuery(
+    chapterId ?? "",
+    {
+      enabled: !!chapterId,
+    },
+  ).data;
+
+  const latestRetreatId = trpc.chapter.getLatestRetreatId.useQuery(chapterId!, {
+    enabled: !!retreatIdProp && !!chapterId,
+  }).data;
+
+  const retreatId = retreatIdProp ?? latestRetreatId;
 
   const router = useRouter();
 
-  const archiveOption: OptionType = useMemo(
-    () => ({
-      value: "Add Archive",
-      label: "Add Archive",
-    }),
-    [],
+  function handleClick(path: String) {
+    if (!retreatId) {
+      // TODO
+      router.push(`/chapters/${chapterId}`);
+      return;
+    }
+
+    router.push(`/${path}/${retreatId}`);
+  }
+
+  const [year, setYear] = useState<number>(
+    yearProp ?? new Date().getFullYear(),
   );
 
-  const options: OptionType[] = useMemo(() => {
-    return [
-      ...(retreatYears.data?.map((yr, i) => {
-        const option = {
-          value: yr.toString(),
-          label: yr.toString(),
-          // onChange: () => {
-          //   // console.log("HERE");
-          //   setSelectedOption(i);
-          // },
-        };
-        return option;
-      }) ?? []),
-      // {
-      //   value: "Add Archive",
-      //   label: "Add Archive",
-      //   // onChange: () => {
-      //   // console.log("lol");
-      //   // console.log(selectedOption?.value);
-      //   // setSelectedOption((retreatYears?.data?.length ?? 0)-1);
-      //   // onOpenModal();
-      //   // },
-      // },
-      archiveOption,
-    ];
-  }, [archiveOption, retreatYears.data]);
-
-  const getOptionFromYear = useCallback(
-    (yr: number) => {
-      return options.find((o) => o.value === yr.toString()) ?? archiveOption;
-    },
-    [archiveOption, options],
-  );
-
-  const [selectedOption, setSelectedOption] = useState<OptionType>(
-    getOptionFromYear(year),
-  );
   const getRetreat = trpc.retreat.getRetreat.useQuery(
-    { chapterId: chapterId.data ?? "", year: parseInt(selectedOption.value) },
+    { chapterId: chapterId ?? "", year },
     { enabled: false },
   );
 
-  const handleChange = async (
-    option: OptionType | null,
-    actionMeta: ActionMeta<OptionType>,
-  ) => {
-    setSelectedOption(option ?? archiveOption);
-    if (option?.value === "Add Archive") {
+  async function handleYearChange(value: string) {
+    if (value == "Add Archive") {
       onOpenAddYearModal();
-    } else {
-      updateYear();
+      return;
     }
-  };
 
-  function updateYear() {
-    if (selectedOption) {
-      if (selectedOption.value !== "Add Archive") {
-        (async () => {
-          const { data: retreat } = await getRetreat.refetch();
-          router.push(`/retreat/${retreat?._id}`);
-        })();
-      }
+    let retreat = allRetreats?.find(
+      (retreat) => retreat.year == parseInt(value),
+    );
+
+    if (retreat?.id) {
+      setYear(parseInt(value));
+      router.push(`/retreat/${retreat.id}`);
     }
   }
 
-  function handleClick(path: String) {
-    router.push(`/${path}/${retreatId}`);
-  }
+  const options = useMemo(() => {
+    const years = allRetreats?.map((retreat) => {
+      return {
+        value: retreat.year.toString(),
+        label: retreat.year.toString(),
+      };
+    });
+
+    return years
+      ? [...years, { value: "Add Archive", label: "Add Archive" }]
+      : [];
+  }, [allRetreats]);
 
   return (
     <>
@@ -142,6 +120,10 @@ const Sidebar = ({ chapter, year, retreatId }: SidebarProps) => {
                 src="/logo.png"
                 alt="Heart of Passion Logo"
                 height="120px"
+                onClick={() => {
+                  router.push(`/chapters/`);
+                }}
+                style={{ cursor: "pointer" }}
               />
             </GridItem>
             <GridItem>
@@ -153,43 +135,35 @@ const Sidebar = ({ chapter, year, retreatId }: SidebarProps) => {
               >
                 {chapter.name.toUpperCase()}
               </Text>
-              <Select
-                instanceId={id}
-                defaultValue={{
-                  value: year.toString(),
-                  label: year.toString(),
-                }}
-                options={options}
-                onChange={handleChange}
-                isSearchable={false}
-                styles={{
-                  control: (base) => ({
-                    ...base,
-                    border: 0,
-                    boxShadow: "none",
-                    textAlign: "right",
-                    backgroundColor: "#F9F9F9",
-                    fontSize: "36px",
-                    fontFamily: "nunito",
-                  }),
-                  dropdownIndicator: (base) => ({
-                    ...base,
-                    color: "black",
-                  }),
-                }}
-                components={{
-                  IndicatorSeparator: () => null,
-                }}
-              />
-              {/* <Select
-                placeholder={year.toString()}
-                fontSize="36px"
-                fontFamily="nunito"
-                variant="unstyled"
-                textAlign="right"
-              >
-                <option>Add Archive</option>
-              </Select> */}
+              {year && (
+                <Select
+                  instanceId={id}
+                  value={{ value: year.toString(), label: year.toString() }}
+                  options={options}
+                  onChange={(value, actionMeta) => {
+                    handleYearChange(value!.value);
+                  }}
+                  isSearchable={false}
+                  styles={{
+                    control: (base) => ({
+                      ...base,
+                      border: 0,
+                      boxShadow: "none",
+                      textAlign: "right",
+                      backgroundColor: "#F9F9F9",
+                      fontSize: "36px",
+                      fontFamily: "nunito",
+                    }),
+                    dropdownIndicator: (base) => ({
+                      ...base,
+                      color: "black",
+                    }),
+                  }}
+                  components={{
+                    IndicatorSeparator: () => null,
+                  }}
+                />
+              )}
             </GridItem>
           </Grid>
           <ChapterProgress chapter={chapter} />
@@ -248,7 +222,7 @@ const Sidebar = ({ chapter, year, retreatId }: SidebarProps) => {
                 justifyContent="left"
                 backgroundColor={clicked == 3 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
-                  handleClick("backlog");
+                  router.push(`/backlog/${chapterId}/`);
                 }}
               >
                 Previous Retreat Events

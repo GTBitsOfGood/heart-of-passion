@@ -1,4 +1,4 @@
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Spinner, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { trpc } from "~/utils/api";
@@ -14,19 +14,16 @@ export default function Backlog() {
     value: "View by Date",
   });
   const router = useRouter();
-  const { id }: { id?: string } = router.query;
-  const { data: currRetreatData } = trpc.retreat.getAllEvents.useQuery(id!, {
-    enabled: !!id,
-  });
-  let dummyChapter = {
-    id: "1",
-    name: "Atlanta",
-    totalCost: 5100,
-    fundExpected: 5180,
-    fundActual: 2600,
-  };
+  const { id: chapterId }: { id?: string } = router.query;
 
-  let dummyYear = 2023;
+  const { data: currRetreatData } =
+    trpc.retreat.getAllEventsForChapter.useQuery(chapterId!, {
+      enabled: !!chapterId,
+    });
+
+  const chapter = trpc.chapter.getChapterById.useQuery(chapterId!, {
+    enabled: !!chapterId,
+  })?.data;
 
   const options = [
     { value: "View by Date", label: "View by Date" },
@@ -49,9 +46,7 @@ export default function Backlog() {
     <Box>
       {currRetreatData && chapterEvents && (
         <Box display={"flex"}>
-          <Box>
-            <Sidebar chapter={dummyChapter} year={dummyYear} retreatId={id} />
-          </Box>
+          <Box>{chapter ? <Sidebar chapter={chapter} /> : <Spinner />}</Box>
           <Box
             display={"flex"}
             flexDirection={"column"}

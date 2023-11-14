@@ -141,10 +141,11 @@ export default function DummyPage() {
         >
           ADD EXPENSE
         </Button>
-        <NewEventModal
+        {/* <NewEventModal
+
           isOpen={isOpenAddEventModal}
           onClose={onCloseAddEventModal}
-        />
+        /> */}
         <NewExpenseModal
           isOpen={isOpenAddExpenseModal}
           onClose={onCloseAddExpenseModal}

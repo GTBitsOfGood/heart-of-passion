@@ -16,20 +16,22 @@ import { IEvent } from "~/server/models/Event";
 
 export default function CalendarCard({
   event,
+  retreatId,
   date,
   expenseTotal,
   width,
-  topY,
+  right,
 }: {
   event: IEvent;
   date: DateObject;
   expenseTotal: number;
   width: number;
-  topY?: number;
+  retreatId: string;
+  right?: boolean;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const height = computeHeight(date.from, date.to, screen.height);
-  const top = computeHeight("9:00 am", date.from, screen.height);
+  const topY = computeHeight("9:00 am", date.from, screen.height);
   const parentRef: any = useRef();
   const [variant, setVariant] = useState(3);
   useEffect(() => {
@@ -130,6 +132,7 @@ export default function CalendarCard({
   return (
     <>
       <Grid
+        position="absolute"
         templateColumns={`${width}px 7px`}
         width={width}
         minH={"15px"}
@@ -143,7 +146,8 @@ export default function CalendarCard({
         as={GridItem}
         area="stack"
         textOverflow="ellipsis"
-        marginTop={!topY ? 0 : topY}
+        left={right ? 103 : 0}
+        top={!!topY ? topY : 0}
       >
         <GridItem
           fontSize="14px"
@@ -167,7 +171,12 @@ export default function CalendarCard({
           {EnergyText()}
         </GridItem>
       </Grid>
-      <NewEventModal event={event} isOpen={isOpen} onClose={onClose} />
+      <NewEventModal
+        retreatId={retreatId}
+        event={event}
+        isOpen={isOpen}
+        onClose={onClose}
+      />
     </>
   );
 }

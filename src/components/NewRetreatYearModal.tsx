@@ -13,6 +13,7 @@ import {
   ModalOverlay,
   VStack,
 } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { Retreat } from "~/common/types";
 import { trpc } from "~/utils/api";
@@ -53,8 +54,11 @@ export const NewRetreatYearModal = ({
     { enabled: false },
   );
 
+  const router = useRouter();
+
   const createRetreat = trpc.retreat.createRetreat.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
+      router.push(`/retreats/${data.id}`);
       trpcUtils.retreat.invalidate();
     },
   });

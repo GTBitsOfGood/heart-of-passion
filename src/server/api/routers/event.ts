@@ -7,20 +7,25 @@ import { EventModel, IEvent } from "~/server/models/Event";
 export const eventRouter = createTRPCRouter({
   updateEvent: publicProcedure
     .input(
-      z
-        .object({
-          id: z.string(),
-        })
-        .merge(eventSchema),
+      z.object({
+        eventId: z.string(),
+        event: eventSchema,
+      }),
     )
     .mutation(async ({ input }) => {
-      const { id, ...update } = input;
-      await EventModel.findByIdAndUpdate(id, update).exec();
+      const { eventId, event } = input;
+      await EventModel.findByIdAndUpdate(eventId, event).exec();
     }),
   createEvent: publicProcedure
-    .input(eventSchema)
+    .input(
+      z.object({
+        retreatId: z.string(),
+        eventDetails: eventSchema,
+      }),
+    )
     .mutation(async ({ input }) => {
-      const event = new EventModel(input);
+      const { retreatId, eventDetails } = input;
+      const event = new EventModel({ retreatId, ...eventDetails });
       await event.save();
     }),
 

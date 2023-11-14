@@ -40,6 +40,7 @@ type NewEventProps = {
   isOpen: boolean;
   onClose: () => void;
   event?: IEvent;
+  retreatId: string;
 };
 
 type Action<T extends keyof Event = keyof Event> =
@@ -81,7 +82,7 @@ const initialState: State = {
     name: "",
     energyLevel: undefined,
     location: "",
-    dates: [],
+    dates: [{ day: 1, from: "09:00 am", to: "10:00 am" }],
     expenses: [],
   },
 
@@ -91,6 +92,7 @@ const initialState: State = {
 
 export const NewEventModal = ({
   event: eventToEdit,
+  retreatId,
   isOpen,
   onClose,
 }: NewEventProps) => {
@@ -159,9 +161,10 @@ export const NewEventModal = ({
     }
 
     if (eventToEdit) {
-      updateEvent.mutate({ ...state.event, id: eventToEdit._id });
+      updateEvent.mutate({ event: state.event, eventId: eventToEdit._id });
     } else {
-      createEvent.mutate(state.event);
+      console.log(state.event);
+      createEvent.mutate({ eventDetails: state.event, retreatId });
     }
     onCloseModal();
   };
