@@ -21,12 +21,26 @@ function Content({
     <Flex
       justifyContent="center"
       alignItems="center"
-      flex={2}
-      width={"max-content"}
+      // flex={2}
+      w="100%"
+      // width={"max-content"}
+      h="100%"
       paddingTop={"20px"}
       paddingBottom={"50px"}
     >
-      <Box display={"flex"} gap={"14px"}>
+      <Box
+        display={"flex"}
+        gap={"14px"}
+        justifyContent="start"
+        w="100%"
+        h="100%"
+        overflowX="scroll"
+        sx={{
+          "::-webkit-scrollbar": {
+            display: "none",
+          },
+        }}
+      >
         {[1, 2, 3, 4].map((num, index) => {
           return (
             <Box key={index}>
@@ -228,23 +242,26 @@ export default function Calendar() {
 
     // </>
 
-    <Box>
-      <Box display="flex">
-        <Box zIndex={1000}>
-          {chapter && retreat && (
-            <Sidebar
-              chapter={chapter}
-              year={retreat.year}
-              retreatId={retreat._id}
-            />
-          )}
-        </Box>
-        <Box position="relative" left="436px" overflowX={"visible"}>
-          {eventsByDay && (
-            <Content eventsByDay={eventsByDay} counter={counter} />
-          )}
-        </Box>
-      </Box>
-    </Box>
+    // <Box>
+    <>
+      {chapter && retreat && (
+        <Sidebar chapter={chapter} year={retreat.year} retreatId={id} />
+      )}
+
+      <Flex
+        // ml="446px"
+        // ml={{ base: "100px", md: "150px", lg: "200px" }}
+        // width="auto"
+        position="relative"
+        left="446px"
+        height="100vh"
+        w="calc(100vw - 446px)"
+        justifyContent="center"
+        // overflowX="scroll"
+      >
+        {eventsByDay && <Content eventsByDay={eventsByDay} counter={counter} />}
+      </Flex>
+    </>
+    // </Box>
   );
 }
