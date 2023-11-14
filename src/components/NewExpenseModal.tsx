@@ -11,16 +11,16 @@ import { useState } from "react";
 import { DropdownIcon } from "~/common/theme/icons";
 import { NewTimeForm } from "./NewTimeForm";
 import { FloatingAlert } from "./FloatingAlert";
-import { Expense, Time, Times } from "~/common/types/types";
+import { ExpenseType, Time, Times } from "~/common/types/types";
 import { NewExpenseForm } from "./NewExpenseForm";
 import { NewExpense } from "./NewExpense";
 
 type NewExpenseProps = {
   isOpen: boolean;
   onClose: () => void;
-  expenses: Expense[];
-  setExpenses: (e: Expense[]) => void;
-  thisExpense: Expense | undefined;
+  expenses: ExpenseType[];
+  setExpenses: (e: ExpenseType[]) => void;
+  thisExpense: ExpenseType | undefined;
 };
 
 export const NewExpenseModal = ({
@@ -81,7 +81,7 @@ export const NewExpenseModal = ({
           >
             <NewExpenseForm
               expenses={expenses}
-              setExpenses={(e: Expense[]) => setExpenses(e)}
+              setExpenses={(e: ExpenseType[]) => setExpenses(e)}
               onOpenError={onOpenError}
               onCloseError={onCloseError}
               selectedExpense={thisExpense}

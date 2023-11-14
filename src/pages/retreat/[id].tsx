@@ -33,6 +33,7 @@ function Content({
         gap={"14px"}
         justifyContent="start"
         w="100%"
+        h="100%"
         overflowX="scroll"
         sx={{
           "::-webkit-scrollbar": {
@@ -243,7 +244,9 @@ export default function Calendar() {
 
     // <Box>
     <>
-      {chapter && retreat && <Sidebar chapter={chapter} year={retreat.year} />}
+      {chapter && retreat && (
+        <Sidebar chapter={chapter} year={retreat.year} retreatId={id} />
+      )}
 
       <Flex
         // ml="446px"
@@ -251,7 +254,7 @@ export default function Calendar() {
         // width="auto"
         position="relative"
         left="446px"
-        height="100%"
+        height="100vh"
         w="calc(100vw - 446px)"
         justifyContent="center"
         // overflowX="scroll"

@@ -9,7 +9,7 @@ import {
   Center,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { Expense } from "~/common/types/types";
+import { ExpenseType } from "~/common/types/types";
 import { NewChapterModal } from "~/components/NewChapterModal";
 import { NewEventModal } from "~/components/NewEventModal";
 import { NewRetreatYearModal } from "~/components/NewRetreatYearModal";
@@ -59,15 +59,19 @@ export default function DummyPage() {
     retreat: dummyRetreat,
   };
 
-  const dummyExpenses: Expense[] = [];
-  const [expenses, setExpenses] = useState<Expense[]>(dummyExpenses);
-  const [selectedExpense, setSelectedExpense] = useState<Expense>();
+  const dummyExpenses: ExpenseType[] = [];
+  const [expenses, setExpenses] = useState<ExpenseType[]>(dummyExpenses);
+  const [selectedExpense, setSelectedExpense] = useState<ExpenseType>();
 
   let dummyYear = 2023;
 
   return (
     <>
-      <Sidebar chapter={dummyChapter} year={dummyYear} />
+      <Sidebar
+        chapter={dummyChapter}
+        year={dummyYear}
+        retreatId={dummyRetreat._id}
+      />
       <Stack
         direction="row"
         spacing={4}

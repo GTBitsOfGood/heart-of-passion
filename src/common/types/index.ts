@@ -118,3 +118,19 @@ export const eventSchema = z.object({
   expenses: z.array(expenseObjectSchema),
 });
 export type Event = z.infer<typeof eventSchema>;
+
+// Fund
+export const fundSchema = z.object({
+  name: z.string(),
+  date: z.string(),
+  amount: z.number(),
+  source: z.string(),
+});
+export type Fund = z.infer<typeof fundSchema>;
+
+// Fund List
+export const fundListSchema = z.object({
+  title: z.string(),
+  funds: z.array(fundSchema),
+});
+export type FundList = z.infer<typeof fundListSchema>;
