@@ -39,7 +39,6 @@ type Action<T extends keyof Expense = keyof Expense> =
 const initialState: State = {
   name: "Expense Name",
   type: "Entertainment",
-  dates: [],
   cost: 0,
 };
 

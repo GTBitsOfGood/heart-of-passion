@@ -5,7 +5,6 @@ import fonts from "~/common/theme/fonts";
 export default function Expense({
   name,
   event,
-  dates,
   type,
   cost,
   numUnits,

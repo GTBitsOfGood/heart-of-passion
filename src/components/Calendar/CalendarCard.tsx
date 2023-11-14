@@ -12,6 +12,7 @@ import { computeHeight } from "./computeHeight";
 import { DateObject, Event } from "~/common/types";
 import { useRef, useEffect, useState } from "react";
 import { NewEventModal } from "../NewEventModal";
+import { IEvent } from "~/server/models/Event";
 
 export default function CalendarCard({
   event,
@@ -20,7 +21,7 @@ export default function CalendarCard({
   width,
   topY,
 }: {
-  event: Event;
+  event: IEvent;
   date: DateObject;
   expenseTotal: number;
   width: number;

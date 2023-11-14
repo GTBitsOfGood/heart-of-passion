@@ -88,8 +88,8 @@ export const NewTimeForm = ({
 
   useEffect(() => {
     setDay(selectedTime?.day ?? 1);
-    // setStartTime(getTimeIndex(selectedTime?.start ?? "-1", 0));
-    // setEndTime(getTimeIndex(selectedTime?.end ?? "-1", 2));
+    setStartTime(selectedTime?.from ?? "09:00 am");
+    setEndTime(selectedTime?.to ?? "10:00 am");
   }, [selectedTime]);
 
   const handleApply = () => {

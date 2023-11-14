@@ -8,6 +8,7 @@ interface IExpense extends z.infer<typeof expenseSchema> {}
 interface IEventDate extends z.infer<typeof dateObjectSchema> {}
 
 export interface IEvent extends z.infer<typeof eventSchema> {
+  _id: string;
   retreatId: mongoose.Types.ObjectId;
 }
 
@@ -20,7 +21,6 @@ const DateSchema = new Schema<IEventDate>({
 export const ExpenseSchema = new Schema<IExpense>({
   name: { type: String, required: true },
   event: { type: String },
-  dates: { type: [DateSchema], required: true },
   type: { type: String, required: true },
   cost: { type: Number, required: true },
   numUnits: { type: Number },
@@ -41,10 +41,6 @@ export const EventSchema = new Schema<IEvent>({
   energyLevel: {
     type: String,
     enum: ["low", "medium", "high"],
-  },
-  category: {
-    type: String,
-    enum: ["entertainment", "educational", "other"],
   },
   dates: {
     type: [

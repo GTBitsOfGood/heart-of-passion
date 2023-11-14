@@ -64,18 +64,17 @@ export default function RetreatExpenses() {
   useEffect(() => {
     // clear expenses so it doesn't add every time the page is re-rendered
     setExpenses([]);
-    eventData?.forEach((event: any) => {
-      event.expenses?.forEach((expense: any) => {
+    eventData?.forEach((event) => {
+      event.expenses?.forEach((expense) => {
         setExpenses((expenses) => [
           ...expenses,
           {
             name: expense.name,
             event: event.name,
             dates: event.dates,
-            type: expense.type === "other" ? "Miscellaneous" : expense.type,
+            type: expense.type,
             cost: expense.cost,
-            numUnits:
-              expense.costType === "flat cost" ? 1 : expense.numberOfUnits,
+            numUnits: expense.numUnits,
           },
         ]);
       });

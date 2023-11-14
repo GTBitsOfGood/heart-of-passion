@@ -33,7 +33,6 @@ type State = Expense;
 
 const initialState: State = {
   name: "Expense Name",
-  dates: [],
   type: "Entertainment",
   cost: 0,
 };

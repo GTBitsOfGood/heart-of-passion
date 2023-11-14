@@ -23,26 +23,30 @@ import {
   Text,
   VStack,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
-import { useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { DropdownIcon } from "~/common/theme/icons";
 import { NewTimeForm } from "./NewTimeForm";
 import { FloatingAlert } from "./FloatingAlert";
 import { NewExpenseForm } from "./NewExpenseForm";
 import { NewExpenseModal } from "./NewExpenseModal";
-import { DateObject, Event, Expense } from "~/common/types";
+import { DateObject, Event, Expense, eventSchema } from "~/common/types";
+import { IEvent } from "~/server/models/Event";
+import { z } from "zod";
+import { trpc } from "~/utils/api";
 
 type NewEventProps = {
   isOpen: boolean;
   onClose: () => void;
-  event?: Event;
+  event?: IEvent;
 };
 
 type Action<T extends keyof Event = keyof Event> =
   | { type: "OPEN_TIME_SIDEBAR" }
   | { type: "OPEN_EXPENSE_SIDEBAR" }
   | { type: "CLOSE_SIDEBAR" }
-  | { type: "RESET_FORM" }
+  | { type: "RESET_FORM"; event: Event | undefined }
   | { type: "UPDATE_EVENT"; field: T; value: Event[T] };
 
 type State = {
@@ -59,7 +63,8 @@ const reducer = (state: State, action: Action): State => {
         event: { ...state.event, [action.field]: action.value },
       };
     case "RESET_FORM":
-      return initialState;
+      if (action.event) return { ...initialState, event: action.event };
+      return { ...initialState };
     case "OPEN_TIME_SIDEBAR":
       return { ...state, timeFormOpen: true, expenseFormOpen: false };
     case "OPEN_EXPENSE_SIDEBAR":
@@ -84,8 +89,15 @@ const initialState: State = {
   expenseFormOpen: false,
 };
 
-export const NewEventModal = ({ event, isOpen, onClose }: NewEventProps) => {
-  let [state, dispatch] = useReducer(reducer, initialState);
+export const NewEventModal = ({
+  event: eventToEdit,
+  isOpen,
+  onClose,
+}: NewEventProps) => {
+  let [state, dispatch] = useReducer(
+    reducer,
+    eventToEdit ? { ...initialState, event: eventToEdit } : initialState,
+  );
   const [selectedTime, setSelectedTime] = useState<DateObject>();
   const [selectedExpense, setSelectedExpense] = useState<Expense>();
 
@@ -95,18 +107,63 @@ export const NewEventModal = ({ event, isOpen, onClose }: NewEventProps) => {
     onOpen: onOpenError,
   } = useDisclosure({ defaultIsOpen: false });
 
+  useEffect(() => {
+    if (eventToEdit) {
+      dispatch({ type: "RESET_FORM", event: eventToEdit });
+    }
+  }, [eventToEdit]);
+
   const sidebarOpen = state.timeFormOpen || state.expenseFormOpen;
 
   const onCloseModal = () => {
-    dispatch({ type: "RESET_FORM" });
+    dispatch({ type: "RESET_FORM", event: eventToEdit });
     onClose();
   };
 
+  const validate = () => {
+    try {
+      eventSchema.parse(state.event);
+      return true;
+    } catch (e) {
+      let errorDesc = "Unknown Error";
+      if (e instanceof z.ZodError) {
+        errorDesc = e.issues.map((issue) => issue.message).join("\n");
+      }
+      toast({
+        title: "Error",
+        description: errorDesc,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return false;
+    }
+  };
+
+  const trpcUtils = trpc.useContext();
+  const updateEvent = trpc.event.updateEvent.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+    },
+  });
+  const createEvent = trpc.event.createEvent.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+    },
+  });
+
+  const toast = useToast();
   const submit = () => {
-    //TODO
-    // validate
-    // create / update
-    // close
+    if (!validate()) {
+      return;
+    }
+
+    if (eventToEdit) {
+      updateEvent.mutate({ ...state.event, id: eventToEdit._id });
+    } else {
+      createEvent.mutate(state.event);
+    }
+    onCloseModal();
   };
 
   return (
@@ -150,24 +207,31 @@ export const NewEventModal = ({ event, isOpen, onClose }: NewEventProps) => {
           >
             <VStack height="100%" justifyContent="space-between">
               <VStack spacing="0px">
-                <Text
-                  fontFamily="heading"
-                  fontWeight="700"
-                  color="#9F9F9F"
-                  fontSize="36px"
-                  lineHeight="53px"
-                  letterSpacing="0em"
-                  alignSelf="start"
-                >
-                  Enter Event Name
-                </Text>
+                <FormControl marginTop="29px" isRequired>
+                  <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
+                    Event Name
+                  </FormLabel>
+                  <Input
+                    color="black"
+                    border="1px solid #D9D9D9"
+                    borderRadius="0px"
+                    width="389px"
+                    value={state.event.name}
+                    onChange={(e) =>
+                      dispatch({
+                        type: "UPDATE_EVENT",
+                        field: "name",
+                        value: e.target.value,
+                      })
+                    }
+                  />
+                </FormControl>
                 <Divider borderColor="black" />
                 <FormControl marginTop="29px" isRequired>
                   <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
                     Energy Level
                   </FormLabel>
                   <Select
-                    width="389px"
                     textAlign="left"
                     borderRadius="none"
                     bg="white"
@@ -176,7 +240,6 @@ export const NewEventModal = ({ event, isOpen, onClose }: NewEventProps) => {
                     fontWeight="400"
                     lineHeight="25px"
                     padding="0px"
-                    paddingLeft="10px"
                     textColor={"black"}
                     borderColor={"#D9D9D9"}
                     value={state.event.energyLevel}
@@ -188,9 +251,9 @@ export const NewEventModal = ({ event, isOpen, onClose }: NewEventProps) => {
                       });
                     }}
                   >
-                    <option value="High">High</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Low">Low</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
                   </Select>
                 </FormControl>
                 <FormControl mt="21px">
@@ -446,9 +509,7 @@ export const NewEventModal = ({ event, isOpen, onClose }: NewEventProps) => {
                   onCloseError={onCloseError}
                   onCloseSide={() => dispatch({ type: "CLOSE_SIDEBAR" })}
                   selectedTime={selectedTime}
-                  setSelectedTime={(t: DateObject | undefined) =>
-                    setSelectedTime(t)
-                  }
+                  setSelectedTime={setSelectedTime}
                 ></NewTimeForm>
               )}
               <NewExpenseForm

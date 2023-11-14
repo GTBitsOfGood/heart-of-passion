@@ -3,7 +3,7 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 import { IRetreat, RetreatModel } from "~/server/models/Retreat";
-import { EventModel, IEvent, IExpense } from "~/server/models/Event";
+import { EventModel, IEvent } from "~/server/models/Event";
 
 export const retreatRouter = createTRPCRouter({
   createRetreat: publicProcedure
@@ -63,13 +63,9 @@ export const retreatRouter = createTRPCRouter({
     const events = await EventModel.find({ retreatId: input });
     let cost = 0;
     events.forEach((event: IEvent) => {
-      let expenses: [IExpense] = event.expenses;
+      let expenses = event.expenses;
       expenses.forEach((expense) => {
-        if (expense.costType == "flat cost") {
-          cost += expense.cost;
-        } else {
-          cost += expense.cost * expense.numberOfUnits;
-        }
+        cost += expense.cost * (expense.numUnits ?? 1);
       });
     });
     return cost;

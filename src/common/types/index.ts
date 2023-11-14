@@ -29,7 +29,7 @@ export const userListSchema = z.object({
 export type UserList = z.infer<typeof userListSchema>;
 
 // Role
-export const typeSchema = z.enum([
+export const expenseTypeSchema = z.enum([
   "Entertainment",
   "Food",
   "Transportation",
@@ -37,7 +37,7 @@ export const typeSchema = z.enum([
   "Decorations",
   "Miscellaneous",
 ]);
-export type Type = z.infer<typeof typeSchema>;
+export type Type = z.infer<typeof expenseTypeSchema>;
 
 export const dateObjectSchema = z.object({
   day: z.number(),
@@ -50,8 +50,7 @@ export type DateObject = z.infer<typeof dateObjectSchema>;
 export const expenseSchema = z.object({
   name: z.string(),
   event: z.string().optional(),
-  dates: z.array(dateObjectSchema),
-  type: typeSchema,
+  type: expenseTypeSchema,
   cost: z.number(),
   numUnits: z.number().optional(),
 });
@@ -85,25 +84,10 @@ export type Retreat = z.infer<typeof retreatSchema>;
 export const energyLevelSchema = z.enum(["low", "medium", "high"]);
 export type EnergyLevel = z.infer<typeof energyLevelSchema>;
 
-// Category
-export const categorySchema = z.enum(["entertainment", "educational", "other"]);
-export type Category = z.infer<typeof categorySchema>;
-
-export const expenseTypeSchema = z.enum([
-  "entertainment",
-  "transportation",
-  "other",
-]);
-export type ExpenseType = z.infer<typeof expenseTypeSchema>;
-
-export const costTypeSchema = z.enum(["per unit", "flat cost"]);
-export type CostType = z.infer<typeof costTypeSchema>;
-
 export const eventSchema = z.object({
   name: z.string(),
   location: z.string().optional(),
   energyLevel: energyLevelSchema.optional(),
-  category: categorySchema.optional(),
   dates: z.array(dateObjectSchema),
   expenses: z.array(expenseSchema),
 });

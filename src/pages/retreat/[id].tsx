@@ -9,14 +9,15 @@ import { DateObject } from "~/common/types";
 import { Event } from "~/common/types";
 import { useState } from "react";
 import { computeHeight } from "~/components/Calendar/computeHeight";
+import { IEvent } from "~/server/models/Event";
 
 type EventWithStamp = {
-  event: Event;
+  event: IEvent;
   from: string;
   to: string;
 };
 
-function Content({ events, counter }: { events: Event[]; counter: number }) {
+function Content({ events, counter }: { events: IEvent[]; counter: number }) {
   let eventsByDay: EventWithStamp[][] = [[], [], [], []];
   for (const event of events) {
     const { dates } = event;
@@ -51,148 +52,143 @@ function Content({ events, counter }: { events: Event[]; counter: number }) {
               </Text>
               <Box display={"flex"}>
                 <Box marginRight={"34px"} minW={"180px"}>
-                  {eventsByDay[day - 1]!.map(
-                    (einfo: any, index: number, array: any[]) => {
-                      if (counter > 0) {
-                        counter--;
-                        return <></>;
-                      }
-                      const { event: currEvent, from, to } = einfo;
-                      const dateObject: DateObject = {
-                        day: 1,
-                        from,
-                        to,
-                      };
+                  {eventsByDay[day - 1]!.map((einfo, index: number, arr) => {
+                    if (counter > 0) {
+                      counter--;
+                      return <></>;
+                    }
+                    const { event: currEvent, from, to } = einfo;
+                    const dateObject: DateObject = {
+                      day,
+                      from,
+                      to,
+                    };
 
-                      const totalExpense = currEvent.expenses.reduce(
-                        (acc: any, cv: any) => acc + cv.cost,
-                        0,
-                      );
+                    const totalExpense = currEvent.expenses.reduce(
+                      (acc: any, cv: any) => acc + cv.cost,
+                      0,
+                    );
 
-                      const event: Event = {
-                        ...currEvent,
-                        dates: [dateObject],
-                      };
-                      if (index < array.length - 1) {
-                        const nextEventsArray = [];
+                    const event: EventWithStamp = {
+                      event: currEvent,
+                      from: from,
+                      to: to,
+                    };
+                    if (index < arr.length - 1) {
+                      const nextEventsArray = [];
+                      var {
+                        event: afterEvent,
+                        from: nextFrom,
+                        to: nextTo,
+                      } = eventsByDay[day - 1]![index + 1]!;
+                      // Check if the next event's "from" time is between the current event's from and to
+                      // appends every additional case where next event's time is between original "from" and "to"
+                      while (
+                        index < arr.length - 1 &&
+                        nextFrom &&
+                        nextFrom >= from &&
+                        nextFrom <= to
+                      ) {
+                        const nextDateObject: DateObject = {
+                          day: 1,
+                          from: nextFrom,
+                          to: nextTo,
+                        };
+
+                        const nextTotalExpense = currEvent.expenses.reduce(
+                          (acc: any, cv: any) => acc + cv.cost,
+                          0,
+                        );
+
+                        const nextEventObject: Event = {
+                          ...afterEvent,
+                          dates: [nextDateObject],
+                        };
+
+                        var topY = computeHeight(nextFrom, from, screen.height);
+                        if (nextEventsArray.length > 0) {
+                          const prevTotalTopY = nextEventsArray.reduce(
+                            (acc, nt) =>
+                              acc -
+                              nt.topY +
+                              computeHeight(
+                                nt.nextDateObject.from,
+                                nt.nextDateObject.to,
+                                screen.height,
+                              ),
+                            0,
+                          );
+                          topY += prevTotalTopY;
+                        }
+                        nextEventsArray.push({
+                          nextDateObject,
+                          nextTotalExpense,
+                          nextEventObject,
+                          topY,
+                        });
+                        index++;
+                        counter++;
+                        if (index + 1 === arr.length) {
+                          break;
+                        }
                         var {
                           event: afterEvent,
                           from: nextFrom,
                           to: nextTo,
                         } = eventsByDay[day - 1]![index + 1]!;
-                        // Check if the next event's "from" time is between the current event's from and to
-                        // appends every additional case where next event's time is between original "from" and "to"
-                        while (
-                          index < array.length - 1 &&
-                          nextFrom &&
-                          nextFrom >= from &&
-                          nextFrom <= to
-                        ) {
-                          const nextDateObject: DateObject = {
-                            day: 1,
-                            from: nextFrom,
-                            to: nextTo,
-                          };
-
-                          const nextTotalExpense = currEvent.expenses.reduce(
-                            (acc: any, cv: any) => acc + cv.cost,
-                            0,
-                          );
-
-                          const nextEventObject: Event = {
-                            ...afterEvent,
-                            dates: [nextDateObject],
-                          };
-
-                          var topY = computeHeight(
-                            nextFrom,
-                            from,
-                            screen.height,
-                          );
-                          if (nextEventsArray.length > 0) {
-                            const prevTotalTopY = nextEventsArray.reduce(
-                              (acc, nt) =>
-                                acc -
-                                nt.topY +
-                                computeHeight(
-                                  nt.nextDateObject.from,
-                                  nt.nextDateObject.to,
-                                  screen.height,
-                                ),
-                              0,
-                            );
-                            topY += prevTotalTopY;
-                          }
-                          nextEventsArray.push({
-                            nextDateObject,
-                            nextTotalExpense,
-                            nextEventObject,
-                            topY,
-                          });
-                          index++;
-                          counter++;
-                          if (index + 1 === array.length) {
-                            break;
-                          }
-                          var {
-                            event: afterEvent,
-                            from: nextFrom,
-                            to: nextTo,
-                          } = eventsByDay[day - 1]![index + 1]!;
-                        }
-                        return (
-                          <Box display={"flex"} key={index}>
-                            {nextEventsArray.length === 0 ? (
+                      }
+                      return (
+                        <Box display={"flex"} key={index}>
+                          {nextEventsArray.length === 0 ? (
+                            <CalendarCard
+                              expenseTotal={totalExpense}
+                              date={dateObject}
+                              event={event.event}
+                              width={207}
+                            />
+                          ) : (
+                            <>
                               <CalendarCard
                                 expenseTotal={totalExpense}
                                 date={dateObject}
-                                event={event}
-                                width={207}
+                                event={event.event}
+                                width={103}
                               />
-                            ) : (
-                              <>
-                                <CalendarCard
-                                  expenseTotal={totalExpense}
-                                  date={dateObject}
-                                  event={event}
-                                  width={103}
-                                />
-                                <Box>
-                                  {nextEventsArray.map(
-                                    (nextEvent: any, index) => {
-                                      console.log(nextEvent);
-                                      return (
-                                        <CalendarCard
-                                          key={index}
-                                          expenseTotal={
-                                            nextEvent.nextTotalExpense
-                                          }
-                                          date={nextEvent.nextDateObject}
-                                          event={nextEvent.nextEventObject}
-                                          width={103}
-                                          topY={-nextEvent.topY}
-                                        />
-                                      );
-                                    },
-                                  )}
-                                </Box>
-                              </>
-                            )}
-                          </Box>
-                        );
-                      }
-
-                      return (
-                        <CalendarCard
-                          key={index}
-                          expenseTotal={totalExpense}
-                          date={dateObject}
-                          event={event}
-                          width={207}
-                        />
+                              <Box>
+                                {nextEventsArray.map(
+                                  (nextEvent: any, index) => {
+                                    console.log(nextEvent);
+                                    return (
+                                      <CalendarCard
+                                        key={index}
+                                        expenseTotal={
+                                          nextEvent.nextTotalExpense
+                                        }
+                                        date={nextEvent.nextDateObject}
+                                        event={nextEvent.nextEventObject}
+                                        width={103}
+                                        topY={-nextEvent.topY}
+                                      />
+                                    );
+                                  },
+                                )}
+                              </Box>
+                            </>
+                          )}
+                        </Box>
                       );
-                    },
-                  )}
+                    }
+
+                    return (
+                      <CalendarCard
+                        key={index}
+                        expenseTotal={totalExpense}
+                        date={dateObject}
+                        event={event.event}
+                        width={207}
+                      />
+                    );
+                  })}
                 </Box>
                 {day !== 4 && (
                   <Box

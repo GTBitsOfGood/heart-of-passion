@@ -17,7 +17,6 @@ const generateData = async (chapterId: string) => {
     name: "Yoga and Meditation Retreat",
     location: "Mountain Retreat Center",
     energyLevel: "high",
-    category: "educational",
     dates: [
       { day: 1, from: "2:30 pm", to: "4:30 pm" },
       { day: 2, from: "5:30 pm", to: "6:30 pm" },
@@ -28,17 +27,17 @@ const generateData = async (chapterId: string) => {
       {
         name: "Venue Rental",
         cost: 2000,
-        type: "other",
+        type: "Miscellaneous",
       },
       {
         name: "Transportation",
         cost: 500,
-        type: "transportation",
+        type: "Transportation",
       },
       {
         name: "Guest Speaker",
         cost: 1000,
-        type: "entertainment",
+        type: "Entertainment",
         numUnits: 2,
       },
     ],
@@ -48,7 +47,6 @@ const generateData = async (chapterId: string) => {
     name: "Art and Creativity Workshop",
     location: "City Art Center",
     energyLevel: "medium",
-    category: "educational",
     dates: [
       { day: 1, from: "1:30 pm", to: "8:30 pm" },
       { day: 1, from: "1:45 pm", to: "2:00 pm" },
@@ -61,13 +59,13 @@ const generateData = async (chapterId: string) => {
       {
         name: "Art Supplies",
         cost: 800,
-        type: "other",
+        type: "Miscellaneous",
         numUnits: 1,
       },
       {
         name: "Instructor Fee",
         cost: 600,
-        type: "transportation",
+        type: "Transportation",
         notes: "Professional art instructor.",
       },
     ],
