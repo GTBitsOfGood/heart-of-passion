@@ -92,7 +92,7 @@ export default function Calendar() {
   const retreat = trpc.retreat.getRetreatById.useQuery(id!, {
     enabled: !!id,
   })?.data;
-
+  console.log(retreat, retreat?.year)
   return (
     <Box>
       {chapter && retreat && <Sidebar chapter={chapter} year={retreat.year} />}

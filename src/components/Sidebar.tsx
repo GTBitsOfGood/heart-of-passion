@@ -15,6 +15,7 @@ import Select, { ActionMeta } from "react-select";
 import { trpc } from "~/utils/api";
 import { NewRetreatYearModal } from "./NewRetreatYearModal";
 import { useRouter } from "next/router";
+import { arch } from "os";
 
 interface SidebarProps {
   chapter: Chapter;
@@ -51,7 +52,6 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
     }),
     [],
   );
-
   const options: OptionType[] = useMemo(() => {
     return [
       ...(retreatYears.data?.map((yr, i) => {
@@ -85,9 +85,9 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
     },
     [archiveOption, options],
   );
-
   const [selectedOption, setSelectedOption] = useState<OptionType>(
-    getOptionFromYear(year),
+    // getOptionFromYear()
+    getOptionFromYear(year)
   );
   const getRetreat = trpc.retreat.getRetreat.useQuery(
     { chapterId: chapterId.data ?? "", year: parseInt(selectedOption.value) },
@@ -98,10 +98,16 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
     option: OptionType | null,
     actionMeta: ActionMeta<OptionType>,
   ) => {
-    setSelectedOption(option ?? archiveOption);
     if (option?.value === "Add Archive") {
       onOpenAddYearModal();
     }
+    else {
+      setSelectedOption(option ?? archiveOption);
+    }
+    // if (option?.value === "Add Archive") {
+    //   onOpenAddYearModal();
+    //   // console.log(option, selectedOption)
+    // }
   };
 
   useEffect(() => {
@@ -114,8 +120,7 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
         })();
       }
     }
-  }, [getRetreat, router, selectedOption]);
-
+  }, [selectedOption]);
   return (
     <>
       <Box pos="fixed" w="400px" h="100%" overflow="hidden">
@@ -149,10 +154,11 @@ const Sidebar = ({ chapter, year }: SidebarProps) => {
               </Text>
               <Select
                 instanceId={id}
-                defaultValue={{
-                  value: year.toString(),
-                  label: year.toString(),
-                }}
+                // defaultValue={{
+                //   value: year.toString(),
+                //   label: year.toString(),
+                // }}
+                value={selectedOption}
                 options={options}
                 onChange={handleChange}
                 isSearchable={false}
