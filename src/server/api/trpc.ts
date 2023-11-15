@@ -12,6 +12,9 @@ import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import dbConnect from "../db";
+import { Role, User } from "~/common/types";
+import { Auth } from "lucia";
+import { auth } from "../auth";
 
 /**
  * 1. CONTEXT
@@ -21,7 +24,14 @@ import dbConnect from "../db";
  * These allow you to access things when processing a request, like the database, the session, etc.
  */
 
-interface CreateContextOptions {}
+interface CreateContextOptions {
+  req: CreateNextContextOptions["req"];
+  res: CreateNextContextOptions["res"];
+}
+
+interface Context {
+  user?: IUser;
+}
 
 /**
  * This helper generates the "internals" for a tRPC context. If you need to use it, you can export
@@ -33,10 +43,22 @@ interface CreateContextOptions {}
  *
  * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
  */
-const createInnerTRPCContext = async (opts: CreateContextOptions) => {
+const createInnerTRPCContext = async (
+  opts: CreateContextOptions,
+): Promise<Context> => {
   await dbConnect();
 
-  return {};
+  let { req, res } = opts;
+
+  const authRequest = auth.handleRequest({ req, res });
+
+  let session = await authRequest.validate();
+
+  if (!session) {
+    return {};
+  }
+
+  return { user: session.user };
 };
 
 /**
@@ -48,7 +70,7 @@ const createInnerTRPCContext = async (opts: CreateContextOptions) => {
 export const createTRPCContext = async (opts: CreateNextContextOptions) => {
   const { req, res } = opts;
 
-  return createInnerTRPCContext({});
+  return createInnerTRPCContext({ req, res });
 };
 
 /**
@@ -96,10 +118,19 @@ export const createTRPCRouter = t.router;
  */
 export const publicProcedure = t.procedure;
 
-/** Reusable middleware that enforces users are logged in before running the procedure. */
-const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
-  return next(); // TODO!
-});
+const authMiddleware = (...allowedRoles: Role[]) => {
+  return t.middleware(({ ctx, next }) => {
+    if (!ctx.user) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+
+    if (!allowedRoles.includes(ctx.user.role)) {
+      throw new TRPCError({ code: "FORBIDDEN" });
+    }
+
+    return next();
+  });
+};
 
 /**
  * Protected (authenticated) procedure
@@ -109,6 +140,11 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
  *
  * @see https://trpc.io/docs/procedures
  */
-export const studentProcedure = t.procedure.use(enforceUserIsAuthed);
-export const mentorProcedure = t.procedure.use(enforceUserIsAuthed); // TODO
-export const adminProcedure = t.procedure.use(enforceUserIsAuthed); // TODO
+
+export const studentProcedure = t.procedure.use(
+  authMiddleware("student", "mentor", "admin"),
+);
+export const mentorProcedure = t.procedure.use(
+  authMiddleware("mentor", "admin"),
+);
+export const adminProcedure = t.procedure.use(authMiddleware("admin"));

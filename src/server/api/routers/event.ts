@@ -1,11 +1,16 @@
 import { z } from "zod";
 import { eventSchema } from "~/common/types";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  mentorProcedure,
+  publicProcedure,
+  studentProcedure,
+} from "~/server/api/trpc";
 
 import { EventModel, IEvent } from "~/server/models/Event";
 export const eventRouter = createTRPCRouter({
-  updateEvent: publicProcedure
+  updateEvent: studentProcedure
     .input(
       z.object({
         eventId: z.string(),
@@ -16,7 +21,7 @@ export const eventRouter = createTRPCRouter({
       const { eventId, event } = input;
       await EventModel.findByIdAndUpdate(eventId, event).exec();
     }),
-  createEvent: publicProcedure
+  createEvent: studentProcedure
     .input(
       z.object({
         retreatId: z.string(),
@@ -29,15 +34,17 @@ export const eventRouter = createTRPCRouter({
       await event.save();
     }),
 
-  deleteEvent: publicProcedure.input(z.string()).mutation(async ({ input }) => {
-    await EventModel.findByIdAndDelete(input).exec();
-  }),
+  deleteEvent: studentProcedure
+    .input(z.string())
+    .mutation(async ({ input }) => {
+      await EventModel.findByIdAndDelete(input).exec();
+    }),
 
-  getEvent: publicProcedure.input(z.string()).query(async (opts) => {
+  getEvent: studentProcedure.input(z.string()).query(async (opts) => {
     const event = await EventModel.findOne({ _id: opts.input }).exec();
     return event;
   }),
-  getEvents: publicProcedure.input(z.string()).query(async (opts) => {
+  getEvents: studentProcedure.input(z.string()).query(async (opts) => {
     const events = await EventModel.find({ retreatId: opts.input }).exec();
     return events;
   }),

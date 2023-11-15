@@ -1,13 +1,18 @@
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  mentorProcedure,
+  publicProcedure,
+  studentProcedure,
+} from "~/server/api/trpc";
 
 import { IRetreat, RetreatModel } from "~/server/models/Retreat";
 import { EventModel, IEvent } from "~/server/models/Event";
 import { Event } from "~/common/types";
 
 export const retreatRouter = createTRPCRouter({
-  createRetreat: publicProcedure
+  createRetreat: mentorProcedure
     .input(
       z.object({
         chapterId: z.string(),
@@ -20,7 +25,7 @@ export const retreatRouter = createTRPCRouter({
 
       return retreat;
     }),
-  getRetreat: publicProcedure
+  getRetreat: studentProcedure
     .input(
       z.object({
         chapterId: z.string(),
@@ -34,7 +39,7 @@ export const retreatRouter = createTRPCRouter({
       });
       return retreat;
     }),
-  getRetreatById: publicProcedure
+  getRetreatById: studentProcedure
     .input(z.string())
     .query(async (opts): Promise<IRetreat> => {
       const retreat = await RetreatModel.findOne({
@@ -42,7 +47,7 @@ export const retreatRouter = createTRPCRouter({
       });
       return retreat!;
     }),
-  existsRetreat: publicProcedure
+  existsRetreat: studentProcedure
     .input(
       z.object({
         chapterId: z.string(),
@@ -56,7 +61,7 @@ export const retreatRouter = createTRPCRouter({
       });
       return !!retreat;
     }),
-  getRetreatYearsAndIds: publicProcedure
+  getRetreatYearsAndIds: studentProcedure
     .input(z.string())
     .query(async (opts) => {
       const retreats = await RetreatModel.find({ chapterId: opts.input })
@@ -71,24 +76,26 @@ export const retreatRouter = createTRPCRouter({
         })
         .sort();
     }),
-  getRetreatCost: publicProcedure.input(z.string()).query(async ({ input }) => {
-    const events = await EventModel.find({ retreatId: input });
-    let cost = 0;
-    events.forEach((event: IEvent) => {
-      let expenses = event.expenses;
-      expenses.forEach((expense) => {
-        cost += expense.cost * (expense.numUnits ?? 1);
+  getRetreatCost: studentProcedure
+    .input(z.string())
+    .query(async ({ input }) => {
+      const events = await EventModel.find({ retreatId: input });
+      let cost = 0;
+      events.forEach((event: IEvent) => {
+        let expenses = event.expenses;
+        expenses.forEach((expense) => {
+          cost += expense.cost * (expense.numUnits ?? 1);
+        });
       });
-    });
-    return cost;
-  }),
+      return cost;
+    }),
 
-  getRetreats: publicProcedure.input(z.string()).query(async (opts) => {
+  getRetreats: studentProcedure.input(z.string()).query(async (opts) => {
     const retreats = await RetreatModel.find({ chapterId: opts.input }).exec();
     return retreats;
   }),
 
-  getAllEventsForChapter: publicProcedure
+  getAllEventsForChapter: studentProcedure
     .input(z.string())
     .query(async (opts) => {
       const retreats: IRetreat[] = await RetreatModel.find({

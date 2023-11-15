@@ -1,6 +1,12 @@
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  adminProcedure,
+  createTRPCRouter,
+  mentorProcedure,
+  publicProcedure,
+  studentProcedure,
+} from "~/server/api/trpc";
 
 import { ChapterModel, IChapter } from "~/server/models/Chapter";
 import { Chapter, Expense } from "~/common/types";
@@ -8,7 +14,7 @@ import { EventModel, IEvent } from "~/server/models/Event";
 import { RetreatModel, IRetreat } from "~/server/models/Retreat";
 
 export const chapterRouter = createTRPCRouter({
-  createChapter: publicProcedure
+  createChapter: adminProcedure
     .input(z.string())
     .mutation(async ({ input: name }) => {
       const chapter = new ChapterModel({
@@ -22,7 +28,7 @@ export const chapterRouter = createTRPCRouter({
       });
       await retreat.save();
     }),
-  getChapterByName: publicProcedure
+  getChapterByName: studentProcedure
     .input(z.string())
     .query(async (opts): Promise<Chapter> => {
       const chapter = (await ChapterModel.findOne({
@@ -30,7 +36,7 @@ export const chapterRouter = createTRPCRouter({
       }).exec())!;
       return processChapter(chapter);
     }),
-  getChapterById: publicProcedure
+  getChapterById: studentProcedure
     .input(z.string())
     .query(async (opts): Promise<Chapter> => {
       const chapter = (await ChapterModel.findOne({
@@ -38,7 +44,7 @@ export const chapterRouter = createTRPCRouter({
       }).exec())!;
       return processChapter(chapter);
     }),
-  getChapterByRetreatId: publicProcedure
+  getChapterByRetreatId: studentProcedure
     .input(z.string())
     .query(async (opts): Promise<Chapter> => {
       const retreat = (await RetreatModel.findOne({
@@ -49,18 +55,18 @@ export const chapterRouter = createTRPCRouter({
       }).exec())!;
       return processChapter(chapter);
     }),
-  getChapterIdByName: publicProcedure.input(z.string()).query(async (opts) => {
+  getChapterIdByName: studentProcedure.input(z.string()).query(async (opts) => {
     const chapter = await ChapterModel.findOne({
       name: opts.input,
     }).exec();
     return chapter?._id ?? "";
   }),
-  getChapters: publicProcedure.query(async (opts): Promise<Chapter[]> => {
+  getChapters: studentProcedure.query(async (opts): Promise<Chapter[]> => {
     const chapters = (await ChapterModel.find().exec())!;
     return await Promise.all(chapters.map(processChapter));
   }),
 
-  updateChapter: publicProcedure
+  updateChapter: mentorProcedure
     .input(z.object({ oldChapterName: z.string(), newChapterName: z.string() }))
     .mutation(async (opts) => {
       const chapter = await ChapterModel.findOneAndUpdate(
@@ -70,7 +76,7 @@ export const chapterRouter = createTRPCRouter({
       return chapter;
     }),
 
-  getLatestRetreatId: publicProcedure.input(z.string()).query(async (opts) => {
+  getLatestRetreatId: studentProcedure.input(z.string()).query(async (opts) => {
     const retreat = await RetreatModel.findOne({ chapterId: opts.input })
       .sort("-year")
       .exec();

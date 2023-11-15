@@ -1,12 +1,19 @@
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  mentorProcedure,
+  publicProcedure,
+  studentProcedure,
+} from "~/server/api/trpc";
 
 import { UserModel } from "~/server/models/User";
 import { ChapterModel } from "~/server/models/Chapter";
 import { Chapter, User, userSchema } from "~/common/types";
+import { auth } from "~/server/auth";
+import { TRPCError } from "@trpc/server";
 export const userRouter = createTRPCRouter({
-  createUser: publicProcedure.input(userSchema).mutation(async ({ input }) => {
+  createUser: mentorProcedure.input(userSchema).mutation(async ({ input }) => {
     let chapter;
     if (input.chapter) {
       chapter = (await ChapterModel.findOne({
@@ -14,22 +21,25 @@ export const userRouter = createTRPCRouter({
       }).exec())!;
     }
 
-    const user = new UserModel({
-      name: input.name,
-      chapter: chapter ? chapter.id : null,
-      email: input.email,
-      role: input.role,
+    let user = await auth.createUser({
+      key: null, // To be created when they attempt to log in for the first time
+      attributes: {
+        name: input.name,
+        chapter: chapter?.id,
+        role: input.role,
+        email: input.email,
+      },
     });
-    await user.save();
+
     return user;
   }),
 
-  deleteUser: publicProcedure.input(z.string()).mutation(async (opts) => {
+  deleteUser: mentorProcedure.input(z.string()).mutation(async (opts) => {
     const user = await UserModel.findOneAndDelete({ email: opts.input }).exec();
     return user;
   }),
 
-  updateUser: publicProcedure
+  updateUser: mentorProcedure
     .input(
       z.object({
         email: z.string(),
@@ -56,7 +66,7 @@ export const userRouter = createTRPCRouter({
 
       return user;
     }),
-  getUser: publicProcedure
+  getUser: studentProcedure
     .input(z.string())
     .query(async (opts): Promise<User> => {
       const user = await UserModel.findOne({ email: opts.input })
@@ -64,7 +74,7 @@ export const userRouter = createTRPCRouter({
         .exec();
       return processUser(user);
     }),
-  getUsers: publicProcedure.query(async (opts): Promise<User[]> => {
+  getUsers: studentProcedure.query(async (opts): Promise<User[]> => {
     const users = await UserModel.find()
       .populate<{ chapter: Chapter }>("chapter")
       .exec();
