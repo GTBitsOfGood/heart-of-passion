@@ -29,8 +29,6 @@ export default function BacklogCopyModal({
 }: BacklogCopyModalProps) {
   return (
     <>
-      <Button onClick={onOpen}>Open Modal</Button>
-
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
