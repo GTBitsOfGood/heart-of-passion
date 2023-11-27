@@ -2,13 +2,12 @@ import { Heading, Stack, Flex } from "@chakra-ui/react";
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import ExpenseEntry from "./ExpenseEntry";
-import { Expense, ExpenseList as ExpenseListType } from "src/common/types";
+import { Expense } from "src/common/types";
+import { ExpenseGroup } from "~/pages/retreat-expenses/[id]";
 
-export default function ExpenseList({ title, expenses }: ExpenseListType) {
+export default function ExpenseGroup({ title, expenses }: ExpenseGroup) {
   const [open, setOpen] = useState(true);
-  const expensesRendered = expenses.map((expense: Expense) => (
-    <ExpenseEntry key={expense.name} {...expense} />
-  ));
+
   return (
     <>
       <Stack w="95%" py="0.5em" px="1em">
@@ -25,7 +24,16 @@ export default function ExpenseList({ title, expenses }: ExpenseListType) {
           {open ? <TriangleUpIcon /> : <TriangleDownIcon />}
         </Flex>
         <Stack pl="3em" gap="1em">
-          {open ? expensesRendered : <></>}
+          {open ? (
+            expenses.map((expense: Expense) => (
+              <ExpenseEntry
+                key={expense.name + expense.type + expense.cost + expense.event}
+                {...expense}
+              />
+            ))
+          ) : (
+            <></>
+          )}
         </Stack>
       </Stack>
     </>

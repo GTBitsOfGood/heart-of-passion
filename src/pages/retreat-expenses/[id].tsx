@@ -17,9 +17,9 @@ import { TriangleDownIcon } from "@chakra-ui/icons";
 import fonts from "src/common/theme/fonts";
 import Sidebar from "~/components/Sidebar";
 import { useEffect, useState } from "react";
-import ExpenseList from "~/components/expenses/ExpenseList";
+import ExpenseGroup from "~/components/expenses/ExpenseGroup";
 import { trpc } from "~/utils/api";
-import { Expense } from "~/common/types";
+import { DateObject, Expense } from "~/common/types";
 import { useRouter } from "next/router";
 import { NewExpenseModal } from "~/components/NewExpenseModal";
 
@@ -28,6 +28,16 @@ function getTotalCost(expense: Expense) {
 
   return expense.cost * numUnits;
 }
+
+type ExpenseWithDateAndEvent = Expense & {
+  dates: DateObject[];
+  event: string;
+};
+
+export type ExpenseGroup = {
+  title: string;
+  expenses: ExpenseWithDateAndEvent[];
+};
 
 export default function RetreatExpenses() {
   const [filter, setFilter] = useState("category");
@@ -50,59 +60,40 @@ export default function RetreatExpenses() {
   }
 
   const router = useRouter();
-  const { id }: { id?: string } = router.query;
-  const eventData = trpc.event.getEvents.useQuery(id!).data;
+  const { id: retreatId }: { id?: string } = router.query;
+  const eventData = trpc.event.getEvents.useQuery(retreatId!).data;
 
-  const [expenses, setExpenses] = useState([] as Expense[]);
+  const chapter = trpc.chapter.getChapterByRetreatId.useQuery(retreatId!).data;
 
-  const [expense, setExpense] = useState<Expense[]>([]);
-  const [selectedExpense, setSelectedExpense] = useState<Expense>();
-
-  const chapter = trpc.chapter.getChapterByRetreatId.useQuery(id!).data;
-
-  useEffect(() => {
-    // clear expenses so it doesn't add every time the page is re-rendered
-    setExpenses([]);
-    eventData?.forEach((event) => {
-      event.expenses?.forEach((expense) => {
-        setExpenses((expenses) => [
-          ...expenses,
-          {
-            name: expense.name,
-            event: event.name,
+  const expenses: ExpenseWithDateAndEvent[] =
+    eventData
+      ?.map((event) => {
+        return event.expenses.map((expense) => {
+          return {
+            ...expense,
             dates: event.dates,
-            type: expense.type,
-            cost: expense.cost,
-            numUnits: expense.numUnits,
-          },
-        ]);
-      });
-    });
-  }, [eventData]);
+            event: event.name,
+          };
+        });
+      })
+      ?.flat() ?? [];
 
   const totalCost = expenses.reduce(
     (total, expense) => total + expense.cost * (expense.numUnits || 1),
     0,
   );
 
-  const groups = (function () {
+  const groups: ExpenseGroup[] = (function () {
     if (expenses && expenses.length > 0) {
       if (filter === "category") {
-        const uniques = [...new Set(expenses?.map((u: any) => u["type"]))]; // array of unique vals
-        const emap = new Map(uniques.map((e: any) => [e, new Array()])); // map of val to empty array
-        expenses?.forEach(
-          (e: any) =>
-            emap.get(e["type"])?.push({
-              name: e["name"],
-              event: e["event"],
-              type: e["type"],
-              cost: e["cost"],
-              numUnits: e["numUnits"],
-            }),
-        );
-        return uniques?.map((e: string) => ({
+        const uniques = [...new Set(expenses?.map((u) => u.type))]; // array of unique vals
+        const emap: Map<string, ExpenseWithDateAndEvent[]> = new Map(
+          uniques.map((e) => [e, new Array()]),
+        ); // map of val to empty array
+        expenses?.forEach((e) => emap.get(e.type)?.push(e));
+        return uniques?.map((e) => ({
           title: e,
-          expenses: emap.get(e),
+          expenses: emap.get(e) || [],
         }));
       } else if (filter === "highest cost") {
         expenses.sort((a, b) => getTotalCost(b) - getTotalCost(a));
@@ -115,28 +106,26 @@ export default function RetreatExpenses() {
         const uniques = [
           ...new Set(
             expenses
-              .filter((u: any) => u["dates"].length === 1)
-              .map((u: any) => u["dates"][0]["date"]),
+              .filter((u) => u.dates.length === 1)
+              .map((u) => u.dates[0]!.day.toString()),
           ),
         ];
         uniques.push("Other Expenses"); // for expenses with multiple dates
-        const emap = new Map(uniques.map((e: any) => [e, new Array()])); // map of val to empty array
-        expenses?.forEach((e: any) => {
+        const emap: Map<string, ExpenseWithDateAndEvent[]> = new Map(
+          uniques.map((e) => [e, new Array()]),
+        ); // map of val to empty array
+        expenses?.forEach((e) => {
           emap
             .get(
-              e["dates"].length > 1 ? "Other Expenses" : e["dates"][0]["date"],
+              e.dates.length !== 1
+                ? "Other Expenses"
+                : e.dates[0]!.day.toString(),
             )
-            ?.push({
-              name: e["name"],
-              event: e["event"],
-              type: e["type"],
-              cost: e["cost"],
-              numUnits: e["numUnits"],
-            });
+            ?.push(e);
         });
-        const categories = uniques?.map((e: string) => ({
+        const categories = uniques?.map((e) => ({
           title: e,
-          expenses: emap.get(e),
+          expenses: emap.get(e) || [],
         }));
         // sort by date
         categories.sort((a, b) => {
@@ -166,18 +155,22 @@ export default function RetreatExpenses() {
         }
         return categories;
       }
-    } else {
-      return [];
     }
+
+    return [];
   })();
 
-  const groupsRendered = groups.map((gr: any) => (
-    <ExpenseList key={gr.title} {...gr} />
+  const groupsRendered = groups.map((gr) => (
+    <ExpenseGroup key={gr.title} {...gr} />
   ));
 
   return (
     <Box>
-      {chapter ? <Sidebar chapter={chapter!} retreatId={id} /> : <Spinner />}
+      {chapter ? (
+        <Sidebar chapter={chapter!} retreatId={retreatId} />
+      ) : (
+        <Spinner />
+      )}
       <Stack
         spacing={4}
         alignItems={"right"}
@@ -281,9 +274,9 @@ export default function RetreatExpenses() {
             <NewExpenseModal
               isOpen={isOpenAddExpenseModal}
               onClose={onCloseAddExpenseModal}
-              setExpenses={setExpense}
-              expenses={expense}
-              thisExpense={selectedExpense}
+              expenses={[]}
+              setExpenses={() => {}}
+              thisExpense={undefined}
             />
           </Box>
         </Flex>
