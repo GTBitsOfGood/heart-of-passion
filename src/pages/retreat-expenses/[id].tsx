@@ -23,6 +23,12 @@ import { Expense } from "~/common/types";
 import { useRouter } from "next/router";
 import { NewExpenseModal } from "~/components/NewExpenseModal";
 
+function getTotalCost(expense: Expense) {
+  const numUnits = expense.numUnits || 1;
+
+  return expense.cost * numUnits;
+}
+
 export default function RetreatExpenses() {
   const [filter, setFilter] = useState("category");
 
@@ -99,10 +105,10 @@ export default function RetreatExpenses() {
           expenses: emap.get(e),
         }));
       } else if (filter === "highest cost") {
-        expenses.sort((a, b) => b.cost - a.cost);
+        expenses.sort((a, b) => getTotalCost(b) - getTotalCost(a));
         return [{ title: "Highest to Lowest", expenses: expenses }];
       } else if (filter === "lowest cost") {
-        expenses.sort((a, b) => a.cost - b.cost);
+        expenses.sort((a, b) => getTotalCost(a) - getTotalCost(b));
         return [{ title: "Lowest to Highest", expenses: expenses }];
       } else {
         // filter === "date"
