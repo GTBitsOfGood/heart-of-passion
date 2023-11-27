@@ -97,6 +97,9 @@ export const eventSchema = z
   });
 export type Event = z.infer<typeof eventSchema>;
 
+export const eventsByYearSchema = z.record(z.number(), z.array(eventSchema));
+export type EventsByYear = z.infer<typeof eventsByYearSchema>;
+
 // Fund
 export const fundSchema = z.object({
   name: z.string(),

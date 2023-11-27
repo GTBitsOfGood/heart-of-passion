@@ -9,7 +9,7 @@ import {
 
 import { IRetreat, RetreatModel } from "~/server/models/Retreat";
 import { EventModel, IEvent } from "~/server/models/Event";
-import { Event } from "~/common/types";
+import { Event, eventsByYearSchema } from "~/common/types";
 
 export const retreatRouter = createTRPCRouter({
   createRetreat: mentorProcedure

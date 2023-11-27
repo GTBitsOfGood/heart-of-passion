@@ -43,13 +43,7 @@ export const EventSchema = new Schema<IEvent>({
     enum: ["low", "medium", "high"],
   },
   dates: {
-    type: [
-      {
-        day: Number,
-        from: String,
-        to: String,
-      },
-    ], // [{date: Date, from: time, to: time}]
+    type: [DateSchema], // [{date: Date, from: time, to: time}]
     required: true,
   },
   expenses: [ExpenseSchema],

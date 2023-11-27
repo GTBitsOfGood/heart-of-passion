@@ -9,6 +9,7 @@ import {
 } from "~/server/api/trpc";
 
 import { EventModel, IEvent } from "~/server/models/Event";
+import { RetreatModel } from "~/server/models/Retreat";
 export const eventRouter = createTRPCRouter({
   updateEvent: studentProcedure
     .input(
@@ -30,6 +31,30 @@ export const eventRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       const { retreatId, eventDetails } = input;
+      const event = new EventModel({ retreatId, ...eventDetails });
+      await event.save();
+    }),
+
+  createEventInLatestRetreat: studentProcedure
+    .input(
+      z.object({
+        chapterId: z.string(),
+        eventDetails: eventSchema,
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const { chapterId, eventDetails } = input;
+
+      const retreat = await RetreatModel.findOne({
+        chapterId,
+      }).sort({ year: -1 });
+
+      if (!retreat) {
+        throw new Error("No retreat found");
+      }
+
+      const retreatId = retreat._id;
+
       const event = new EventModel({ retreatId, ...eventDetails });
       await event.save();
     }),
