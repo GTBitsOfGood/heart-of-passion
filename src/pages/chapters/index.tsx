@@ -15,6 +15,7 @@ import { NewChapterModal } from "~/components/NewChapterModal";
 import { useRef } from "react";
 import { trpc } from "~/utils/api";
 import { Chapter } from "~/common/types";
+import { useRouter } from "next/router";
 
 export default function Home() {
   const {
@@ -26,6 +27,9 @@ export default function Home() {
 
   // Get all the chapters from the backend and populate the frontend afterwards
   let chapters = trpc.chapter.getChapters.useQuery();
+
+  const router = useRouter();
+
   return (
     <Box m="2%">
       <Grid templateColumns="repeat(8, 1fr)" mb="3%">
@@ -59,7 +63,14 @@ export default function Home() {
             variant="ghost"
             height="50px"
             width="50px"
-            icon={<IoMdSettings size="50px" onClick={() => {}} />}
+            icon={
+              <IoMdSettings
+                size="50px"
+                onClick={() => {
+                  router.push("/users");
+                }}
+              />
+            }
           />
         </GridItem>
       </Grid>
