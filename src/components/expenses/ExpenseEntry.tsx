@@ -11,7 +11,14 @@ export default function Expense({
 }: Expense) {
   return (
     <>
-      <Grid templateColumns="repeat(9, 1fr)" gap={4}>
+      <Grid
+        templateColumns="repeat(9, 1fr)"
+        gap={4}
+        _hover={{
+          backgroundColor: "LightGray",
+          cursor: "pointer",
+        }}
+      >
         <GridItem colSpan={2}>
           <Box fontFamily={fonts.nunito}>{name}</Box>
         </GridItem>
