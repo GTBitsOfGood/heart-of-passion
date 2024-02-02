@@ -34,7 +34,7 @@ type State = Expense;
 const initialState: State = {
   name: "Expense Name",
   type: "Entertainment",
-  cost: 0,
+  cost: '',
 };
 
 const reducer = (state: State, action: Action): State => {
@@ -73,7 +73,7 @@ export const NewExpenseForm = ({
     dispatch({
       type: "UPDATE_EXPENSE",
       field: "cost",
-      value: parseFloat(event.currentTarget.value || "0"),
+      value: parseFloat(event.currentTarget.value === '' ? '' : event.currentTarget.value),
     });
   const handleUnitsChange = (event: React.FormEvent<HTMLInputElement>) =>
     dispatch({
@@ -181,6 +181,7 @@ export const NewExpenseForm = ({
             borderRadius="0px"
             width="100%"
             type="number"
+            placeholder="Enter Cost"
             value={state.cost}
             onChange={handleCostChange}
             padding="10px"
