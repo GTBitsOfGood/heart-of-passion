@@ -101,8 +101,10 @@ export const NewEventModal = ({
     reducer,
     eventToEdit ? { ...initialState, event: eventToEdit } : initialState,
   );
-  const [selectedTime, setSelectedTime] = useState<DateObject>();
-  const [selectedExpense, setSelectedExpense] = useState<Expense>();
+  const [selectedTime, setSelectedTime] = useState<DateObject | null>(null);
+  const [hoveredTime, setHoveredTime] = useState<DateObject | null>(null);
+  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
+  const [hoveredExpense, setHoveredExpense] = useState<Expense | null>(null);
 
   const {
     isOpen: isError,
@@ -376,25 +378,28 @@ export const NewEventModal = ({
                     //   selectedTime?.start === t.start &&
                     //   selectedTime?.end === t.end;
                     const isSelected = selectedTime === t;
+                    const isHovered = hoveredTime === t;
 
                     return (
                       <button
                         onClick={() => {
                           setSelectedExpense(undefined);
                           setSelectedTime(t);
-
                           dispatch({ type: "OPEN_TIME_SIDEBAR" });
                         }}
-                        key={`${t.day}-${t.from}-${t.to}`}
+                        onMouseOver={() => (setHoveredTime(t))}
+                        onMouseOut={() => (setHoveredTime(null))}  
+                        key={`${t.day}-${t.from}-${t.to}`}              
                       >
                         <HStack
-                          width="372px"
-                          height="39px"
-                          justifyContent="space-between"
-                          textColor={isSelected ? "white" : "black"}
-                          bg={isSelected ? "hop_blue.500" : "white"}
-                          paddingLeft="10px"
-                          paddingRight="10px"
+                        width="372px"
+                        height="39px"
+                        justifyContent="space-between"
+                        color={isHovered?"black":(isSelected ? "white" : "black")}
+                        bg={isHovered? "#E2E8F0" : (isSelected ? "hop_blue.500" : "white")}
+                          // paddingLeft: "10px",
+                          // paddingRight: "10px",
+                        padding="10px"
                         >
                           {<Text>Day {t.day}</Text>}
                           <Text>{`${t.from} - ${t.to}`}</Text>
@@ -452,6 +457,7 @@ export const NewEventModal = ({
                 >
                   {state.event.expenses.map((e, i) => {
                     const isSelected = e === selectedExpense;
+                    const isHovered = hoveredExpense === e;
                     return (
                       <button
                         onClick={() => {
@@ -459,14 +465,16 @@ export const NewEventModal = ({
                           setSelectedExpense(e);
                           dispatch({ type: "OPEN_EXPENSE_SIDEBAR" });
                         }}
+                        onMouseOver={() => (setHoveredExpense(e))}
+                        onMouseOut={() => (setHoveredExpense(null))}  
                         key={i}
                       >
                         <HStack
                           width="372px"
                           height="39px"
                           justifyContent="space-between"
-                          textColor={isSelected ? "white" : "black"}
-                          bg={isSelected ? "hop_blue.500" : "white"}
+                          color={isHovered?"black":(isSelected ? "white" : "black")}
+                          bg={isHovered? "#E2E8F0" : (isSelected ? "hop_blue.500" : "white")}
                           paddingLeft="10px"
                           paddingRight="10px"
                         >
