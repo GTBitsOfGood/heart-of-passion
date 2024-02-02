@@ -47,6 +47,9 @@ export const EventSchema = new Schema<IEvent>({
     required: true,
   },
   expenses: [ExpenseSchema],
+  notes: {
+    type: String,
+  },
 });
 
 export const EventModel =

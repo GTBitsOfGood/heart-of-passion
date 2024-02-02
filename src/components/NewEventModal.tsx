@@ -24,6 +24,7 @@ import {
   VStack,
   useDisclosure,
   useToast,
+  Textarea,
 } from "@chakra-ui/react";
 import { useEffect, useReducer, useState } from "react";
 import { DropdownIcon } from "~/common/theme/icons";
@@ -466,6 +467,26 @@ export const NewEventModal = ({
                     0,
                   )}`}</Text>
                 </HStack>
+                <FormControl marginTop="29px">
+                  <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
+                    Notes
+                  </FormLabel>
+                  <Textarea
+                    color="black"
+                    border="1px solid #D9D9D9"
+                    borderRadius="0px"
+                    height="150px"
+                    width="389px"
+                    value={state.event.notes}
+                    onChange={(e) =>
+                      dispatch({
+                        type: "UPDATE_EVENT",
+                        field: "notes",
+                        value: e.target.value,
+                      })
+                    }
+                  />
+                </FormControl>
               </VStack>
               {!sidebarOpen && (
                 <HStack width="100%" justifyContent="end" mb="34px">

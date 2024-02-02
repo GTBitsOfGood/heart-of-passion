@@ -91,6 +91,7 @@ export const eventSchema = z
     energyLevel: energyLevelSchema.optional(),
     dates: z.array(dateObjectSchema),
     expenses: z.array(expenseSchema),
+    notes: z.string().optional(),
   })
   .refine((data) => data.dates.length > 0, {
     message: "Event must have at least one date.",
