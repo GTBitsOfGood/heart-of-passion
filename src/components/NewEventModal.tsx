@@ -25,7 +25,9 @@ import {
   useDisclosure,
   useToast,
   Textarea,
+  useCallbackRef,
 } from "@chakra-ui/react";
+import debounce from 'lodash/debounce';
 import { useEffect, useReducer, useState } from "react";
 import { DropdownIcon } from "~/common/theme/icons";
 import { NewTimeForm } from "./NewTimeForm";
@@ -118,9 +120,25 @@ export const NewEventModal = ({
     }
   }, [eventToEdit]);
 
+  useEffect(() => {
+    // You might want to check if the form is in a valid state before auto-saving.
+    // For example, only auto-save if the name field is not empty.
+    if (state.event.name) {
+      debouncedSave();
+    }
+
+    // return () => {
+    //   debouncedSave.cancel();
+    // };
+    // save();
+  }, [state.event]); // Run this effect whenever the event data changes
+  
+
   const sidebarOpen = state.timeFormOpen || state.expenseFormOpen;
 
   const onCloseModal = () => {
+    // debouncedSave.cancel();
+    save();
     dispatch({ type: "RESET_FORM", event: eventToEdit });
     onClose();
   };
@@ -184,6 +202,21 @@ export const NewEventModal = ({
     }
     onCloseModal();
   };
+
+  const save = useCallbackRef(() => {
+    if (!validate()) {
+      return;
+    }
+
+    if (eventToEdit) {
+      updateEvent.mutate({ event: state.event, eventId: eventToEdit._id });
+    } else {
+      console.log(state.event);
+      createEvent.mutate({ eventDetails: state.event, retreatId });
+    }
+  });
+  const debouncedSave = useCallbackRef(debounce(save, 50000), [save]);
+  
 
   return (
     <Modal
