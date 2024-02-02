@@ -38,6 +38,9 @@ export const EventSchema = new Schema<IEvent>({
   location: {
     type: String,
   },
+  status: {
+    type: String,
+  },
   energyLevel: {
     type: String,
     enum: ["low", "medium", "high"],

@@ -295,6 +295,35 @@ export const NewEventModal = ({
                     // required
                   />
                 </FormControl>
+                <FormControl marginTop="29px" isRequired>
+                  <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
+                    Status
+                  </FormLabel>
+                  <Select
+                    textAlign="left"
+                    borderRadius="none"
+                    bg="white"
+                    border="1px solid"
+                    fontSize="18px"
+                    fontWeight="400"
+                    lineHeight="25px"
+                    padding="0px"
+                    textColor={"black"}
+                    borderColor={"#D9D9D9"}
+                    value={state.event.status}
+                    onChange={(e) => {
+                      dispatch({
+                        type: "UPDATE_EVENT",
+                        field: "status",
+                        value: e.target.value,
+                      });
+                    }}
+                  >
+                    <option value="planning">Planning</option>
+                    <option value="pending">Confirmation Pending</option>
+                    <option value="confirmed">Confirmed by Business</option>
+                  </Select>
+                </FormControl>
                 <HStack width="389px" mt="21px" justifyContent="space-between">
                   <Text
                     fontFamily="body"
