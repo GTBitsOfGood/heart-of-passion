@@ -71,148 +71,138 @@ function Content({
     dayEvents.sort(DayComparator)
   }
 
-  const MapEventsForDay = (day: number) => (einfo: EventWithStamp, index: number, arr) => {
-    if (counter > 0) {
-      counter--;
-      return <></>;
-    }
-    const { event: currEvent, from: currFrom, to: currTo } = einfo;
-    const dateObject: DateObject = {
-      day,
-      from: currFrom,
-      to: currTo,
-    };
-
-    const totalExpense = currEvent.expenses.reduce(
-      (acc: any, cv: any) => acc + cv.cost,
-      0,
-    );
-
-    const event: EventWithStamp = {
-      event: currEvent,
-      from: currFrom,
-      to: currTo,
-    };
-    if (index < arr.length - 1) {
-      const nextEventsArray = [];
-      var {
-        event: afterEvent,
-        from: nextFrom,
-        to: nextTo,
-      } = eventsByDay[day - 1]![index + 1]!;
-      // Check if the next event's "from" time is between the current event's from and to
-      // appends every additional case where next event's time is between original "from" and "to"
-      let prevTop: number | null = null;
-      while (
-        index < arr.length - 1 &&
-        StrToMinutes(nextFrom) &&
-        StrToMinutes(nextFrom) >= StrToMinutes(currFrom) &&
-        StrToMinutes(nextFrom) < StrToMinutes(currTo)
-      ) {
-        const nextDateObject: DateObject = {
-          day: 1, 
-          from: nextFrom,
-          to: nextTo,
-        };
-
-        const nextTotalExpense = currEvent.expenses.reduce(
-          (acc: any, cv: any) => acc + cv.cost,
-          0,
-        );
-
-        const nextEventObject: Event = {
-          ...afterEvent,
-          dates: [nextDateObject],
-        };
-
-        var topY = computeHeight(nextFrom, currFrom, screen.height);
-        // if (nextEventsArray.length > 0) {
-        if (prevTop) {
-          // const prevTotalTopY = nextEventsArray.reduce(
-          //   (acc, nt) =>
-          //     acc -
-          //     nt.topY +
-          //     computeHeight(
-          //       nt.nextDateObject.from,
-          //       nt.nextDateObject.to,
-          //       screen.height,
-          //     ),
-          //   0,
-          // );
-          // topY += prevTotalTopY;
-          topY += prevTop;
-        }
-        nextEventsArray.push({
-          nextDateObject,
-          nextTotalExpense,
-          nextEventObject,
-          topY,
-        });
-        prevTop = topY;
-        index++;
-        counter++;
-        if (index + 1 === arr.length) {
-          break;
-        }
-        var {
-          event: afterEvent,
-          from: nextFrom,
-          to: nextTo,
-        } = eventsByDay[day - 1]![index + 1]!;
+  function MapEventsForDay(day: number) {
+    return function bruhEvent(einfo: EventWithStamp, index: number, arr: EventWithStamp[]) {
+      if (counter > 0) {
+        counter--;
+        return <></>;
       }
-      return (
-        <Box display={"flex"} key={index}>
-          {nextEventsArray.length === 0 ? (
-            <CalendarCard
-              retreatId={retreatId}
-              expenseTotal={totalExpense}
-              date={dateObject}
-              event={event.event}
-              width={207}
-            />
-          ) : (
-            <>
+      const { event: currEvent, from: currFrom, to: currTo } = einfo;
+      const dateObject: DateObject = {
+        day,
+        from: currFrom,
+        to: currTo,
+      };
+  
+      const totalExpense = currEvent.expenses.reduce(
+        (acc: any, cv: any) => acc + cv.cost,
+        0
+      );
+  
+      const event: EventWithStamp = {
+        event: currEvent,
+        from: currFrom,
+        to: currTo,
+      };
+      if (index < arr.length - 1) {
+        const nextEventsArray = [];
+        var {
+          event: afterEvent, from: nextFrom, to: nextTo,
+        } = eventsByDay[day - 1]![index + 1]!;
+        // Check if the next event's "from" time is between the current event's from and to
+        // appends every additional case where next event's time is between original "from" and "to"
+        let prevTop: number | null = null;
+        while (index < arr.length - 1 &&
+          StrToMinutes(nextFrom) &&
+          StrToMinutes(nextFrom) >= StrToMinutes(currFrom) &&
+          StrToMinutes(nextFrom) < StrToMinutes(currTo)) {
+          const nextDateObject: DateObject = {
+            day: 1,
+            from: nextFrom,
+            to: nextTo,
+          };
+  
+          const nextTotalExpense = currEvent.expenses.reduce(
+            (acc: any, cv: any) => acc + cv.cost,
+            0
+          );
+  
+          const nextEventObject: Event = {
+            ...afterEvent,
+            dates: [nextDateObject],
+          };
+  
+          var topY = computeHeight(nextFrom, currFrom, screen.height);
+          // if (nextEventsArray.length > 0) {
+          if (prevTop) {
+            // const prevTotalTopY = nextEventsArray.reduce(
+            //   (acc, nt) =>
+            //     acc -
+            //     nt.topY +
+            //     computeHeight(
+            //       nt.nextDateObject.from,
+            //       nt.nextDateObject.to,
+            //       screen.height,
+            //     ),
+            //   0,
+            // );
+            // topY += prevTotalTopY;
+            topY += prevTop;
+          }
+          nextEventsArray.push({
+            nextDateObject,
+            nextTotalExpense,
+            nextEventObject,
+            topY,
+          });
+          prevTop = topY;
+          index++;
+          counter++;
+          if (index + 1 === arr.length) {
+            break;
+          }
+          var {
+            event: afterEvent, from: nextFrom, to: nextTo,
+          } = eventsByDay[day - 1]![index + 1]!;
+        }
+        return (
+          <Box display={"flex"} key={index}>
+            {nextEventsArray.length === 0 ? (
               <CalendarCard
+                retreatId={retreatId}
                 expenseTotal={totalExpense}
                 date={dateObject}
                 event={event.event}
-                width={103}
-                retreatId={retreatId}
-              />
-              <Box>
-                {nextEventsArray.map(
-                  (nextEvent: any, index) => {
-                    return (
-                      <CalendarCard
-                        right={true}
-                        retreatId={retreatId}
-                        key={index}
-                        expenseTotal={
-                          nextEvent.nextTotalExpense
-                        }
-                        date={nextEvent.nextDateObject}
-                        event={nextEvent.nextEventObject}
-                        width={103}
-                      />
-                    );
-                  },
-                )}
-              </Box>
-            </>
-          )}
-        </Box>
+                width={207} />
+            ) : (
+              <>
+                <CalendarCard
+                  expenseTotal={totalExpense}
+                  date={dateObject}
+                  event={event.event}
+                  width={103}
+                  retreatId={retreatId} />
+                <Box>
+                  {nextEventsArray.map(
+                    (nextEvent: any, index) => {
+                      return (
+                        <CalendarCard
+                          right={true}
+                          retreatId={retreatId}
+                          key={index}
+                          expenseTotal={nextEvent.nextTotalExpense}
+                          date={nextEvent.nextDateObject}
+                          event={nextEvent.nextEventObject}
+                          width={103} />
+                      );
+                    }
+                  )}
+                </Box>
+              </>
+            )}
+          </Box>
+        );
+      }
+      return (
+        <CalendarCard
+          retreatId={retreatId}
+          key={index}
+          expenseTotal={totalExpense}
+          date={dateObject}
+          event={event.event}
+          width={207} />
       );
     }
-    return (
-      <CalendarCard
-        retreatId={retreatId}
-        key={index}
-        expenseTotal={totalExpense}
-        date={dateObject}
-        event={event.event}
-        width={207}
-      />
-    );
   }
 
   return (
