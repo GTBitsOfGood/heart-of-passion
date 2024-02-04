@@ -48,7 +48,7 @@ export type DateObject = z.infer<typeof dateObjectSchema>;
 
 // Expense
 export const expenseSchema = z.object({
-  name: z.string(),
+  name: z.string().min(1, "Expense name is empty"),
   event: z.string().optional(),
   type: expenseTypeSchema,
   cost: z.number(),
@@ -86,7 +86,7 @@ export type EnergyLevel = z.infer<typeof energyLevelSchema>;
 
 export const eventSchema = z
   .object({
-    name: z.string().nonempty(),
+    name: z.string().min(1, "Event name is empty"),
     location: z.string().optional(),
     energyLevel: energyLevelSchema.optional(),
     dates: z.array(dateObjectSchema),
