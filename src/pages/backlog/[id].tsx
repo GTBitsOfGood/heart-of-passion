@@ -1,12 +1,11 @@
-import { Box, Spinner, Text, useDisclosure } from "@chakra-ui/react";
+import { Box, Spinner, Text, useDisclosure, useToast } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { trpc } from "~/utils/api";
 import "@fontsource/oswald/700.css";
 import Sidebar from "~/components/Sidebar";
 import Select from "react-select";
 import BacklogHandler from "~/components/Backlog/BacklogHandler";
-import { set } from "mongoose";
 import BacklogCopyModal from "~/components/Backlog/BacklogCopyModal";
 import { Event } from "~/common/types";
 
@@ -31,6 +30,7 @@ export default function Backlog() {
     enabled: !!chapterId,
   })?.data;
 
+  const toast = useToast();
   const trpcUtils = trpc.useUtils();
   const createEventInLatestRetreat =
     trpc.event.createEventInLatestRetreat.useMutation({
@@ -50,7 +50,7 @@ export default function Backlog() {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const [eventToCopy, setEventToCopy] = useState<Event | null>(null);
+  const [eventToCopy, setEventToCopy] = useState<Event | undefined>(undefined);
 
   const openCopyModal = (event: Event) => {
     setEventToCopy(event);
@@ -63,6 +63,13 @@ export default function Backlog() {
     createEventInLatestRetreat.mutate({
       chapterId: chapterId!,
       eventDetails: eventToCopy,
+    });
+    toast({
+      title: "Success",
+      description: "You successfully copied the event!",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
     });
     onClose();
   };

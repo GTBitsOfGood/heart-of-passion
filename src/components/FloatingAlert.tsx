@@ -1,15 +1,4 @@
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
-  Box,
-  VStack,
-  HStack,
-  useDisclosure,
-  CloseButton,
-  Button,
-} from "@chakra-ui/react";
+import { Alert, AlertDescription, Box, VStack, HStack } from "@chakra-ui/react";
 import { WarningIcon, XIcon } from "~/common/theme/icons";
 
 type FloatingAlertProps = {

@@ -36,11 +36,43 @@ function Content({
   retreatId: string;
 }) {
   let eventsByDay: EventWithStamp[][] = [[], [], [], []];
+  let startTime: string[] = ["9:00 am", "9:00 am", "9:00 am", "9:00 am"];
+
+  let parseTime = (from: string, day: number) => {
+    if (
+      parseInt(from.split(":")[0]!) <
+      parseInt(startTime[day - 1]?.split(":")[0]!)
+    ) {
+      startTime[day - 1] = from;
+    } else if (
+      parseInt(from.split(":")[0]!) ===
+      parseInt(startTime[day - 1]?.split(":")[0]!)
+    ) {
+      if (
+        parseInt(from.split(":")[1]!.slice(0, 2)) <
+        parseInt(startTime[day - 1]!.split(":")[1]!.slice(0, 2))
+      ) {
+        startTime[day - 1] = from;
+      }
+    }
+  };
+
   for (const event of events) {
     const { dates } = event;
     for (const date of dates) {
       const { from, to, day } = date;
       eventsByDay[day - 1]!.push({ event, from, to });
+      if (startTime[day - 1]!.slice(-2) == "am") {
+        if (from.slice(-2) == "am") {
+          parseTime(from, day);
+        }
+      } else {
+        if (from[-2] == "am") {
+          startTime[day - 1] = from;
+        } else {
+          parseTime(from, day);
+        }
+      }
     }
   }
 
@@ -82,7 +114,8 @@ function Content({
                     };
 
                     const totalExpense = currEvent.expenses.reduce(
-                      (acc: any, cv: any) => acc + cv.cost,
+                      (acc: any, cv: any) =>
+                        acc + cv.cost * (cv.numUnits ? cv.numUnits : 1),
                       0,
                     );
 
@@ -163,6 +196,7 @@ function Content({
                               date={dateObject}
                               event={event.event}
                               width={207}
+                              startTime={startTime[day - 1]!}
                             />
                           ) : (
                             <>
@@ -172,6 +206,7 @@ function Content({
                                 event={event.event}
                                 width={103}
                                 retreatId={retreatId}
+                                startTime={startTime[day - 1]!}
                               />
                               <Box>
                                 {nextEventsArray.map(
@@ -187,6 +222,7 @@ function Content({
                                         date={nextEvent.nextDateObject}
                                         event={nextEvent.nextEventObject}
                                         width={103}
+                                        startTime={startTime[day - 1]!}
                                       />
                                     );
                                   },
@@ -206,6 +242,7 @@ function Content({
                         date={dateObject}
                         event={event.event}
                         width={207}
+                        startTime={startTime[day - 1]!}
                       />
                     );
                   })}
@@ -291,6 +328,7 @@ export default function Calendar() {
               retreatId={retreat?._id ?? ""}
               isOpen={isAddEventOpen}
               onClose={onAddEventClose}
+              isCopy={false}
             />
           </Flex>
         </Box>
