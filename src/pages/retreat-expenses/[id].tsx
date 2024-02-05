@@ -32,6 +32,7 @@ function getTotalCost(expense: Expense) {
 type ExpenseWithDateAndEvent = Expense & {
   dates: DateObject[];
   event: string;
+  eventId?: string;
 };
 
 export type ExpenseGroup = {
@@ -88,6 +89,7 @@ export default function RetreatExpenses() {
                 ...expense,
                 dates: event.dates,
                 event: event.name,
+                eventId: event._id
             });
         });
     });

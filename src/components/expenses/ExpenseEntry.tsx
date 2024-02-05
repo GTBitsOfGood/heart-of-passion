@@ -2,10 +2,12 @@ import { Box, Grid, GridItem, useDisclosure } from "@chakra-ui/react";
 import { Expense } from "~/common/types";
 import fonts from "~/common/theme/fonts";
 import { NewExpenseModal } from "../NewExpenseModal";
+
 export default function Expense({
   _id,
   name,
   event,
+  eventId,
   type,
   cost,
   numUnits
@@ -14,6 +16,7 @@ export default function Expense({
     _id: _id,
     name: name,
     event: event,
+    eventId: eventId,
     type: type,
     cost: cost,
     numUnits: numUnits
@@ -68,6 +71,7 @@ export default function Expense({
       <NewExpenseModal
         isOpen={isOpenAddExpenseModal}
         onClose={onCloseAddExpenseModal}
+        thisEvent={eventId}
         thisExpense={expense}
       />
     </>

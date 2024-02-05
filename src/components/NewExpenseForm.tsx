@@ -25,6 +25,7 @@ type NewExpenseFormProps = {
   selectedExpense: Expense | undefined;
   setSelectedExpense?: (t: Expense | undefined) => void;
   retreatId?: string;
+  thisEvent?: string;
 };
 
 type Action<T extends keyof Expense = keyof Expense> =
@@ -62,6 +63,7 @@ export const NewExpenseForm = ({
   selectedExpense,
   setSelectedExpense,
   retreatId,
+  thisEvent,
   ...rest
 }: NewExpenseFormProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -106,6 +108,11 @@ export const NewExpenseForm = ({
       trpcUtils.event.invalidate();
     },
   });
+  const updateExpenseByEvent = trpc.event.updateExpenseByEvent.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+    },
+  });
   const createExpense = trpc.event.createExpense.useMutation({
     onSuccess: () => {
       trpcUtils.event.invalidate();
@@ -138,6 +145,8 @@ export const NewExpenseForm = ({
         }
         dispatch({ type: "RESET" });
         return;
+      } else if (selectedExpense && selectedExpense._id && thisEvent) {
+        await updateExpenseByEvent.mutate({ expense: state, expenseId: selectedExpense._id, eventId: thisEvent });
       } else if (selectedExpense && selectedExpense._id) {
         await updateExpense.mutate({ expense: state, expenseId: selectedExpense._id });
       }

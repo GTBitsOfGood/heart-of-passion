@@ -45,6 +45,27 @@ export const eventRouter = createTRPCRouter({
       const { expenseId, expense } = input;
       await ExpenseModel.findByIdAndUpdate(expenseId, expense).exec();
     }),
+    updateExpenseByEvent: studentProcedure
+    .input(
+      z.object({
+        expenseId: z.string(),
+        expense: expenseSchema,
+        eventId: z.string()
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const { expenseId, expense, eventId } = input;
+      const event = await EventModel.findById(eventId).exec();
+      if (!event) {
+        throw new Error('Event not found: ' + event);
+      }
+      const expenseIndex = event.expenses.findIndex(exp => exp._id?.toString() === expenseId)
+      if (expenseIndex === -1) {
+        throw new Error('Expense not found with ID: ' + expenseId);
+      }
+      event.expenses[expenseIndex] = expense;
+      await event.save();
+    }),
     createExpense: studentProcedure
     .input(
       z.object({
