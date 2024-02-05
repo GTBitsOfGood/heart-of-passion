@@ -48,6 +48,7 @@ export type DateObject = z.infer<typeof dateObjectSchema>;
 
 // Expense
 export const expenseSchema = z.object({
+  _id: z.string().optional(),
   name: z.string(),
   event: z.string().optional(),
   type: expenseTypeSchema,

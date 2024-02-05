@@ -1,17 +1,33 @@
-import { Box, Grid, GridItem } from "@chakra-ui/react";
+import { Box, Grid, GridItem, useDisclosure } from "@chakra-ui/react";
 import { Expense } from "~/common/types";
 import fonts from "~/common/theme/fonts";
-
+import { NewExpenseModal } from "../NewExpenseModal";
 export default function Expense({
+  _id,
   name,
   event,
   type,
   cost,
-  numUnits,
+  numUnits
 }: Expense) {
+  const expense: Expense = {
+    _id: _id,
+    name: name,
+    event: event,
+    type: type,
+    cost: cost,
+    numUnits: numUnits
+  };
+  const {
+    isOpen: isOpenAddExpenseModal,
+    onOpen: onOpenAddExpenseModal,
+    onClose: onCloseAddExpenseModal,
+  } = useDisclosure();
+
   return (
     <>
       <Grid
+        onClick={onOpenAddExpenseModal}
         templateColumns="repeat(9, 1fr)"
         gap={4}
         _hover={{
@@ -49,6 +65,11 @@ export default function Expense({
           <Box fontFamily={fonts.nunito}>${cost * (numUnits || 1)}</Box>
         </GridItem>
       </Grid>
+      <NewExpenseModal
+        isOpen={isOpenAddExpenseModal}
+        onClose={onCloseAddExpenseModal}
+        thisExpense={expense}
+      />
     </>
   );
 }

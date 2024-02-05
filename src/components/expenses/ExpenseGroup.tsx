@@ -27,7 +27,7 @@ export default function ExpenseGroup({ title, expenses }: ExpenseGroup) {
           {open ? (
             expenses.map((expense: Expense) => (
               <ExpenseEntry
-                key={expense.name + expense.type + expense.cost + expense.event}
+                key={expense._id + expense.name + expense.type + expense.cost + expense.event}
                 {...expense}
               />
             ))

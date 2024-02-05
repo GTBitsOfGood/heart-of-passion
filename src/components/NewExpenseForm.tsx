@@ -128,19 +128,25 @@ export const NewExpenseForm = ({
         await createExpense.mutate({ expenseDetails: state });
       }
     } else {
-      if (expenses && setExpenses) {
-        const updatedExpenses = expenses.map((e) =>
-        e === selectedExpense ? state : e,
-        );
-        setExpenses(updatedExpenses);
-        if (setSelectedExpense) {
-          setSelectedExpense(undefined);
-        }
+      if (selectedExpense && selectedExpense._id && !expenses) {
+        await updateExpense.mutate({ expense: state, expenseId: selectedExpense._id });
       }
+      if (selectedExpense && selectedExpense._id && expenses) {
+        await updateExpense.mutate({ expense: state, expenseId: selectedExpense._id });
+      }
+      // if (expenses && setExpenses) {
+      //   const updatedExpenses = expenses.map((e) =>
+      //   e === selectedExpense ? state : e,
+      //   );
+      //   setExpenses(updatedExpenses);
+      //   if (setSelectedExpense) {
+      //     setSelectedExpense(undefined);
+      //   }
+      // }
     }
-    if (setExpenses && expenses) {
-      setExpenses([...expenses, state]);
-    }
+    // if (setExpenses && expenses) {
+    //   setExpenses([...expenses, state]);
+    // }
     if (onCloseSide) {
       onCloseSide();
     }
