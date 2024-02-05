@@ -17,6 +17,8 @@ type NewExpenseProps = {
   retreatId?: string;
   thisExpense: Expense | undefined;
   thisEvent?: string;
+  expenses?: Expense[];
+  setExpenses?: (e: Expense[]) => void;
 };
 
 export const NewExpenseModal = ({
@@ -24,7 +26,9 @@ export const NewExpenseModal = ({
   onClose,
   thisExpense,
   retreatId,
-  thisEvent
+  thisEvent,
+  expenses,
+  setExpenses
 }: NewExpenseProps) => {
   const {
     isOpen: isError,
@@ -82,6 +86,8 @@ export const NewExpenseModal = ({
               onCloseSide={onClose}
               retreatId={retreatId}
               thisEvent={thisEvent}
+              expenses={expenses}
+              setExpenses={setExpenses}
             />
           </ModalBody>
         </HStack>
