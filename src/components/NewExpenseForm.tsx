@@ -118,9 +118,9 @@ export const NewExpenseForm = ({
       return;
     }
     onCloseError();
-    // if (onCloseSide) {
-    //   onCloseSide();
-    // }
+    if (onCloseSide) {
+      onCloseSide();
+    }
     if (create) {
       if (retreatId) {
         await createExpense.mutate({ expenseDetails: state, retreatId });
@@ -128,25 +128,23 @@ export const NewExpenseForm = ({
         await createExpense.mutate({ expenseDetails: state });
       }
     } else {
-      if (selectedExpense && selectedExpense._id && !expenses) {
+      if (setExpenses && expenses) {
+        const updatedExpenses = expenses.map((e) =>
+          e === selectedExpense ? state : e,
+        );
+        setExpenses(updatedExpenses);
+        if (setSelectedExpense) {
+          setSelectedExpense(undefined);
+        }
+        dispatch({ type: "RESET" });
+        return;
+      } else if (selectedExpense && selectedExpense._id) {
         await updateExpense.mutate({ expense: state, expenseId: selectedExpense._id });
       }
-      if (selectedExpense && selectedExpense._id && expenses) {
-        await updateExpense.mutate({ expense: state, expenseId: selectedExpense._id });
-      }
-      // if (expenses && setExpenses) {
-      //   const updatedExpenses = expenses.map((e) =>
-      //   e === selectedExpense ? state : e,
-      //   );
-      //   setExpenses(updatedExpenses);
-      //   if (setSelectedExpense) {
-      //     setSelectedExpense(undefined);
-      //   }
-      // }
     }
-    // if (setExpenses && expenses) {
-    //   setExpenses([...expenses, state]);
-    // }
+    if (setExpenses && expenses) {
+      setExpenses([...expenses, state]);
+    }
     if (onCloseSide) {
       onCloseSide();
     }
