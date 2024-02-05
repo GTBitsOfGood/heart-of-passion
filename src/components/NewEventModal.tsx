@@ -103,9 +103,9 @@ export const NewEventModal = ({
     reducer,
     eventToEdit ? { ...initialState, event: eventToEdit } : initialState,
   );
-  const [selectedTime, setSelectedTime] = useState<DateObject | null>(null);
+  const [selectedTime, setSelectedTime] = useState<DateObject>();
   const [hoveredTime, setHoveredTime] = useState<DateObject | null>(null);
-  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
+  const [selectedExpense, setSelectedExpense] = useState<Expense>();
   const [hoveredExpense, setHoveredExpense] = useState<Expense | null>(null);
 
   const {
