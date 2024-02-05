@@ -52,3 +52,7 @@ export const EventSchema = new Schema<IEvent>({
 export const EventModel =
   (mongoose.models.Event as mongoose.Model<IEvent>) ??
   mongoose.model("Event", EventSchema);
+
+export const ExpenseModel =
+  (mongoose.models.Expense as mongoose.Model<IExpense>) ??
+  mongoose.model("Expense", ExpenseSchema);

@@ -10,14 +10,15 @@ import {
   Select,
   Radio,
 } from "@chakra-ui/react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Expense, expenseTypeSchema } from "~/common/types";
+import { trpc } from '~/utils/api';
 
 import { useReducer } from "react";
 
 type NewExpenseFormProps = {
-  expenses: Expense[];
-  setExpenses: (e: Expense[]) => void;
+  expenses?: Expense[];
+  setExpenses?: (e: Expense[]) => void;
   onOpenError: () => void;
   onCloseError: () => void;
   onCloseSide?: () => void;
@@ -36,6 +37,8 @@ const initialState: State = {
   type: "Entertainment",
   cost: 0,
 };
+
+// const [expense, setExpense] = useState(selectedExpense)
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
@@ -60,8 +63,7 @@ export const NewExpenseForm = ({
   ...rest
 }: NewExpenseFormProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-
-  const editing = selectedExpense !== undefined;
+  const create = selectedExpense === undefined;
 
   const handleExpenseNameChange = (event: React.FormEvent<HTMLInputElement>) =>
     dispatch({
@@ -85,32 +87,57 @@ export const NewExpenseForm = ({
   //   dispatch({ type: "UPDATE_EXPENSE", field: "notes", value: e.target.value });
 
   const validateFields = () => {
-    //todo
-    return true;
+    let valid = true;
+
+    if (state === undefined) {
+      onOpenError();
+      valid = false;
+    } else {
+      onCloseError();
+    }
+    return valid;
   };
 
-  const handleApply = () => {
+  const trpcUtils = trpc.useContext();
+  // const updateExpense = trpc.event.updateExpense.useMutation({
+  //   onSuccess: () => {
+  //     trpcUtils.event.invalidate();
+  //   },
+  // });
+  const createExpense = trpc.event.createExpense.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+    },
+  });
+
+  const handleApply = async () => {
     if (!validateFields()) {
       onOpenError();
       return;
     }
     onCloseError();
+    // if (onCloseSide) {
+    //   onCloseSide();
+    // }
+    if (create) {
+      await createExpense.mutate({ expenseDetails: state });
+    } else {
+      if (expenses && setExpenses) {
+        const updatedExpenses = expenses.map((e) =>
+        e === selectedExpense ? state : e,
+        );
+        setExpenses(updatedExpenses);
+        if (setSelectedExpense) {
+          setSelectedExpense(undefined);
+        }
+      }
+    }
+    if (setExpenses && expenses) {
+      setExpenses([...expenses, state]);
+    }
     if (onCloseSide) {
       onCloseSide();
     }
-
-    if (editing) {
-      const updatedExpenses = expenses.map((e) =>
-        e === selectedExpense ? state : e,
-      );
-      setExpenses(updatedExpenses);
-      if (setSelectedExpense) {
-        setSelectedExpense(undefined);
-      }
-      dispatch({ type: "RESET" });
-      return;
-    }
-    setExpenses([...expenses, state]);
     dispatch({ type: "RESET" });
     return;
   };
@@ -255,8 +282,9 @@ export const NewExpenseForm = ({
         lineHeight="24px"
         borderRadius="none"
         onClick={handleApply}
+        marginBottom="50px"
       >
-        {editing ? "Update Expense" : "Add Expense"}
+        {create ? "Add Expense" : "Update Expense"}
       </Button>
     </VStack>
   );

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eventSchema } from "~/common/types";
+import { eventSchema, expenseSchema } from "~/common/types";
 
 import {
   createTRPCRouter,
@@ -8,7 +8,7 @@ import {
   studentProcedure,
 } from "~/server/api/trpc";
 
-import { EventModel, IEvent } from "~/server/models/Event";
+import {EventModel, ExpenseModel, IEvent } from "~/server/models/Event";
 import { RetreatModel } from "~/server/models/Retreat";
 export const eventRouter = createTRPCRouter({
   updateEvent: studentProcedure
@@ -34,7 +34,17 @@ export const eventRouter = createTRPCRouter({
       const event = new EventModel({ retreatId, ...eventDetails });
       await event.save();
     }),
-
+    createExpense: studentProcedure
+    .input(
+      z.object({
+        expenseDetails: expenseSchema,
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const { expenseDetails } = input;
+      const expense = new ExpenseModel({ ...expenseDetails });
+      await expense.save();
+    }),
   createEventInLatestRetreat: studentProcedure
     .input(
       z.object({

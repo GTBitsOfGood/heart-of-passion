@@ -274,8 +274,6 @@ export default function RetreatExpenses() {
             <NewExpenseModal
               isOpen={isOpenAddExpenseModal}
               onClose={onCloseAddExpenseModal}
-              expenses={[]}
-              setExpenses={() => {}}
               thisExpense={undefined}
             />
           </Box>

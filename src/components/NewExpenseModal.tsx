@@ -14,16 +14,12 @@ import { Expense } from "~/common/types";
 type NewExpenseProps = {
   isOpen: boolean;
   onClose: () => void;
-  expenses: Expense[];
-  setExpenses: (e: Expense[]) => void;
   thisExpense: Expense | undefined;
 };
 
 export const NewExpenseModal = ({
   isOpen,
   onClose,
-  expenses,
-  setExpenses,
   thisExpense,
 }: NewExpenseProps) => {
   const {
@@ -76,8 +72,6 @@ export const NewExpenseModal = ({
             boxShadow={"0px 4px 29px 0px #00000040"}
           >
             <NewExpenseForm
-              expenses={expenses}
-              setExpenses={(e: Expense[]) => setExpenses(e)}
               onOpenError={onOpenError}
               onCloseError={onCloseError}
               selectedExpense={thisExpense}
