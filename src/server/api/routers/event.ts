@@ -34,16 +34,34 @@ export const eventRouter = createTRPCRouter({
       const event = new EventModel({ retreatId, ...eventDetails });
       await event.save();
     }),
+    updateExpense: studentProcedure
+    .input(
+      z.object({
+        expenseId: z.string(),
+        expense: expenseSchema,
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const { expenseId, expense } = input;
+      await ExpenseModel.findByIdAndUpdate(expenseId, expense).exec();
+    }),
     createExpense: studentProcedure
     .input(
       z.object({
+        retreatId: z.string().optional(),
         expenseDetails: expenseSchema,
       }),
     )
     .mutation(async ({ input }) => {
-      const { expenseDetails } = input;
-      const expense = new ExpenseModel({ ...expenseDetails });
-      await expense.save();
+      const { retreatId, expenseDetails } = input;
+      if (retreatId) {
+        const expense = new ExpenseModel({ retreatId, ...expenseDetails });
+        await expense.save();
+      } else {
+        const { expenseDetails } = input;
+        const expense = new ExpenseModel({ ...expenseDetails });
+        await expense.save();
+      }
     }),
   createEventInLatestRetreat: studentProcedure
     .input(
@@ -82,5 +100,9 @@ export const eventRouter = createTRPCRouter({
   getEvents: studentProcedure.input(z.string()).query(async (opts) => {
     const events = await EventModel.find({ retreatId: opts.input }).exec();
     return events;
+  }),
+  getExpenses: studentProcedure.input(z.string()).query(async (opts) => {
+    const expenses = await ExpenseModel.find({ retreatId: opts.input }).exec();
+    return expenses;
   }),
 });

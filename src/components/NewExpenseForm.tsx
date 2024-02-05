@@ -24,6 +24,7 @@ type NewExpenseFormProps = {
   onCloseSide?: () => void;
   selectedExpense: Expense | undefined;
   setSelectedExpense?: (t: Expense | undefined) => void;
+  retreatId?: string;
 };
 
 type Action<T extends keyof Expense = keyof Expense> =
@@ -60,6 +61,7 @@ export const NewExpenseForm = ({
   onCloseSide,
   selectedExpense,
   setSelectedExpense,
+  retreatId,
   ...rest
 }: NewExpenseFormProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -99,11 +101,11 @@ export const NewExpenseForm = ({
   };
 
   const trpcUtils = trpc.useContext();
-  // const updateExpense = trpc.event.updateExpense.useMutation({
-  //   onSuccess: () => {
-  //     trpcUtils.event.invalidate();
-  //   },
-  // });
+  const updateExpense = trpc.event.updateExpense.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+    },
+  });
   const createExpense = trpc.event.createExpense.useMutation({
     onSuccess: () => {
       trpcUtils.event.invalidate();
@@ -120,7 +122,11 @@ export const NewExpenseForm = ({
     //   onCloseSide();
     // }
     if (create) {
-      await createExpense.mutate({ expenseDetails: state });
+      if (retreatId) {
+        await createExpense.mutate({ expenseDetails: state, retreatId });
+      } else {
+        await createExpense.mutate({ expenseDetails: state });
+      }
     } else {
       if (expenses && setExpenses) {
         const updatedExpenses = expenses.map((e) =>
@@ -271,21 +277,21 @@ export const NewExpenseForm = ({
             height="100px"
           />
         </FormControl> */}
+        <Button
+          width="100%"
+          height="50px"
+          bg="#FF6B6B"
+          color="white"
+          fontSize="18px"
+          fontWeight="500"
+          lineHeight="24px"
+          borderRadius="none"
+          onClick={handleApply}
+          marginTop="80px"
+        >
+          {create ? "Add Expense" : "Update Expense"}
+        </Button>
       </VStack>
-      <Button
-        width="100%"
-        height="50px"
-        bg="#FF6B6B"
-        color="white"
-        fontSize="18px"
-        fontWeight="500"
-        lineHeight="24px"
-        borderRadius="none"
-        onClick={handleApply}
-        marginBottom="50px"
-      >
-        {create ? "Add Expense" : "Update Expense"}
-      </Button>
     </VStack>
   );
 };

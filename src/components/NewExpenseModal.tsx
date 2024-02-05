@@ -14,6 +14,7 @@ import { Expense } from "~/common/types";
 type NewExpenseProps = {
   isOpen: boolean;
   onClose: () => void;
+  retreatId?: string;
   thisExpense: Expense | undefined;
 };
 
@@ -21,6 +22,7 @@ export const NewExpenseModal = ({
   isOpen,
   onClose,
   thisExpense,
+  retreatId,
 }: NewExpenseProps) => {
   const {
     isOpen: isError,
@@ -76,6 +78,7 @@ export const NewExpenseModal = ({
               onCloseError={onCloseError}
               selectedExpense={thisExpense}
               onCloseSide={onClose}
+              retreatId={retreatId}
             />
           </ModalBody>
         </HStack>
