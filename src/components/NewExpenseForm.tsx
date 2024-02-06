@@ -10,7 +10,7 @@ import {
   Select,
   Radio,
 } from "@chakra-ui/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Expense, expenseTypeSchema } from "~/common/types";
 
 import { useReducer } from "react";
@@ -34,7 +34,7 @@ type State = Expense;
 const initialState: State = {
   name: "Expense Name",
   type: "Entertainment",
-  cost: '',
+  cost: -1000,
 };
 
 const reducer = (state: State, action: Action): State => {
@@ -60,6 +60,7 @@ export const NewExpenseForm = ({
   ...rest
 }: NewExpenseFormProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [costChanged, setCostChanged] = useState(false);
 
   const editing = selectedExpense !== undefined;
 
@@ -69,12 +70,22 @@ export const NewExpenseForm = ({
       field: "name",
       value: event.currentTarget.value,
     });
-  const handleCostChange = (event: React.FormEvent<HTMLInputElement>) =>
-    dispatch({
-      type: "UPDATE_EXPENSE",
-      field: "cost",
-      value: parseFloat(event.currentTarget.value === '' ? '' : event.currentTarget.value),
-    });
+  const handleCostChange = (event: React.FormEvent<HTMLInputElement>) => {
+    if (event.currentTarget.value !== '') {
+      dispatch({
+        type: "UPDATE_EXPENSE",
+        field: "cost",
+        value: parseFloat(event.currentTarget.value),
+      });
+    } else {
+      dispatch({
+        type: "UPDATE_EXPENSE",
+        field: "cost",
+        value: -1000,
+      });
+    }
+  };
+
   const handleUnitsChange = (event: React.FormEvent<HTMLInputElement>) =>
     dispatch({
       type: "UPDATE_EXPENSE",
@@ -182,7 +193,7 @@ export const NewExpenseForm = ({
             width="100%"
             type="number"
             placeholder="Enter Cost"
-            value={state.cost}
+            value={state.cost === -1000 ? '' : state.cost.toString()}
             onChange={handleCostChange}
             padding="10px"
             borderColor={!valid ? "#C63636" : "#D9D9D9"}
