@@ -43,6 +43,10 @@ const Sidebar = ({
       enabled: !!chapterId,
     },
   ).data;
+  
+  if (allRetreats) {
+    allRetreats.sort((a, b) => a.year - b.year);
+  }
 
   const latestRetreatId = trpc.chapter.getLatestRetreatId.useQuery(chapterId!, {
     enabled: !!retreatIdProp && !!chapterId,
