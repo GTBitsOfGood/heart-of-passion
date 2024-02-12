@@ -12,9 +12,10 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { DateObject, Event } from "~/common/types";
+import { NewEventModal } from "../NewEventModal";
 
 type BacklogCopyModalProps = {
-  event: Event | null;
+  event: Event | undefined;
   copyToCurrentRetreat: () => void;
   isOpen: boolean;
   onOpen: () => void;
@@ -22,6 +23,7 @@ type BacklogCopyModalProps = {
 };
 
 export default function BacklogCopyModal({
+  event,
   copyToCurrentRetreat,
   isOpen,
   onOpen,
@@ -29,23 +31,14 @@ export default function BacklogCopyModal({
 }: BacklogCopyModalProps) {
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Copy to Current Retreat?</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody></ModalBody>
-
-          <ModalFooter>
-            <Button colorScheme="ghost" mr={3} onClick={onClose}>
-              Close
-            </Button>
-            <Button colorScheme="blue" onClick={copyToCurrentRetreat}>
-              Copy
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <NewEventModal
+        isOpen={isOpen}
+        onClose={onClose}
+        isCopy={true}
+        copyToCurrentRetreat={copyToCurrentRetreat}
+        retreatId="temp"
+        copyEvent={event}
+      />
     </>
   );
 }

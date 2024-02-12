@@ -21,6 +21,7 @@ export default function CalendarCard({
   expenseTotal,
   width,
   right,
+  startTime,
 }: {
   event: IEvent;
   date: DateObject;
@@ -28,10 +29,11 @@ export default function CalendarCard({
   width: number;
   retreatId: string;
   right?: boolean;
+  startTime: string;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const height = computeHeight(date.from, date.to, screen.height);
-  const topY = computeHeight("9:00 am", date.from, screen.height);
+  const topY = computeHeight(startTime, date.from, screen.height);
   const parentRef: any = useRef();
   const [variant, setVariant] = useState(3);
   useEffect(() => {
@@ -176,6 +178,7 @@ export default function CalendarCard({
         event={event}
         isOpen={isOpen}
         onClose={onClose}
+        isCopy={false}
       />
     </>
   );

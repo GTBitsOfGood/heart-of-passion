@@ -59,6 +59,27 @@ function Content({
     return afrom - bfrom; // ascending 'from's first
   }
   let eventsByDay: EventWithStamp[][] = [[], [], [], []];
+  let startTime: string[] = ["9:00 am", "9:00 am", "9:00 am", "9:00 am"];
+
+  let parseTime = (from: string, day: number) => {
+    if (
+      parseInt(from.split(":")[0]!) <
+      parseInt(startTime[day - 1]?.split(":")[0]!)
+    ) {
+      startTime[day - 1] = from;
+    } else if (
+      parseInt(from.split(":")[0]!) ===
+      parseInt(startTime[day - 1]?.split(":")[0]!)
+    ) {
+      if (
+        parseInt(from.split(":")[1]!.slice(0, 2)) <
+        parseInt(startTime[day - 1]!.split(":")[1]!.slice(0, 2))
+      ) {
+        startTime[day - 1] = from;
+      }
+    }
+  };
+
   for (const event of events) {
     const { dates } = event;
     for (const date of dates) {
@@ -313,6 +334,7 @@ export default function Calendar() {
               retreatId={retreat?._id ?? ""}
               isOpen={isAddEventOpen}
               onClose={onAddEventClose}
+              isCopy={false}
             />
           </Flex>
         </Box>
