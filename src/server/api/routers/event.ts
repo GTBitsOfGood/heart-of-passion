@@ -8,7 +8,7 @@ import {
   studentProcedure,
 } from "~/server/api/trpc";
 
-import {EventModel, ExpenseModel, IEvent } from "~/server/models/Event";
+import { EventModel, ExpenseModel, IEvent } from "~/server/models/Event";
 import { RetreatModel } from "~/server/models/Retreat";
 export const eventRouter = createTRPCRouter({
   updateEvent: studentProcedure
@@ -34,7 +34,7 @@ export const eventRouter = createTRPCRouter({
       const event = new EventModel({ retreatId, ...eventDetails });
       await event.save();
     }),
-    updateExpense: studentProcedure
+  updateExpense: studentProcedure
     .input(
       z.object({
         expenseId: z.string(),
@@ -45,28 +45,30 @@ export const eventRouter = createTRPCRouter({
       const { expenseId, expense } = input;
       await ExpenseModel.findByIdAndUpdate(expenseId, expense).exec();
     }),
-    updateExpenseByEvent: studentProcedure
+  updateExpenseByEvent: studentProcedure
     .input(
       z.object({
         expenseId: z.string(),
         expense: expenseSchema,
-        eventId: z.string()
+        eventId: z.string(),
       }),
     )
     .mutation(async ({ input }) => {
       const { expenseId, expense, eventId } = input;
       const event = await EventModel.findById(eventId).exec();
       if (!event) {
-        throw new Error('Event not found: ' + event);
+        throw new Error("Event not found: " + event);
       }
-      const expenseIndex = event.expenses.findIndex(exp => exp._id?.toString() === expenseId)
+      const expenseIndex = event.expenses.findIndex(
+        (exp) => exp._id?.toString() === expenseId,
+      );
       if (expenseIndex === -1) {
-        throw new Error('Expense not found with ID: ' + expenseId);
+        throw new Error("Expense not found with ID: " + expenseId);
       }
       event.expenses[expenseIndex] = expense;
       await event.save();
     }),
-    createExpense: studentProcedure
+  createExpense: studentProcedure
     .input(
       z.object({
         retreatId: z.string().optional(),

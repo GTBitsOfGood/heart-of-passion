@@ -83,25 +83,25 @@ export default function RetreatExpenses() {
   const expenses: ExpenseWithDateAndEvent[] = [];
 
   if (eventData) {
-    eventData.forEach(event => {
-        event.expenses.forEach(expense => {
-            expenses.push({
-                ...expense,
-                dates: event.dates,
-                event: event.name,
-                eventId: event._id
-            });
+    eventData.forEach((event) => {
+      event.expenses.forEach((expense) => {
+        expenses.push({
+          ...expense,
+          dates: event.dates,
+          event: event.name,
+          eventId: event._id,
         });
+      });
     });
   }
 
   if (expenseData) {
-    expenseData.forEach(expense => {
-        expenses.push({
-            ...expense,
-            dates: [],
-            event: "General"
-        });
+    expenseData.forEach((expense) => {
+      expenses.push({
+        ...expense,
+        dates: [],
+        event: "General",
+      });
     });
   }
 

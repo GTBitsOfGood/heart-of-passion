@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { Expense, expenseSchema, expenseTypeSchema } from "~/common/types";
 import { useState, useEffect } from "react";
-import { trpc } from '~/utils/api';
+import { trpc } from "~/utils/api";
 
 import { useReducer } from "react";
 import { z } from "zod";
@@ -80,7 +80,7 @@ export const NewExpenseForm = ({
       value: event.currentTarget.value,
     });
   const handleCostChange = (event: React.FormEvent<HTMLInputElement>) => {
-    if (event.currentTarget.value !== '') {
+    if (event.currentTarget.value !== "") {
       dispatch({
         type: "UPDATE_EXPENSE",
         field: "cost",
@@ -138,9 +138,7 @@ export const NewExpenseForm = ({
       onCloseSide();
     }
     // console.log('a');
-    const updatedExpenses = expenses.filter((e) =>
-      e !== selectedExpense
-    );
+    const updatedExpenses = expenses.filter((e) => e !== selectedExpense);
     setExpenses(updatedExpenses);
     if (setSelectedExpense) {
       setSelectedExpense(undefined);
@@ -193,9 +191,16 @@ export const NewExpenseForm = ({
         dispatch({ type: "RESET" });
         return;
       } else if (selectedExpense && selectedExpense._id && thisEvent) {
-        await updateExpenseByEvent.mutate({ expense: state, expenseId: selectedExpense._id, eventId: thisEvent });
+        await updateExpenseByEvent.mutate({
+          expense: state,
+          expenseId: selectedExpense._id,
+          eventId: thisEvent,
+        });
       } else if (selectedExpense && selectedExpense._id) {
-        await updateExpense.mutate({ expense: state, expenseId: selectedExpense._id });
+        await updateExpense.mutate({
+          expense: state,
+          expenseId: selectedExpense._id,
+        });
       }
     }
     if (setExpenses && expenses) {
@@ -275,7 +280,7 @@ export const NewExpenseForm = ({
             width="100%"
             type="number"
             placeholder="Enter Cost"
-            value={state.cost === -1000 ? '' : state.cost.toString()}
+            value={state.cost === -1000 ? "" : state.cost.toString()}
             onChange={handleCostChange}
             padding="10px"
             borderColor={!valid ? "#C63636" : "#D9D9D9"}

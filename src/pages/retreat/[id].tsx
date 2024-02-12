@@ -43,11 +43,13 @@ function Content({
     // Extract hours, minutes, and the period (AM/PM)
     let [_, hours, minutes, period] = parts!;
     // Get hours in 24hr format
-    const hoursNumber = ((parseInt(hours!) % 12) + (period!.toLowerCase() === 'pm' ? 12 : 0)) % 24;
+    const hoursNumber =
+      ((parseInt(hours!) % 12) + (period!.toLowerCase() === "pm" ? 12 : 0)) %
+      24;
     const minutesNumber = parseInt(minutes!);
     // Calculate total minutes
     return hoursNumber * 60 + minutesNumber;
-  }
+  };
   const DayComparator = (a: EventWithStamp, b: EventWithStamp): number => {
     const afrom = StrToMinutes(a.from);
     const bfrom = StrToMinutes(b.from);
@@ -57,7 +59,7 @@ function Content({
       return bto - ato; // descending 'to's otherwise
     }
     return afrom - bfrom; // ascending 'from's first
-  }
+  };
   let eventsByDay: EventWithStamp[][] = [[], [], [], []];
   let startTime: string[] = ["9:00 am", "9:00 am", "9:00 am", "9:00 am"];
 
@@ -85,15 +87,19 @@ function Content({
     for (const date of dates) {
       const { from, to, day } = date;
       eventsByDay[day - 1]!.push({ event, from, to });
-      console.log(from)
+      console.log(from);
     }
   }
   for (const dayEvents of eventsByDay) {
-    dayEvents.sort(DayComparator)
+    dayEvents.sort(DayComparator);
   }
 
   function MapEventsForDay(day: number) {
-    return function bruhEvent(einfo: EventWithStamp, index: number, arr: EventWithStamp[]) {
+    return function bruhEvent(
+      einfo: EventWithStamp,
+      index: number,
+      arr: EventWithStamp[],
+    ) {
       if (counter > 0) {
         counter--;
         return <></>;
@@ -104,12 +110,12 @@ function Content({
         from: currFrom,
         to: currTo,
       };
-  
+
       const totalExpense = currEvent.expenses.reduce(
         (acc: any, cv: any) => acc + cv.cost,
-        0
+        0,
       );
-  
+
       const event: EventWithStamp = {
         event: currEvent,
         from: currFrom,
@@ -118,31 +124,35 @@ function Content({
       if (index < arr.length - 1) {
         const nextEventsArray = [];
         var {
-          event: afterEvent, from: nextFrom, to: nextTo,
+          event: afterEvent,
+          from: nextFrom,
+          to: nextTo,
         } = eventsByDay[day - 1]![index + 1]!;
         // Check if the next event's "from" time is between the current event's from and to
         // appends every additional case where next event's time is between original "from" and "to"
         let prevTop: number | null = null;
-        while (index < arr.length - 1 &&
+        while (
+          index < arr.length - 1 &&
           StrToMinutes(nextFrom) &&
           StrToMinutes(nextFrom) >= StrToMinutes(currFrom) &&
-          StrToMinutes(nextFrom) < StrToMinutes(currTo)) {
+          StrToMinutes(nextFrom) < StrToMinutes(currTo)
+        ) {
           const nextDateObject: DateObject = {
             day: 1,
             from: nextFrom,
             to: nextTo,
           };
-  
+
           const nextTotalExpense = currEvent.expenses.reduce(
             (acc: any, cv: any) => acc + cv.cost,
-            0
+            0,
           );
-  
+
           const nextEventObject: Event = {
             ...afterEvent,
             dates: [nextDateObject],
           };
-  
+
           var topY = computeHeight(nextFrom, currFrom, screen.height);
           // if (nextEventsArray.length > 0) {
           if (prevTop) {
@@ -173,7 +183,9 @@ function Content({
             break;
           }
           var {
-            event: afterEvent, from: nextFrom, to: nextTo,
+            event: afterEvent,
+            from: nextFrom,
+            to: nextTo,
           } = eventsByDay[day - 1]![index + 1]!;
         }
         return (
@@ -184,7 +196,8 @@ function Content({
                 expenseTotal={totalExpense}
                 date={dateObject}
                 event={event.event}
-                width={207} />
+                width={207}
+              />
             ) : (
               <>
                 <CalendarCard
@@ -192,22 +205,22 @@ function Content({
                   date={dateObject}
                   event={event.event}
                   width={103}
-                  retreatId={retreatId} />
+                  retreatId={retreatId}
+                />
                 <Box>
-                  {nextEventsArray.map(
-                    (nextEvent: any, index) => {
-                      return (
-                        <CalendarCard
-                          right={true}
-                          retreatId={retreatId}
-                          key={index}
-                          expenseTotal={nextEvent.nextTotalExpense}
-                          date={nextEvent.nextDateObject}
-                          event={nextEvent.nextEventObject}
-                          width={103} />
-                      );
-                    }
-                  )}
+                  {nextEventsArray.map((nextEvent: any, index) => {
+                    return (
+                      <CalendarCard
+                        right={true}
+                        retreatId={retreatId}
+                        key={index}
+                        expenseTotal={nextEvent.nextTotalExpense}
+                        date={nextEvent.nextDateObject}
+                        event={nextEvent.nextEventObject}
+                        width={103}
+                      />
+                    );
+                  })}
                 </Box>
               </>
             )}
@@ -221,9 +234,10 @@ function Content({
           expenseTotal={totalExpense}
           date={dateObject}
           event={event.event}
-          width={207} />
+          width={207}
+        />
       );
-    }
+    };
   }
 
   return (

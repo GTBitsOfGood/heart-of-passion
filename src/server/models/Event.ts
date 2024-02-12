@@ -24,7 +24,7 @@ const DateSchema = new Schema<IEventDate>({
 export const ExpenseSchema = new Schema<IExpense>({
   retreatId: {
     ref: "Retreat",
-    type: Schema.Types.ObjectId
+    type: Schema.Types.ObjectId,
   },
   name: { type: String, required: true },
   event: { type: String },

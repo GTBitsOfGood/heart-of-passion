@@ -69,7 +69,7 @@ export const NewRetreatYearModal = ({
       setYearError(1);
       return;
     }
-   
+
     const { data: exists } = await existsRetreat.refetch();
 
     if (exists) {

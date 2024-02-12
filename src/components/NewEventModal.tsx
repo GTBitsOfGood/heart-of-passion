@@ -27,7 +27,7 @@ import {
   Textarea,
   useCallbackRef,
 } from "@chakra-ui/react";
-import debounce from 'lodash/debounce';
+import debounce from "lodash/debounce";
 import { useEffect, useReducer, useState } from "react";
 import { DropdownIcon } from "~/common/theme/icons";
 import { NewTimeForm } from "./NewTimeForm";
@@ -127,6 +127,21 @@ export const NewEventModal = ({
     }
   }, [eventToEdit]);
 
+  const save = useCallbackRef(() => {
+    if (!validate()) {
+      return;
+    }
+
+    if (eventToEdit) {
+      updateEvent.mutate({ event: state.event, eventId: eventToEdit._id });
+    } else {
+      console.log(state.event);
+      createEvent.mutate({ eventDetails: state.event, retreatId });
+    }
+  });
+
+  const debouncedSave = useCallbackRef(debounce(save, 50000), [save]);
+
   useEffect(() => {
     // You might want to check if the form is in a valid state before auto-saving.
     // For example, only auto-save if the name field is not empty.
@@ -138,8 +153,7 @@ export const NewEventModal = ({
     //   debouncedSave.cancel();
     // };
     // save();
-  }, [state.event]); // Run this effect whenever the event data changes
-  
+  }, [state.event, debouncedSave]); // Run this effect whenever the event data changes
 
   const sidebarOpen = state.timeFormOpen || state.expenseFormOpen;
 
@@ -153,7 +167,7 @@ export const NewEventModal = ({
   const validate = () => {
     try {
       eventSchema.parse(state.event);
-      
+
       return true;
     } catch (e) {
       let errorDesc = "Unknown Error";
@@ -218,21 +232,6 @@ export const NewEventModal = ({
     }
     onCloseModal();
   };
-
-  const save = useCallbackRef(() => {
-    if (!validate()) {
-      return;
-    }
-
-    if (eventToEdit) {
-      updateEvent.mutate({ event: state.event, eventId: eventToEdit._id });
-    } else {
-      console.log(state.event);
-      createEvent.mutate({ eventDetails: state.event, retreatId });
-    }
-  });
-  const debouncedSave = useCallbackRef(debounce(save, 50000), [save]);
-  
 
   return (
     <Modal
@@ -448,19 +447,27 @@ export const NewEventModal = ({
                             dispatch({ type: "OPEN_TIME_SIDEBAR" });
                           }
                         }}
-                        onMouseOver={() => (setHoveredTime(t))}
-                        onMouseOut={() => (setHoveredTime(null))}  
-                        key={`${t.day}-${t.from}-${t.to}`}              
+                        onMouseOver={() => setHoveredTime(t)}
+                        onMouseOut={() => setHoveredTime(null)}
+                        key={`${t.day}-${t.from}-${t.to}`}
                       >
                         <HStack
-                        width="372px"
-                        height="39px"
-                        justifyContent="space-between"
-                        color={isHovered?"black":(isSelected ? "white" : "black")}
-                        bg={isHovered? "#E2E8F0" : (isSelected ? "hop_blue.500" : "white")}
+                          width="372px"
+                          height="39px"
+                          justifyContent="space-between"
+                          color={
+                            isHovered ? "black" : isSelected ? "white" : "black"
+                          }
+                          bg={
+                            isHovered
+                              ? "#E2E8F0"
+                              : isSelected
+                              ? "hop_blue.500"
+                              : "white"
+                          }
                           // paddingLeft: "10px",
                           // paddingRight: "10px",
-                        padding="10px"
+                          padding="10px"
                         >
                           {<Text>Day {t.day}</Text>}
                           <Text>{`${t.from} - ${t.to}`}</Text>

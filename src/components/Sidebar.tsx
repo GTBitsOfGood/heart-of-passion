@@ -43,7 +43,7 @@ const Sidebar = ({
       enabled: !!chapterId,
     },
   ).data;
-  
+
   if (allRetreats) {
     allRetreats.sort((a, b) => a.year - b.year);
   }

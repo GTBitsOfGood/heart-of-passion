@@ -119,10 +119,10 @@ export const NewTimeForm = ({
       } else {
         updatedTimes = [...updatedTimes, newTime];
       }
-      updatedTimes.sort((a,b)=>{
-        if(a.day===b.day) return toMinutes(a.from)-toMinutes(b.from);
-        return a.day-b.day;
-      })
+      updatedTimes.sort((a, b) => {
+        if (a.day === b.day) return toMinutes(a.from) - toMinutes(b.from);
+        return a.day - b.day;
+      });
 
       return updatedTimes;
     });

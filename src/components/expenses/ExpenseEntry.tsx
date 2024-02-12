@@ -10,7 +10,7 @@ export default function Expense({
   eventId,
   type,
   cost,
-  numUnits
+  numUnits,
 }: Expense) {
   const expense: Expense = {
     _id: _id,
@@ -19,7 +19,7 @@ export default function Expense({
     eventId: eventId,
     type: type,
     cost: cost,
-    numUnits: numUnits
+    numUnits: numUnits,
   };
   const {
     isOpen: isOpenAddExpenseModal,

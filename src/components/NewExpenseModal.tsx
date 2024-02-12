@@ -28,7 +28,7 @@ export const NewExpenseModal = ({
   retreatId,
   thisEvent,
   expenses,
-  setExpenses
+  setExpenses,
 }: NewExpenseProps) => {
   const {
     isOpen: isError,

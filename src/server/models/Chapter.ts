@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 export interface IChapter {
-  _id: string,
+  _id: string;
   name: string;
 }
 
