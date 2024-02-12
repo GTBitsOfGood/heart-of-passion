@@ -138,8 +138,11 @@ export const NewExpenseForm = ({
       onCloseSide();
     }
     // console.log('a');
-    const updatedExpenses = expenses.filter((e) => e !== selectedExpense);
-    setExpenses(updatedExpenses);
+    const updatedExpenses = (expenses ?? []).filter(
+      (e) => e !== selectedExpense,
+    );
+    setExpenses && setExpenses(updatedExpenses);
+
     if (setSelectedExpense) {
       setSelectedExpense(undefined);
     }

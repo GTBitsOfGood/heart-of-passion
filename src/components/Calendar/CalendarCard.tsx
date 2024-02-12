@@ -29,11 +29,11 @@ export default function CalendarCard({
   width: number;
   retreatId: string;
   right?: boolean;
-  startTime: string;
+  startTime?: string;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const height = computeHeight(date.from, date.to, screen.height);
-  const topY = computeHeight(startTime, date.from, screen.height);
+  const topY = computeHeight(startTime ?? "9:00 am", date.from, screen.height);
   const parentRef: any = useRef();
   const [variant, setVariant] = useState(3);
   useEffect(() => {
