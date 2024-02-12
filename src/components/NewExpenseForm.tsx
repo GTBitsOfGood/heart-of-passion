@@ -10,19 +10,22 @@ import {
   Select,
   Radio,
 } from "@chakra-ui/react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Expense, expenseTypeSchema } from "~/common/types";
+import { trpc } from '~/utils/api';
 
 import { useReducer } from "react";
 
 type NewExpenseFormProps = {
-  expenses: Expense[];
-  setExpenses: (e: Expense[]) => void;
+  expenses?: Expense[];
+  setExpenses?: (e: Expense[]) => void;
   onOpenError: () => void;
   onCloseError: () => void;
   onCloseSide?: () => void;
   selectedExpense: Expense | undefined;
   setSelectedExpense?: (t: Expense | undefined) => void;
+  retreatId?: string;
+  thisEvent?: string;
 };
 
 type Action<T extends keyof Expense = keyof Expense> =
@@ -36,6 +39,8 @@ const initialState: State = {
   type: "Entertainment",
   cost: 0,
 };
+
+// const [expense, setExpense] = useState(selectedExpense)
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
@@ -57,11 +62,12 @@ export const NewExpenseForm = ({
   onCloseSide,
   selectedExpense,
   setSelectedExpense,
+  retreatId,
+  thisEvent,
   ...rest
 }: NewExpenseFormProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-
-  const editing = selectedExpense !== undefined;
+  const create = selectedExpense === undefined;
 
   const handleExpenseNameChange = (event: React.FormEvent<HTMLInputElement>) =>
     dispatch({
@@ -85,11 +91,35 @@ export const NewExpenseForm = ({
   //   dispatch({ type: "UPDATE_EXPENSE", field: "notes", value: e.target.value });
 
   const validateFields = () => {
-    //todo
-    return true;
+    let valid = true;
+
+    if (state === undefined) {
+      onOpenError();
+      valid = false;
+    } else {
+      onCloseError();
+    }
+    return valid;
   };
 
-  const handleApply = () => {
+  const trpcUtils = trpc.useContext();
+  const updateExpense = trpc.event.updateExpense.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+    },
+  });
+  const updateExpenseByEvent = trpc.event.updateExpenseByEvent.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+    },
+  });
+  const createExpense = trpc.event.createExpense.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+    },
+  });
+
+  const handleApply = async () => {
     if (!validateFields()) {
       onOpenError();
       return;
@@ -98,19 +128,35 @@ export const NewExpenseForm = ({
     if (onCloseSide) {
       onCloseSide();
     }
-
-    if (editing) {
-      const updatedExpenses = expenses.map((e) =>
-        e === selectedExpense ? state : e,
-      );
-      setExpenses(updatedExpenses);
-      if (setSelectedExpense) {
-        setSelectedExpense(undefined);
+    if (create) {
+      if (retreatId) {
+        await createExpense.mutate({ expenseDetails: state, retreatId });
+      } else {
+        await createExpense.mutate({ expenseDetails: state });
       }
-      dispatch({ type: "RESET" });
-      return;
+    } else {
+      if (setExpenses && expenses) {
+        const updatedExpenses = expenses.map((e) =>
+          e === selectedExpense ? state : e,
+        );
+        setExpenses(updatedExpenses);
+        if (setSelectedExpense) {
+          setSelectedExpense(undefined);
+        }
+        dispatch({ type: "RESET" });
+        return;
+      } else if (selectedExpense && selectedExpense._id && thisEvent) {
+        await updateExpenseByEvent.mutate({ expense: state, expenseId: selectedExpense._id, eventId: thisEvent });
+      } else if (selectedExpense && selectedExpense._id) {
+        await updateExpense.mutate({ expense: state, expenseId: selectedExpense._id });
+      }
     }
-    setExpenses([...expenses, state]);
+    if (setExpenses && expenses) {
+      setExpenses([...expenses, state]);
+    }
+    if (onCloseSide) {
+      onCloseSide();
+    }
     dispatch({ type: "RESET" });
     return;
   };
@@ -244,20 +290,21 @@ export const NewExpenseForm = ({
             height="100px"
           />
         </FormControl> */}
+        <Button
+          width="100%"
+          height="50px"
+          bg="#FF6B6B"
+          color="white"
+          fontSize="18px"
+          fontWeight="500"
+          lineHeight="24px"
+          borderRadius="none"
+          onClick={handleApply}
+          marginTop="80px"
+        >
+          {create ? "Add Expense" : "Update Expense"}
+        </Button>
       </VStack>
-      <Button
-        width="100%"
-        height="50px"
-        bg="#FF6B6B"
-        color="white"
-        fontSize="18px"
-        fontWeight="500"
-        lineHeight="24px"
-        borderRadius="none"
-        onClick={handleApply}
-      >
-        {editing ? "Update Expense" : "Add Expense"}
-      </Button>
     </VStack>
   );
 };
