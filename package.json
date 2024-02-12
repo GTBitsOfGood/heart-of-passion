@@ -29,7 +29,7 @@
     "@trpc/server": "^10.34.0",
     "framer-motion": "^10.16.3",
     "lucia": "^2.7.4",
-    "mongoose": "^7.5.0",
+    "mongoose": "^7.6.8",
     "next": "13.4.x",
     "react": "18.2.0",
     "react-dom": "18.2.0",
