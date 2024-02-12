@@ -24,7 +24,10 @@ import {
   VStack,
   useDisclosure,
   useToast,
+  Textarea,
+  useCallbackRef,
 } from "@chakra-ui/react";
+import debounce from 'lodash/debounce';
 import { useEffect, useReducer, useState } from "react";
 import { DropdownIcon } from "~/common/theme/icons";
 import { NewTimeForm } from "./NewTimeForm";
@@ -35,6 +38,7 @@ import { DateObject, Event, Expense, eventSchema } from "~/common/types";
 import { IEvent } from "~/server/models/Event";
 import { z } from "zod";
 import { trpc } from "~/utils/api";
+import { error } from "console";
 
 type NewEventProps = {
   isOpen: boolean;
@@ -107,7 +111,9 @@ export const NewEventModal = ({
     eventToEdit ? { ...initialState, event: eventToEdit } : initialState,
   );
   const [selectedTime, setSelectedTime] = useState<DateObject>();
+  const [hoveredTime, setHoveredTime] = useState<DateObject | null>(null);
   const [selectedExpense, setSelectedExpense] = useState<Expense>();
+  const [hoveredExpense, setHoveredExpense] = useState<Expense | null>(null);
 
   const {
     isOpen: isError,
@@ -121,9 +127,25 @@ export const NewEventModal = ({
     }
   }, [eventToEdit]);
 
+  useEffect(() => {
+    // You might want to check if the form is in a valid state before auto-saving.
+    // For example, only auto-save if the name field is not empty.
+    if (state.event.name) {
+      debouncedSave();
+    }
+
+    // return () => {
+    //   debouncedSave.cancel();
+    // };
+    // save();
+  }, [state.event]); // Run this effect whenever the event data changes
+  
+
   const sidebarOpen = state.timeFormOpen || state.expenseFormOpen;
 
   const onCloseModal = () => {
+    // debouncedSave.cancel();
+    save();
     dispatch({ type: "RESET_FORM", event: eventToEdit });
     onClose();
   };
@@ -131,12 +153,21 @@ export const NewEventModal = ({
   const validate = () => {
     try {
       eventSchema.parse(state.event);
+      
       return true;
     } catch (e) {
       let errorDesc = "Unknown Error";
       if (e instanceof z.ZodError) {
+        // if(e.issues.  ==="too_small") {
+        //   errorDesc = "lol";
+        //   return;
+        // }
+        // console.log(state.event);
         errorDesc = e.issues.map((issue) => issue.message).join("\n");
+        // errorDesc = `Please fill all fields marked by asterisk`;
+        // console.log(e.issues);
       }
+      // onOpenError();
       toast({
         title: "Error",
         description: errorDesc,
@@ -187,6 +218,21 @@ export const NewEventModal = ({
     }
     onCloseModal();
   };
+
+  const save = useCallbackRef(() => {
+    if (!validate()) {
+      return;
+    }
+
+    if (eventToEdit) {
+      updateEvent.mutate({ event: state.event, eventId: eventToEdit._id });
+    } else {
+      console.log(state.event);
+      createEvent.mutate({ eventDetails: state.event, retreatId });
+    }
+  });
+  const debouncedSave = useCallbackRef(debounce(save, 50000), [save]);
+  
 
   return (
     <Modal
@@ -305,6 +351,35 @@ export const NewEventModal = ({
                     // required
                   />
                 </FormControl>
+                <FormControl marginTop="29px" isRequired>
+                  <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
+                    Status
+                  </FormLabel>
+                  <Select
+                    textAlign="left"
+                    borderRadius="none"
+                    bg="white"
+                    border="1px solid"
+                    fontSize="18px"
+                    fontWeight="400"
+                    lineHeight="25px"
+                    padding="0px"
+                    textColor={"black"}
+                    borderColor={"#D9D9D9"}
+                    value={state.event.status}
+                    onChange={(e) => {
+                      dispatch({
+                        type: "UPDATE_EVENT",
+                        field: "status",
+                        value: e.target.value,
+                      });
+                    }}
+                  >
+                    <option value="planning">Planning</option>
+                    <option value="pending">Confirmation Pending</option>
+                    <option value="confirmed">Confirmed by Business</option>
+                  </Select>
+                </FormControl>
                 <HStack width="389px" mt="21px" justifyContent="space-between">
                   <Text
                     fontFamily="body"
@@ -361,6 +436,7 @@ export const NewEventModal = ({
                     //   selectedTime?.start === t.start &&
                     //   selectedTime?.end === t.end;
                     const isSelected = selectedTime === t;
+                    const isHovered = hoveredTime === t;
 
                     return (
                       <button
@@ -372,16 +448,19 @@ export const NewEventModal = ({
                             dispatch({ type: "OPEN_TIME_SIDEBAR" });
                           }
                         }}
-                        key={`${t.day}-${t.from}-${t.to}`}
+                        onMouseOver={() => (setHoveredTime(t))}
+                        onMouseOut={() => (setHoveredTime(null))}  
+                        key={`${t.day}-${t.from}-${t.to}`}              
                       >
                         <HStack
-                          width="372px"
-                          height="39px"
-                          justifyContent="space-between"
-                          textColor={isSelected ? "white" : "black"}
-                          bg={isSelected ? "hop_blue.500" : "white"}
-                          paddingLeft="10px"
-                          paddingRight="10px"
+                        width="372px"
+                        height="39px"
+                        justifyContent="space-between"
+                        color={isHovered?"black":(isSelected ? "white" : "black")}
+                        bg={isHovered? "#E2E8F0" : (isSelected ? "hop_blue.500" : "white")}
+                          // paddingLeft: "10px",
+                          // paddingRight: "10px",
+                        padding="10px"
                         >
                           {<Text>Day {t.day}</Text>}
                           <Text>{`${t.from} - ${t.to}`}</Text>
@@ -494,6 +573,26 @@ export const NewEventModal = ({
                     0,
                   )}`}</Text>
                 </HStack>
+                <FormControl marginTop="29px">
+                  <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
+                    Notes
+                  </FormLabel>
+                  <Textarea
+                    color="black"
+                    border="1px solid #D9D9D9"
+                    borderRadius="0px"
+                    height="150px"
+                    width="389px"
+                    value={state.event.notes}
+                    onChange={(e) =>
+                      dispatch({
+                        type: "UPDATE_EVENT",
+                        field: "notes",
+                        value: e.target.value,
+                      })
+                    }
+                  />
+                </FormControl>
               </VStack>
               {!sidebarOpen && isCopy ? (
                 <>
