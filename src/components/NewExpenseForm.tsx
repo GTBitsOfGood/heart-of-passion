@@ -9,12 +9,14 @@ import {
   RadioGroup,
   Select,
   Radio,
+  useToast,
 } from "@chakra-ui/react";
+import { Expense, expenseSchema, expenseTypeSchema } from "~/common/types";
 import { useState, useEffect } from "react";
-import { Expense, expenseTypeSchema } from "~/common/types";
 import { trpc } from '~/utils/api';
 
 import { useReducer } from "react";
+import { z } from "zod";
 
 type NewExpenseFormProps = {
   expenses?: Expense[];
@@ -67,6 +69,8 @@ export const NewExpenseForm = ({
   ...rest
 }: NewExpenseFormProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const toast = useToast();
+  const editing = selectedExpense !== undefined;
   const create = selectedExpense === undefined;
 
   const handleExpenseNameChange = (event: React.FormEvent<HTMLInputElement>) =>
@@ -101,15 +105,48 @@ export const NewExpenseForm = ({
   //   dispatch({ type: "UPDATE_EXPENSE", field: "notes", value: e.target.value });
 
   const validateFields = () => {
-    let valid = true;
-
-    if (state === undefined) {
-      onOpenError();
-      valid = false;
-    } else {
-      onCloseError();
+    //todo
+    // if(state.name)
+    try {
+      expenseSchema.parse(state);
+      // console.log('parse ');
+      // console.log(state);
+      return true;
+    } catch (e) {
+      let errorDesc = "Unknown Error";
+      if (e instanceof z.ZodError) {
+        // console.log(state.event);
+        errorDesc = e.issues.map((issue) => issue.message).join("\n");
+        // errorDesc = `Please fill all fields marked by asterisk`;
+        // console.log(e.issues);
+        // console.log(state);
+      }
+      // onOpenError();
+      toast({
+        title: "Error",
+        description: errorDesc,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
-    return valid;
+
+    return false;
+  };
+  const handleDelete = () => {
+    if (onCloseSide) {
+      onCloseSide();
+    }
+    // console.log('a');
+    const updatedExpenses = expenses.filter((e) =>
+      e !== selectedExpense
+    );
+    setExpenses(updatedExpenses);
+    if (setSelectedExpense) {
+      setSelectedExpense(undefined);
+    }
+    dispatch({ type: "RESET" });
+    return;
   };
 
   const trpcUtils = trpc.useContext();
@@ -131,10 +168,10 @@ export const NewExpenseForm = ({
 
   const handleApply = async () => {
     if (!validateFields()) {
-      onOpenError();
+      // onOpenError();
       return;
     }
-    onCloseError();
+    // onCloseError();
     if (onCloseSide) {
       onCloseSide();
     }
@@ -316,6 +353,36 @@ export const NewExpenseForm = ({
           {create ? "Add Expense" : "Update Expense"}
         </Button>
       </VStack>
+      <HStack>
+        {editing && (
+          <Button
+            width="100%"
+            height="50px"
+            bg="#FF6B6B"
+            color="white"
+            fontSize="18px"
+            fontWeight="500"
+            lineHeight="24px"
+            borderRadius="none"
+            onClick={handleDelete}
+          >
+            {"Delete expense"}
+          </Button>
+        )}
+        <Button
+          width="100%"
+          height="50px"
+          bg="#FF6B6B"
+          color="white"
+          fontSize="18px"
+          fontWeight="500"
+          lineHeight="24px"
+          borderRadius="none"
+          onClick={handleApply}
+        >
+          {editing ? "Update Expense" : "Add Expense"}
+        </Button>
+      </HStack>
     </VStack>
   );
 };

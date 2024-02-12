@@ -38,6 +38,7 @@ import { DateObject, Event, Expense, eventSchema } from "~/common/types";
 import { IEvent } from "~/server/models/Event";
 import { z } from "zod";
 import { trpc } from "~/utils/api";
+import { error } from "console";
 
 type NewEventProps = {
   isOpen: boolean;
@@ -146,12 +147,21 @@ export const NewEventModal = ({
   const validate = () => {
     try {
       eventSchema.parse(state.event);
+      
       return true;
     } catch (e) {
       let errorDesc = "Unknown Error";
       if (e instanceof z.ZodError) {
+        // if(e.issues.  ==="too_small") {
+        //   errorDesc = "lol";
+        //   return;
+        // }
+        // console.log(state.event);
         errorDesc = e.issues.map((issue) => issue.message).join("\n");
+        // errorDesc = `Please fill all fields marked by asterisk`;
+        // console.log(e.issues);
       }
+      // onOpenError();
       toast({
         title: "Error",
         description: errorDesc,
