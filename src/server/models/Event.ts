@@ -44,6 +44,9 @@ export const EventSchema = new Schema<IEvent>({
   location: {
     type: String,
   },
+  status: {
+    type: String,
+  },
   energyLevel: {
     type: String,
     enum: ["low", "medium", "high"],
@@ -53,6 +56,9 @@ export const EventSchema = new Schema<IEvent>({
     required: true,
   },
   expenses: [ExpenseSchema],
+  notes: {
+    type: String,
+  },
 });
 
 export const EventModel =

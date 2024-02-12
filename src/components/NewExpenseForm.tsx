@@ -37,7 +37,7 @@ type State = Expense;
 const initialState: State = {
   name: "Expense Name",
   type: "Entertainment",
-  cost: 0,
+  cost: -1000,
 };
 
 // const [expense, setExpense] = useState(selectedExpense)
@@ -75,12 +75,22 @@ export const NewExpenseForm = ({
       field: "name",
       value: event.currentTarget.value,
     });
-  const handleCostChange = (event: React.FormEvent<HTMLInputElement>) =>
-    dispatch({
-      type: "UPDATE_EXPENSE",
-      field: "cost",
-      value: parseFloat(event.currentTarget.value || "0"),
-    });
+  const handleCostChange = (event: React.FormEvent<HTMLInputElement>) => {
+    if (event.currentTarget.value !== '') {
+      dispatch({
+        type: "UPDATE_EXPENSE",
+        field: "cost",
+        value: parseFloat(event.currentTarget.value),
+      });
+    } else {
+      dispatch({
+        type: "UPDATE_EXPENSE",
+        field: "cost",
+        value: -1000,
+      });
+    }
+  };
+
   const handleUnitsChange = (event: React.FormEvent<HTMLInputElement>) =>
     dispatch({
       type: "UPDATE_EXPENSE",
@@ -227,7 +237,8 @@ export const NewExpenseForm = ({
             borderRadius="0px"
             width="100%"
             type="number"
-            value={state.cost}
+            placeholder="Enter Cost"
+            value={state.cost === -1000 ? '' : state.cost.toString()}
             onChange={handleCostChange}
             padding="10px"
             borderColor={!valid ? "#C63636" : "#D9D9D9"}
