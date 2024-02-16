@@ -48,5 +48,5 @@ const DonorSchema = new Schema<IDonor>(
 );
 
 export const DonorModel =
-    (mongoose.models.Donor as mongoose.Model<IUser>) ??
-    mongoose.model("User", Donor);
+    (mongoose.models.Donor as mongoose.Model<IDonor>) ??
+    mongoose.model("Donor", DonorSchema);
