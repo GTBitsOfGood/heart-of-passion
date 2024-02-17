@@ -9,12 +9,8 @@ import {
 
 import { UserModel } from "~/server/models/User";
 import { DonorModel } from "~/server/models/Donor";
-import { ChapterModel } from "~/server/models/Chapter";
-import { Chapter, User, userSchema } from "~/common/types";
 import { Donor } from "~/common/types";
 import { donorSchema } from "~/common/types";
-import { auth } from "~/server/auth";
-import { TRPCError } from "@trpc/server";
 export const donorRouter = createTRPCRouter({
   createDonor: studentProcedure
     .input(donorSchema)
