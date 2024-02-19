@@ -14,7 +14,9 @@ export const DownArrowIcon = createIcon({
 export const DropdownIcon = createIcon({
   displayName: "DropdownIcon",
   viewBox: "0 0 31 31",
-  path: <path d="M7.75 11.625L15.5 19.375L23.25 11.625H7.75Z" fill="currentColor" />,
+  path: (
+    <path d="M7.75 11.625L15.5 19.375L23.25 11.625H7.75Z" fill="currentColor" />
+  ),
 });
 
 export const WarningIcon = createIcon({

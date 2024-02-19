@@ -24,7 +24,10 @@ import {
   VStack,
   useDisclosure,
   useToast,
+  Textarea,
+  useCallbackRef,
 } from "@chakra-ui/react";
+import debounce from "lodash/debounce";
 import { useEffect, useReducer, useState } from "react";
 import { DropdownIcon } from "~/common/theme/icons";
 import { NewTimeForm } from "./NewTimeForm";
@@ -35,12 +38,16 @@ import { DateObject, Event, Expense, eventSchema } from "~/common/types";
 import { IEvent } from "~/server/models/Event";
 import { z } from "zod";
 import { trpc } from "~/utils/api";
+import { error } from "console";
 
 type NewEventProps = {
   isOpen: boolean;
   onClose: () => void;
   event?: IEvent;
   retreatId: string;
+  isCopy: boolean;
+  copyEvent?: Event;
+  copyToCurrentRetreat?: () => void;
 };
 
 type Action<T extends keyof Event = keyof Event> =
@@ -95,13 +102,18 @@ export const NewEventModal = ({
   retreatId,
   isOpen,
   onClose,
+  isCopy,
+  copyEvent,
+  copyToCurrentRetreat,
 }: NewEventProps) => {
   let [state, dispatch] = useReducer(
     reducer,
     eventToEdit ? { ...initialState, event: eventToEdit } : initialState,
   );
   const [selectedTime, setSelectedTime] = useState<DateObject>();
+  const [hoveredTime, setHoveredTime] = useState<DateObject | null>(null);
   const [selectedExpense, setSelectedExpense] = useState<Expense>();
+  const [hoveredExpense, setHoveredExpense] = useState<Expense | null>(null);
 
   const {
     isOpen: isError,
@@ -115,9 +127,39 @@ export const NewEventModal = ({
     }
   }, [eventToEdit]);
 
+  const save = useCallbackRef(() => {
+    if (!validate()) {
+      return;
+    }
+
+    if (eventToEdit) {
+      updateEvent.mutate({ event: state.event, eventId: eventToEdit._id });
+    } else {
+      console.log(state.event);
+      createEvent.mutate({ eventDetails: state.event, retreatId });
+    }
+  });
+
+  const debouncedSave = useCallbackRef(debounce(save, 50000), [save]);
+
+  useEffect(() => {
+    // You might want to check if the form is in a valid state before auto-saving.
+    // For example, only auto-save if the name field is not empty.
+    if (state.event.name) {
+      debouncedSave();
+    }
+
+    // return () => {
+    //   debouncedSave.cancel();
+    // };
+    // save();
+  }, [state.event, debouncedSave]); // Run this effect whenever the event data changes
+
   const sidebarOpen = state.timeFormOpen || state.expenseFormOpen;
 
   const onCloseModal = () => {
+    // debouncedSave.cancel();
+    save();
     dispatch({ type: "RESET_FORM", event: eventToEdit });
     onClose();
   };
@@ -125,12 +167,21 @@ export const NewEventModal = ({
   const validate = () => {
     try {
       eventSchema.parse(state.event);
+
       return true;
     } catch (e) {
       let errorDesc = "Unknown Error";
       if (e instanceof z.ZodError) {
+        // if(e.issues.  ==="too_small") {
+        //   errorDesc = "lol";
+        //   return;
+        // }
+        // console.log(state.event);
         errorDesc = e.issues.map((issue) => issue.message).join("\n");
+        // errorDesc = `Please fill all fields marked by asterisk`;
+        // console.log(e.issues);
       }
+      // onOpenError();
       toast({
         title: "Error",
         description: errorDesc,
@@ -232,7 +283,8 @@ export const NewEventModal = ({
                     border="1px solid #D9D9D9"
                     borderRadius="0px"
                     width="389px"
-                    value={state.event.name}
+                    isReadOnly={isCopy ? true : false}
+                    value={isCopy ? copyEvent?.name : state.event.name}
                     onChange={(e) =>
                       dispatch({
                         type: "UPDATE_EVENT",
@@ -258,7 +310,10 @@ export const NewEventModal = ({
                     padding="0px"
                     textColor={"black"}
                     borderColor={"#D9D9D9"}
-                    value={state.event.energyLevel}
+                    isDisabled={isCopy ? true : false}
+                    value={
+                      isCopy ? copyEvent?.energyLevel : state.event.energyLevel
+                    }
                     onChange={(e) => {
                       dispatch({
                         type: "UPDATE_EVENT",
@@ -282,7 +337,8 @@ export const NewEventModal = ({
                     borderRadius="0px"
                     width="389px"
                     // height="30px"
-                    value={state.event.location}
+                    isReadOnly={isCopy ? true : false}
+                    value={isCopy ? copyEvent?.location : state.event.location}
                     onChange={(e) =>
                       dispatch({
                         type: "UPDATE_EVENT",
@@ -294,6 +350,35 @@ export const NewEventModal = ({
                     // required
                   />
                 </FormControl>
+                <FormControl marginTop="29px" isRequired>
+                  <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
+                    Status
+                  </FormLabel>
+                  <Select
+                    textAlign="left"
+                    borderRadius="none"
+                    bg="white"
+                    border="1px solid"
+                    fontSize="18px"
+                    fontWeight="400"
+                    lineHeight="25px"
+                    padding="0px"
+                    textColor={"black"}
+                    borderColor={"#D9D9D9"}
+                    value={state.event.status}
+                    onChange={(e) => {
+                      dispatch({
+                        type: "UPDATE_EVENT",
+                        field: "status",
+                        value: e.target.value,
+                      });
+                    }}
+                  >
+                    <option value="planning">Planning</option>
+                    <option value="pending">Confirmation Pending</option>
+                    <option value="confirmed">Confirmed by Business</option>
+                  </Select>
+                </FormControl>
                 <HStack width="389px" mt="21px" justifyContent="space-between">
                   <Text
                     fontFamily="body"
@@ -303,26 +388,30 @@ export const NewEventModal = ({
                   >
                     Dates
                   </Text>
-                  <Button
-                    colorScheme="twitter"
-                    bg="hop_blue.500"
-                    borderRadius="6px"
-                    onClick={() => {
-                      setSelectedExpense(undefined);
-                      setSelectedTime(undefined);
-                      dispatch({ type: "OPEN_TIME_SIDEBAR" });
-                    }}
-                    fontFamily="heading"
-                    fontWeight="400"
-                    fontSize="16px"
-                    lineHeight="23px"
-                    minWidth="auto"
-                    // maxWidth="auto"
-                    width="66px"
-                    height="28px"
-                  >
-                    ADD TIME
-                  </Button>
+                  {isCopy ? (
+                    <></>
+                  ) : (
+                    <Button
+                      colorScheme="twitter"
+                      bg="hop_blue.500"
+                      borderRadius="6px"
+                      onClick={() => {
+                        setSelectedExpense(undefined);
+                        setSelectedTime(undefined);
+                        dispatch({ type: "OPEN_TIME_SIDEBAR" });
+                      }}
+                      fontFamily="heading"
+                      fontWeight="400"
+                      fontSize="16px"
+                      lineHeight="23px"
+                      minWidth="auto"
+                      // maxWidth="auto"
+                      width="66px"
+                      height="28px"
+                    >
+                      ADD TIME
+                    </Button>
+                  )}
                 </HStack>
                 <VStack
                   mt="8px"
@@ -340,31 +429,45 @@ export const NewEventModal = ({
                     },
                   }}
                 >
-                  {state.event.dates.map((t) => {
+                  {(isCopy ? copyEvent?.dates : state.event.dates)?.map((t) => {
                     // const isSelected =
                     //   selectedTime?.day === t.day &&
                     //   selectedTime?.start === t.start &&
                     //   selectedTime?.end === t.end;
                     const isSelected = selectedTime === t;
+                    const isHovered = hoveredTime === t;
 
                     return (
                       <button
                         onClick={() => {
-                          setSelectedExpense(undefined);
-                          setSelectedTime(t);
+                          if (!isCopy) {
+                            setSelectedExpense(undefined);
+                            setSelectedTime(t);
 
-                          dispatch({ type: "OPEN_TIME_SIDEBAR" });
+                            dispatch({ type: "OPEN_TIME_SIDEBAR" });
+                          }
                         }}
+                        onMouseOver={() => setHoveredTime(t)}
+                        onMouseOut={() => setHoveredTime(null)}
                         key={`${t.day}-${t.from}-${t.to}`}
                       >
                         <HStack
                           width="372px"
                           height="39px"
                           justifyContent="space-between"
-                          textColor={isSelected ? "white" : "black"}
-                          bg={isSelected ? "hop_blue.500" : "white"}
-                          paddingLeft="10px"
-                          paddingRight="10px"
+                          color={
+                            isHovered ? "black" : isSelected ? "white" : "black"
+                          }
+                          bg={
+                            isHovered
+                              ? "#E2E8F0"
+                              : isSelected
+                              ? "hop_blue.500"
+                              : "white"
+                          }
+                          // paddingLeft: "10px",
+                          // paddingRight: "10px",
+                          padding="10px"
                         >
                           {<Text>Day {t.day}</Text>}
                           <Text>{`${t.from} - ${t.to}`}</Text>
@@ -383,26 +486,30 @@ export const NewEventModal = ({
                   >
                     Expenses
                   </Text>
-                  <Button
-                    colorScheme="twitter"
-                    bg="hop_blue.500"
-                    borderRadius="6px"
-                    onClick={() => {
-                      setSelectedTime(undefined);
-                      setSelectedExpense(undefined);
-                      dispatch({ type: "OPEN_EXPENSE_SIDEBAR" });
-                    }}
-                    fontFamily="heading"
-                    fontWeight="400"
-                    fontSize="16px"
-                    lineHeight="23px"
-                    minWidth="auto"
-                    // maxWidth="auto"
-                    width="89px"
-                    height="28px"
-                  >
-                    ADD EXPENSE
-                  </Button>
+                  {isCopy ? (
+                    <></>
+                  ) : (
+                    <Button
+                      colorScheme="twitter"
+                      bg="hop_blue.500"
+                      borderRadius="6px"
+                      onClick={() => {
+                        setSelectedTime(undefined);
+                        setSelectedExpense(undefined);
+                        dispatch({ type: "OPEN_EXPENSE_SIDEBAR" });
+                      }}
+                      fontFamily="heading"
+                      fontWeight="400"
+                      fontSize="16px"
+                      lineHeight="23px"
+                      minWidth="auto"
+                      // maxWidth="auto"
+                      width="89px"
+                      height="28px"
+                    >
+                      ADD EXPENSE
+                    </Button>
+                  )}
                 </HStack>
                 <VStack
                   mt="8px"
@@ -420,32 +527,38 @@ export const NewEventModal = ({
                   // height="148px"
                   maxHeight="148px"
                 >
-                  {state.event.expenses.map((e, i) => {
-                    const isSelected = e === selectedExpense;
-                    return (
-                      <button
-                        onClick={() => {
-                          setSelectedTime(undefined);
-                          setSelectedExpense(e);
-                          dispatch({ type: "OPEN_EXPENSE_SIDEBAR" });
-                        }}
-                        key={i}
-                      >
-                        <HStack
-                          width="372px"
-                          height="39px"
-                          justifyContent="space-between"
-                          textColor={isSelected ? "white" : "black"}
-                          bg={isSelected ? "hop_blue.500" : "white"}
-                          paddingLeft="10px"
-                          paddingRight="10px"
+                  {(isCopy ? copyEvent?.expenses : state.event.expenses)?.map(
+                    (e, i) => {
+                      const isSelected = e === selectedExpense;
+                      return (
+                        <button
+                          onClick={() => {
+                            if (isCopy) {
+                              setSelectedTime(undefined);
+                              setSelectedExpense(e);
+                              dispatch({ type: "OPEN_EXPENSE_SIDEBAR" });
+                            }
+                          }}
+                          key={i}
                         >
-                          <Text>{e.name}</Text>
-                          <Text>{`$${e.cost}`}</Text>
-                        </HStack>
-                      </button>
-                    );
-                  })}
+                          <HStack
+                            width="372px"
+                            height="39px"
+                            justifyContent="space-between"
+                            textColor={isSelected ? "white" : "black"}
+                            bg={isSelected ? "hop_blue.500" : "white"}
+                            paddingLeft="10px"
+                            paddingRight="10px"
+                          >
+                            <Text>{e.name}</Text>
+                            <Text>{`$${
+                              e.cost * (e.numUnits ? e.numUnits : 1)
+                            }`}</Text>
+                          </HStack>
+                        </button>
+                      );
+                    },
+                  )}
                 </VStack>
                 <Divider mt="16px" borderColor="black" width="389px" />
                 <HStack width="389px" mt="7px" justifyContent="space-between">
@@ -462,12 +575,62 @@ export const NewEventModal = ({
                     fontWeight="400"
                     lineHeight="25px"
                   >{`$${state.event.expenses.reduce(
-                    (acc, cv) => acc + cv.cost,
+                    (acc, cv) =>
+                      acc + cv.cost * (cv.numUnits ? cv.numUnits : 1),
                     0,
                   )}`}</Text>
                 </HStack>
+                <FormControl marginTop="29px">
+                  <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
+                    Notes
+                  </FormLabel>
+                  <Textarea
+                    color="black"
+                    border="1px solid #D9D9D9"
+                    borderRadius="0px"
+                    height="150px"
+                    width="389px"
+                    value={state.event.notes}
+                    onChange={(e) =>
+                      dispatch({
+                        type: "UPDATE_EVENT",
+                        field: "notes",
+                        value: e.target.value,
+                      })
+                    }
+                  />
+                </FormControl>
               </VStack>
-              {!sidebarOpen && (
+              {!sidebarOpen && isCopy ? (
+                <>
+                  <HStack width="100%" justifyContent="end" mb="34px">
+                    <Button
+                      fontFamily="heading"
+                      fontSize="20px"
+                      fontWeight="400"
+                      colorScheme="red"
+                      color="hop_red.500"
+                      variant="outline"
+                      onClick={onClose}
+                      borderRadius="6px"
+                      mr="13px"
+                    >
+                      Close
+                    </Button>
+                    <Button
+                      colorScheme="twitter"
+                      bg="hop_blue.500"
+                      borderRadius="6px"
+                      fontFamily="heading"
+                      fontSize="20px"
+                      fontWeight="400"
+                      onClick={copyToCurrentRetreat}
+                    >
+                      Copy
+                    </Button>
+                  </HStack>
+                </>
+              ) : (
                 <HStack width="100%" justifyContent="end" mb="34px">
                   <Button
                     fontFamily="heading"

@@ -32,6 +32,7 @@ function getTotalCost(expense: Expense) {
 type ExpenseWithDateAndEvent = Expense & {
   dates: DateObject[];
   event: string;
+  eventId?: string;
 };
 
 export type ExpenseGroup = {
@@ -62,21 +63,47 @@ export default function RetreatExpenses() {
   const router = useRouter();
   const { id: retreatId }: { id?: string } = router.query;
   const eventData = trpc.event.getEvents.useQuery(retreatId!).data;
+  const expenseData = trpc.event.getExpenses.useQuery(retreatId!).data;
 
   const chapter = trpc.chapter.getChapterByRetreatId.useQuery(retreatId!).data;
 
-  const expenses: ExpenseWithDateAndEvent[] =
-    eventData
-      ?.map((event) => {
-        return event.expenses.map((expense) => {
-          return {
-            ...expense,
-            dates: event.dates,
-            event: event.name,
-          };
+  // const expenses: ExpenseWithDateAndEvent[] =
+  //   eventData
+  //     ?.map((event) => {
+  //       return event.expenses.map((expense) => {
+  //         return {
+  //           ...expense,
+  //           dates: event.dates,
+  //           event: event.name,
+  //         };
+  //       });
+  //     })
+  //     ?.flat() ?? [];
+
+  const expenses: ExpenseWithDateAndEvent[] = [];
+
+  if (eventData) {
+    eventData.forEach((event) => {
+      event.expenses.forEach((expense) => {
+        expenses.push({
+          ...expense,
+          dates: event.dates,
+          event: event.name,
+          eventId: event._id,
         });
-      })
-      ?.flat() ?? [];
+      });
+    });
+  }
+
+  if (expenseData) {
+    expenseData.forEach((expense) => {
+      expenses.push({
+        ...expense,
+        dates: [],
+        event: "General",
+      });
+    });
+  }
 
   const totalCost = expenses.reduce(
     (total, expense) => total + expense.cost * (expense.numUnits || 1),
@@ -274,9 +301,8 @@ export default function RetreatExpenses() {
             <NewExpenseModal
               isOpen={isOpenAddExpenseModal}
               onClose={onCloseAddExpenseModal}
-              expenses={[]}
-              setExpenses={() => {}}
               thisExpense={undefined}
+              retreatId={retreatId}
             />
           </Box>
         </Flex>

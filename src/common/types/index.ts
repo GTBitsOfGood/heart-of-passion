@@ -78,8 +78,10 @@ export type DateObject = z.infer<typeof dateObjectSchema>;
 
 // Expense
 export const expenseSchema = z.object({
-  name: z.string(),
+  name: z.string().min(1, "Expense name is empty"),
+  _id: z.string().optional(),
   event: z.string().optional(),
+  eventId: z.string().optional(),
   type: expenseTypeSchema,
   cost: z.number(),
   numUnits: z.number().optional(),
@@ -112,15 +114,18 @@ export type Retreat = z.infer<typeof retreatSchema>;
 
 // Energy Level
 export const energyLevelSchema = z.enum(["low", "medium", "high"]);
+export const statusSchema = z.enum(["planning", "pending", "confirmed"]);
 export type EnergyLevel = z.infer<typeof energyLevelSchema>;
 
 export const eventSchema = z
   .object({
-    name: z.string().nonempty(),
+    name: z.string().min(1, "Event name is empty"),
     location: z.string().optional(),
+    status: statusSchema.optional(),
     energyLevel: energyLevelSchema.optional(),
     dates: z.array(dateObjectSchema),
     expenses: z.array(expenseSchema),
+    notes: z.string().optional(),
   })
   .refine((data) => data.dates.length > 0, {
     message: "Event must have at least one date.",

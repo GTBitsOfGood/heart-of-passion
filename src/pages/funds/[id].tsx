@@ -11,7 +11,7 @@ import {
   useDisclosure,
   Text,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useMemo } from "react";
 import { TriangleDownIcon } from "@chakra-ui/icons";
 import fonts from "src/common/theme/fonts";
 import Sidebar from "~/components/Sidebar";
@@ -118,74 +118,77 @@ export default function RaisedFunds() {
 
   let dummyYear = 2023;
 
-  const dummy_funds = [
-    {
-      name: "Nikola Tesla",
-      date: "11/01/2023",
-      amount: 500,
-      source: "Donation",
-    },
-    {
-      name: "Rosalind Franklin",
-      date: "10/15/2023",
-      amount: 120,
-      source: "Event 1",
-    },
-    {
-      name: "Stephen Hawking",
-      date: "09/20/2023",
-      amount: 200,
-      source: "Event 1",
-    },
-    {
-      name: "Ada Lovelace",
-      date: "08/05/2023",
-      amount: 750,
-      source: "Event 2",
-    },
-    {
-      name: "Albert Einstein",
-      date: "11/01/2023",
-      amount: 500,
-      source: "Donation",
-    },
-    {
-      name: "Galileo Galilei",
-      date: "10/15/2023",
-      amount: 120,
-      source: "Event 1",
-    },
-    {
-      name: "Grace Hopper",
-      date: "09/20/2023",
-      amount: 200,
-      source: "Event 1",
-    },
-    {
-      name: "Carl Sagan",
-      date: "08/05/2023",
-      amount: 750,
-      source: "Event 2",
-    },
-    {
-      name: "Marie Curie",
-      date: "11/01/2023",
-      amount: 500,
-      source: "Donation",
-    },
-    {
-      name: "Gregor Mendel",
-      date: "10/15/2023",
-      amount: 120,
-      source: "Event 1",
-    },
-    {
-      name: "Leonardo da Vinci",
-      date: "08/05/2023",
-      amount: 750,
-      source: "Event 2",
-    },
-  ];
+  const dummy_funds = useMemo(
+    () => [
+      {
+        name: "Nikola Tesla",
+        date: "11/01/2023",
+        amount: 500,
+        source: "Donation",
+      },
+      {
+        name: "Rosalind Franklin",
+        date: "10/15/2023",
+        amount: 120,
+        source: "Event 1",
+      },
+      {
+        name: "Stephen Hawking",
+        date: "09/20/2023",
+        amount: 200,
+        source: "Event 1",
+      },
+      {
+        name: "Ada Lovelace",
+        date: "08/05/2023",
+        amount: 750,
+        source: "Event 2",
+      },
+      {
+        name: "Albert Einstein",
+        date: "11/01/2023",
+        amount: 500,
+        source: "Donation",
+      },
+      {
+        name: "Galileo Galilei",
+        date: "10/15/2023",
+        amount: 120,
+        source: "Event 1",
+      },
+      {
+        name: "Grace Hopper",
+        date: "09/20/2023",
+        amount: 200,
+        source: "Event 1",
+      },
+      {
+        name: "Carl Sagan",
+        date: "08/05/2023",
+        amount: 750,
+        source: "Event 2",
+      },
+      {
+        name: "Marie Curie",
+        date: "11/01/2023",
+        amount: 500,
+        source: "Donation",
+      },
+      {
+        name: "Gregor Mendel",
+        date: "10/15/2023",
+        amount: 120,
+        source: "Event 1",
+      },
+      {
+        name: "Leonardo da Vinci",
+        date: "08/05/2023",
+        amount: 750,
+        source: "Event 2",
+      },
+    ],
+    [],
+  );
 
   const [funds, setFunds] = useState([] as Fund[]);
 

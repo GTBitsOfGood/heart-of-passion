@@ -14,17 +14,21 @@ import { Expense } from "~/common/types";
 type NewExpenseProps = {
   isOpen: boolean;
   onClose: () => void;
-  expenses: Expense[];
-  setExpenses: (e: Expense[]) => void;
+  retreatId?: string;
   thisExpense: Expense | undefined;
+  thisEvent?: string;
+  expenses?: Expense[];
+  setExpenses?: (e: Expense[]) => void;
 };
 
 export const NewExpenseModal = ({
   isOpen,
   onClose,
+  thisExpense,
+  retreatId,
+  thisEvent,
   expenses,
   setExpenses,
-  thisExpense,
 }: NewExpenseProps) => {
   const {
     isOpen: isError,
@@ -76,12 +80,14 @@ export const NewExpenseModal = ({
             boxShadow={"0px 4px 29px 0px #00000040"}
           >
             <NewExpenseForm
-              expenses={expenses}
-              setExpenses={(e: Expense[]) => setExpenses(e)}
               onOpenError={onOpenError}
               onCloseError={onCloseError}
               selectedExpense={thisExpense}
               onCloseSide={onClose}
+              retreatId={retreatId}
+              thisEvent={thisEvent}
+              expenses={expenses}
+              setExpenses={setExpenses}
             />
           </ModalBody>
         </HStack>
