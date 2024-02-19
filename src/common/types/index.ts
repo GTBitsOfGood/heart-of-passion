@@ -102,6 +102,23 @@ export const eventSchema = z
   });
 export type Event = z.infer<typeof eventSchema>;
 
+export const fundraiserSchema = z.object({
+  name: z.string().min(1, "Fundraiser name is empty"),
+  location: z.string().min(1, "Location name is empty"),
+  date: z.string().datetime(),
+  contactName: z.string().min(1, "Contact name is empty"),
+  email: z.string().email(),
+  profit: z
+    .number({
+      required_error: "Age is required",
+      invalid_type_error: "Age must be a number",
+    })
+    .nonnegative(),
+  expenses: z.array(expenseSchema),
+});
+
+export type Fundraiser = z.infer<typeof fundraiserSchema>;
+
 export const eventsByYearSchema = z.record(z.number(), z.array(eventSchema));
 export type EventsByYear = z.infer<typeof eventsByYearSchema>;
 
