@@ -1,8 +1,23 @@
 import { z } from "zod";
+import { sponsorLevelOptions } from "~/server/models/Donor";
 
 // Role
 export const roleSchema = z.enum(["student", "mentor", "admin"]);
 export type Role = z.infer<typeof roleSchema>;
+
+// Donor
+
+export const sponsorLevelSchema = z.enum(sponsorLevelOptions as [string, ...string[]])
+
+export const donorSchema = z
+  .object({
+    studentName: z.string().optional(),
+    donorName: z.string().optional(),
+    donorEmail: z.string().email(),
+    source: z.string(),
+    sponsorLevel: sponsorLevelSchema
+  });
+export type Donor = z.infer<typeof donorSchema>;
 
 // User
 export const userSchema = z
