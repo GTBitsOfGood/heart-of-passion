@@ -13,8 +13,8 @@ export type SponsorLevel = z.infer<typeof sponsorLevelSchema>;
 export const sourceSchema = z.enum(sourceOptions as [string, ...string[]])
 export type Source = z.infer<typeof sourceSchema>;
 
-export const statusSchema = z.enum(statusOptions as [string, ...string[]])
-export type Status = z.infer<typeof statusSchema>;
+export const statusDonorSchema = z.enum(statusOptions as [string, ...string[]])
+export type Status = z.infer<typeof statusDonorSchema>;
 
 export const donorSchema = z
   .object({
@@ -23,7 +23,7 @@ export const donorSchema = z
     donorEmail: z.string().email(),
     source: sourceSchema,
     sponsorLevel: sponsorLevelSchema,
-    status: statusSchema,
+    status: statusDonorSchema,
   });
 export type Donor = z.infer<typeof donorSchema>;
 

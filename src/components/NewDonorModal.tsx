@@ -18,7 +18,7 @@ import {
   } from "@chakra-ui/react";
   import { useEffect, useState } from "react";
   import { RadioDropdown } from "./RadioDropdown";
-  import { Donor, donorSchema, Source, sourceSchema, SponsorLevel, statusSchema, sponsorLevelSchema } from "~/common/types";
+  import { Donor, donorSchema, Source, sourceSchema, SponsorLevel, statusDonorSchema, sponsorLevelSchema } from "~/common/types";
   import { trpc } from "~/utils/api";
   import { FloatingAlert } from "./FloatingAlert";
   
@@ -57,7 +57,7 @@ import {
     // Options
     const SponsorLevelOptions = Object.values(sponsorLevelSchema.enum);
     const SourceOptions = Object.values(sourceSchema.enum);
-    const StatusOptions = Object.values(statusSchema.enum);
+    const StatusOptions = Object.values(statusDonorSchema.enum);
   
     // Errors
     const [nameError, setNameError] = useState<DonorError>(DonorError.None);
@@ -153,7 +153,7 @@ import {
       setSponsorLevel(sponsorLevelSchema.parse(sponsorLevel));
     };
     const handleStatusChange = (status: string) => {
-        setStatus(statusSchema.parse(status));
+        setStatus(statusDonorSchema.parse(status));
       };
     const handleSourceChange = (source: string) => {
         setSource(sourceSchema.parse(source));
