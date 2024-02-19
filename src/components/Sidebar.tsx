@@ -245,7 +245,7 @@ const Sidebar = ({
             mb="2px"
             p="10px"
             onClick={() => {
-              setClicked(4);
+              router.push(`/planning/${chapterId}/`);
             }}
           >
             Fundraising Planning
