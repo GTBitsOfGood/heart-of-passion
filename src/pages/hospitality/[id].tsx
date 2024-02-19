@@ -25,7 +25,7 @@ import {
   import Link from "next/link";
   
   export default function Donors() {
-    const [filter, setFilter] = useState("chapter"); // value decides grouping behavior
+    const [filter, setFilter] = useState("donor name"); // value decides grouping behavior
   
     const {
       isOpen: isOpenFilterPopover,
@@ -47,7 +47,7 @@ import {
     const finalRef = useRef(null);
   
     // Get user data from the backend and populate the frontend afterwards
-    const donorData = trpc.user.getUsers.useQuery().data;
+    const donorData = trpc.donor.getDonors.useQuery().data;
     const [donors, setDonors] = useState([] as Donor[]);
   
     // Wait for the data to get fetched and then update users list
@@ -58,11 +58,11 @@ import {
     // uses value of filter variable to group users by a text property in their class
     const groups = (function () {
       if (donors && donors.length > 0) {
-        const uniques = [...new Set(donors?.map((u) => u.type))]; // array of unique vals
+        const uniques = [...new Set(donors?.map((u) => u.donorEmail))]; // array of unique vals
         const dmap: Map<string, Donor[]> = new Map(
           uniques.map((d) => [d, new Array()]),
         ); // map of val to empty array
-        donors?.forEach((d) => dmap.get(d.type)?.push(d));
+        donors?.forEach((d) => dmap.get(d.donorEmail)?.push(d));
         return uniques?.map((d) => ({
           title: d,
           expenses: dmap.get(d) || [],
@@ -109,9 +109,9 @@ import {
                     gap="0.5em"
                   >
                     <Text align="right" fontFamily={fonts.nunito} fontSize="sm">
-                      {filter == "chapter"
-                        ? "View by Chapter"
-                        : "View by Permission"}
+                      {filter == "donor"
+                        ? "View by Donor Name"
+                        : "View by Student Name"}
                     </Text>
                     <TriangleDownIcon />
                   </Button>
@@ -119,14 +119,14 @@ import {
                 <PopoverContent w="11.7em">
                   <PopoverBody w="10em">
                     <Stack>
-                      <Box onClick={() => handleFilterClick("chapter")}>
+                      <Box onClick={() => handleFilterClick("donor name")}>
                         <Text
                           align="right"
                           cursor="pointer"
                           fontFamily={fonts.nunito}
                           fontSize="sm"
                         >
-                          View by Chapter
+                          View by Donor Name
                         </Text>
                       </Box>
                     </Stack>
@@ -147,7 +147,7 @@ import {
               <NewDonorModal
                 isOpen={isOpenAddUserModal}
                 onClose={onCloseAddUserModal}
-                donorData={{ donorName: "", studentName: "", donorEmail: "", status: "" }}
+                donorData={{ donorName: "", studentName: "", donorEmail: "", status: "", source: "", sponsorLevel: ""}}
                 create={true}
               />
             </Box>

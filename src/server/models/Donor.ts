@@ -8,10 +8,13 @@ export interface IDonor {
     studentName: string;
     donorEmail: string;
     source: "Event 1" | "Event 2" | "Event 3";
-    sponsorLevel: "Platinum" | "Gold" | "Silver" | "Star" | "Bronze"
+    sponsorLevel: "Platinum" | "Gold" | "Silver" | "Star" | "Bronze";
+    status: "Waiting for Reply" | "Send Thank You Note" | "Note Sent" | "Send Email";
 }
 
 export const sponsorLevelOptions = ["Platinum", "Gold", "Silver", "Star", "Bronze"];
+export const statusOptions = ["Waiting for Reply", "Send Thank You Note", "Note Sent", "Send Email"];
+export const sourceOptions = ["Event 1", "Event 2", "Event 3"];
 
 const DonorSchema = new Schema<IDonor>(
     {
@@ -22,9 +25,11 @@ const DonorSchema = new Schema<IDonor>(
         },
         donorName: {
             type: String,
+            required: true,
         },
         studentName: {
             type: String,
+            required: true,
         },
         donorEmail: {
             type: String,
@@ -33,7 +38,7 @@ const DonorSchema = new Schema<IDonor>(
         },
         source: {
             type: String,
-            enum: ["Event 1", "Event 2", "Event 3"],
+            enum: sourceOptions,
             default: "Event 1",
             required: true,
         },
@@ -42,11 +47,16 @@ const DonorSchema = new Schema<IDonor>(
             enum: sponsorLevelOptions,
             required: true,
         },
+        status: {
+            type: String,
+            enum: statusOptions,
+            required: true,
+        },
 
     },
     { _id: false },
 );
 
 export const DonorModel =
-    (mongoose.models.Donor as mongoose.Model<IDonor>) ??
-    mongoose.model("Donor", DonorSchema);
+  (mongoose.models.Donor as mongoose.Model<IDonor>) ??
+  mongoose.model("Donor", DonorSchema);

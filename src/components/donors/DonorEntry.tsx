@@ -5,7 +5,7 @@ import fonts from "~/common/theme/fonts";
 import { NewDonorModal } from "../NewDonorModal";
 import { useRef } from "react";
 
-export default function Donors({ donorName, studentName, donorEmail, status }: Donor) {
+export default function Donors({ donorName, studentName, donorEmail, status, source, sponsorLevel }: Donor) {
   const {
     isOpen: isOpenAddDonorModal,
     onOpen: onOpenAddDonorModal,
@@ -60,7 +60,7 @@ export default function Donors({ donorName, studentName, donorEmail, status }: D
         <NewDonorModal
           isOpen={isOpenAddDonorModal}
           onClose={onCloseAddDonorModal}
-          donorData={{ donorName: donorName, studentName: studentName, donorEmail: donorEmail, status: status }}
+          donorData={{ donorName: donorName, studentName: studentName, donorEmail: donorEmail, sponsorLevel: sponsorLevel, source: source, status: status }}
           create={false}
         />
       </Flex>

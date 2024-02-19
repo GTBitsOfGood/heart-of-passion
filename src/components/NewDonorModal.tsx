@@ -18,7 +18,7 @@ import {
   } from "@chakra-ui/react";
   import { useEffect, useState } from "react";
   import { RadioDropdown } from "./RadioDropdown";
-  import { Donor, donorSchema, Source, SourceOptions, sourceSchema, SponsorLevel, SponsorLevelOptions, StatusOptions, statusSchema, sponsorLevelSchema } from "~/common/types";
+  import { Donor, donorSchema, Source, sourceSchema, SponsorLevel, statusSchema, sponsorLevelSchema } from "~/common/types";
   import { trpc } from "~/utils/api";
   import { FloatingAlert } from "./FloatingAlert";
   
@@ -53,6 +53,11 @@ import {
     const [status, setStatus] = useState("Waiting for Reply");
     const [source, setSource] = useState<Source>(donorData.source);
     const [sponsorLevel, setSponsorLevel] = useState<SponsorLevel>(donorData.sponsorLevel);
+
+    // Options
+    const SponsorLevelOptions = Object.values(sponsorLevelSchema.enum);
+    const SourceOptions = Object.values(sourceSchema.enum);
+    const StatusOptions = Object.values(statusSchema.enum);
   
     // Errors
     const [nameError, setNameError] = useState<DonorError>(DonorError.None);
@@ -117,14 +122,14 @@ import {
       if (create) {
         createDonor.mutate(donor);
       } else {
-        updateDonor.mutate({ email: donorData.email, updateData: donor });
+        updateDonor.mutate({ donorEmail: donorData.donorEmail, updatedDonor: donor });
       }
       onCloseModal();
       return true;
     };
   
     const handleDelete = () => {
-      deleteDonor.mutate(donorData.email);
+      deleteDonor.mutate(donorData.donorEmail);
       onCloseModal();
       onCloseError();
       return true;

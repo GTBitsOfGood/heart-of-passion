@@ -7,7 +7,6 @@ import {
   studentProcedure,
 } from "~/server/api/trpc";
 
-import { UserModel } from "~/server/models/User";
 import { DonorModel } from "~/server/models/Donor";
 import { Donor } from "~/common/types";
 import { donorSchema } from "~/common/types";
@@ -19,27 +18,27 @@ export const donorRouter = createTRPCRouter({
         await donor.save() 
     }),
 
-  deleteDonor: mentorProcedure
+  deleteDonor: studentProcedure
     .input(z.string())
     .mutation(async ({ input }) => {
-    await UserModel.findByIdAndDelete(input).exec();
+    await DonorModel.findByIdAndDelete(input).exec();
   }),
 
-  updateDonor: mentorProcedure
+  updateDonor: studentProcedure
     .input(
         z.object({
-            donorId: z.string(),
+            donorEmail: z.string(),
             updatedDonor: donorSchema,
         })
     )
     .mutation(async ({ input }) => {
-        const { donorId, updatedDonor } = input;
-        await DonorModel.findByIdAndUpdate(donorId, updatedDonor).exec();
+        const { donorEmail, updatedDonor } = input;
+        await DonorModel.findByIdAndUpdate(donorEmail, updatedDonor).exec();
     }),
   getDonor: studentProcedure
     .input(z.string())
     .query(async ({ input }): Promise<Donor> => {
-      const donor = await UserModel
+      const donor = await DonorModel
         .findById(input)
         .exec();
       return processDonor(donor);
@@ -59,5 +58,6 @@ function processDonor(obj: any): Donor {
     donorEmail: obj.email,
     source: obj.source,
     sponsorLevel: obj.sponsorLevel,
+    status: obj.status,
   };
 }

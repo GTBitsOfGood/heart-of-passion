@@ -2,8 +2,7 @@ import { Heading, Stack, Flex } from "@chakra-ui/react";
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import DonorEntry from "./DonorEntry";
-import { Donor } from "src/common/types";
-import { DonorList } from "~/pages/hospitality/[id]";
+import { Donor, DonorList } from "src/common/types";
 
 export default function DonorList({ title, donors }: DonorList) {
   const [open, setOpen] = useState(true);
@@ -27,7 +26,7 @@ export default function DonorList({ title, donors }: DonorList) {
           {open ? (
             donors.map((donor: Donor) => (
               <DonorEntry
-                key={donor.donorName + donor.studentName + donor.donorEmail + donor.status}
+                key={donor.donorEmail + donor.donorName + donor.studentName + donor.status + donor.sponsorLevel + donor.source}
                 {...donor}
               />
             ))
