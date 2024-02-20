@@ -17,17 +17,15 @@ export enum BacklogSort {
 
 export default function Backlog() {
   const toast = useToast();
-  const chapter = {
-    name: "Test Chapter",
-    totalCost: 1000,
-    fundExpected: 1000,
-    fundActual: 1000,
-    id: "12345",
-  };
+  const router = useRouter();
+  const { id: chapterId }: { id?: string } = router.query;
+  const chapter = trpc.chapter.getChapterById.useQuery(chapterId!, {
+    enabled: !!chapterId,
+  })?.data;
   const eventsByYear: EventsByYear = {
     2024: [
       {
-        name: "Test5",
+        name: "Yoga and Meditation Retreat",
         dates: [
           {
             from: "9am",
@@ -46,7 +44,7 @@ export default function Backlog() {
             _id: "Test",
           },
         ],
-        location: "Test",
+        location: "Mountain Retreat Center",
         status: "planning",
         energyLevel: "low",
       },
