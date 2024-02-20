@@ -55,7 +55,7 @@ function processDonor(obj: any): Donor {
   return {
     donorName: obj.donorName ?? "",
     studentName: obj.studentName ?? "",
-    donorEmail: obj.email,
+    donorEmail: obj.donorEmail,
     source: obj.source,
     sponsorLevel: obj.sponsorLevel,
     status: obj.status,

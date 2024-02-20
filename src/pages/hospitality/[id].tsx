@@ -10,6 +10,7 @@ import {
     Box,
     useDisclosure,
     Text,
+    Spinner,
   } from "@chakra-ui/react";
   import Image from "next/image";
   import { TriangleDownIcon, SettingsIcon } from "@chakra-ui/icons";
@@ -19,12 +20,18 @@ import {
   import logo from "public/hoplogo.png";
   import fonts from "src/common/theme/fonts";
   import { NewDonorModal } from "~/components/NewDonorModal";
+  import { useRouter } from "next/router";
   import { trpc } from "~/utils/api";
+  import Sidebar from "~/components/Sidebar";
   
   //Adding
   import Link from "next/link";
   
   export default function Donors() {
+    const router = useRouter();
+    const { id: retreatId }: { id?: string } = router.query;
+    const chapter = trpc.chapter.getChapterByRetreatId.useQuery(retreatId!).data;
+    
     const [filter, setFilter] = useState("donorName"); // value decides grouping behavior
   
     const {
@@ -65,18 +72,24 @@ import {
         donors?.forEach((d) => dmap.get(d.donorEmail)?.push(d));
         return uniques?.map((d) => ({
           title: d,
-          expenses: dmap.get(d) || [],
+          donors: dmap.get(d) || [],
         }));
       } else {
         return [];
       }
     })();
+    console.log(groups)
     const groupsRendered = groups.map((gr: any) => (
       <DonorList key={gr.title} {...gr} />
     ));
   
     return (
       <>
+        {chapter ? (
+          <Sidebar chapter={chapter!} retreatId={retreatId} />
+        ) : (
+          <Spinner />
+        )}
         <Box
           position="absolute"
           w={{ base: "6em", "2xl": "10em" }}
