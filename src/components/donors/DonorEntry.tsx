@@ -43,7 +43,7 @@ export default function Donors({ donorName, studentName, donorEmail, status, sou
           </HStack>
           </Box>
         </GridItem>
-        <GridItem colSpan={2}>
+        <GridItem colSpan={3}>
           <Box
             backgroundColor="#DEEBFF"
             borderRadius=".2em"

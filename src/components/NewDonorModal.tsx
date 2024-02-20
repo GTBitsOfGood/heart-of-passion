@@ -314,7 +314,7 @@ import {
                   </Box>
                 </FormControl>
               </HStack>
-              <HStack>
+              <HStack align="start" spacing="150px">
                 <FormControl>
                   <FormLabel
                     fontFamily="body"

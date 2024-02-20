@@ -195,7 +195,7 @@ import {
                           fontFamily={fonts.nunito}
                           fontSize="sm"
                         >
-                          Student Name
+                          Status
                         </Text>
                       </Box>
                       <Box onClick={() => handleFilterClick("sponsorLevel")}>
