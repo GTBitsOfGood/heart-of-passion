@@ -39,6 +39,16 @@ import {
     None, // No error
     Empty, // Empty donor
   }
+
+  enum StudentError {
+    None, // No error
+    Empty, // Empty donor
+  }
+
+  enum SourceError {
+    None, // No error
+    Empty, // Empty donor
+  }
   
   export const NewDonorModal = ({
     isOpen,
@@ -61,7 +71,9 @@ import {
   
     // Errors
     const [nameError, setNameError] = useState<DonorError>(DonorError.None);
+    const [studentError, setStudentError] = useState<StudentError>(StudentError.None);
     const [emailError, setEmailError] = useState<EmailError>(EmailError.None);
+    const [sourceError, setSourceError] = useState<SourceError>(SourceError.None);
     const {
       isOpen: isError,
       onClose: onCloseError,
@@ -94,7 +106,7 @@ import {
         if (create) {
           setSponsorLevel("Platinum");
           setStatus("Waiting for Reply");
-          setSource("Event 1");
+          setSource("Select Source");
           setDonorName("");
           setStudentName("");
           setDonorEmail("");
@@ -114,12 +126,14 @@ import {
       if (create) {
         setSponsorLevel("Platinum");
         setStatus("Waiting for Reply");
-        setSource("Event 1");
+        setSource("Select Source");
         setDonorName("");
         setStudentName("");
         setDonorEmail("");
       }
       setNameError(DonorError.None);
+      setStudentError(StudentError.None);
+      setSourceError(SourceError.None);
       setEmailError(EmailError.None);
       onClose();
     };
@@ -166,12 +180,10 @@ import {
         source,
         sponsorLevel
       };
+      setSourceError(source === "Select Source" ? SourceError.Empty : SourceError.None);
       setNameError(donorName === "" ? DonorError.Empty : DonorError.None);
+      setStudentError(studentName === "" ? StudentError.Empty : StudentError.None);
       setEmailError(donorEmail === "" ? EmailError.Empty : EmailError.None);
-      const parseResult = donorSchema.safeParse(donor);
-      if (!parseResult.success) {
-        console.log(parseResult.error)
-      }
       return donorSchema.safeParse(donor).success;
     };
   
@@ -234,7 +246,7 @@ import {
                     required
                   />
                   <Box minHeight="20px" mt={2}>
-                    <FormErrorMessage mt={0}>Name is required</FormErrorMessage>
+                    <FormErrorMessage mt={0}>Donor Name is required</FormErrorMessage>
                   </Box>
                 </FormControl>
                 <FormControl isInvalid={emailError !== EmailError.None}>
@@ -263,7 +275,7 @@ import {
                 </FormControl>
               </HStack>
               <HStack align="start" spacing="55px">
-              <FormControl isInvalid={nameError !== DonorError.None}>
+              <FormControl isInvalid={studentError !== StudentError.None}>
                   <FormLabel textColor="black" fontWeight="600" mb="4px">
                     Student Name
                   </FormLabel>
@@ -283,7 +295,7 @@ import {
                     <FormErrorMessage mt={0}>Student Name is required</FormErrorMessage>
                   </Box>
                 </FormControl>
-                <FormControl>
+                <FormControl isInvalid={sourceError !== SourceError.None}>
                   <FormLabel
                     fontFamily="body"
                     fontSize="16px"
@@ -297,7 +309,9 @@ import {
                     selectedOption={source}
                     setSelectedOption={handleSourceChange}
                   />
-                  <FormErrorMessage minHeight="20px" />
+                  <Box minHeight="20px" mt={2}>
+                    <FormErrorMessage mt={0}>Source is required</FormErrorMessage>
+                  </Box>
                 </FormControl>
               </HStack>
               <HStack>
