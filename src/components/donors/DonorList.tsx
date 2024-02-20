@@ -24,7 +24,7 @@ export default function DonorList({ title, donors }: DonorList) {
         </Flex>
         <Stack pl="3em" gap="1em">
           {open ? (
-            donors.map((donor: Donor) => (
+            donors?.map((donor: Donor) => (
               <DonorEntry
                 key={donor.donorEmail + donor.donorName + donor.studentName + donor.status + donor.sponsorLevel + donor.source}
                 {...donor}

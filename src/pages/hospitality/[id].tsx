@@ -25,12 +25,12 @@ import {
   import Link from "next/link";
   
   export default function Donors() {
-    const [filter, setFilter] = useState("donor name"); // value decides grouping behavior
+    const [filter, setFilter] = useState("donorName"); // value decides grouping behavior
   
     const {
       isOpen: isOpenFilterPopover,
       onOpen: onOpenFilterPopover,
-      onClose: onCloseFilterPopeover,
+      onClose: onCloseFilterPopover,
     } = useDisclosure();
   
     const {
@@ -41,7 +41,7 @@ import {
   
     function handleFilterClick(filter: string) {
       setFilter(filter);
-      onCloseFilterPopeover();
+      onCloseFilterPopover();
     }
   
     const finalRef = useRef(null);
@@ -50,12 +50,12 @@ import {
     const donorData = trpc.donor.getDonors.useQuery().data;
     const [donors, setDonors] = useState([] as Donor[]);
   
-    // Wait for the data to get fetched and then update users list
+    // Wait for the data to get fetched and then update donors list
     useEffect(() => {
       setDonors(donorData as Donor[]);
     }, [donorData]);
   
-    // uses value of filter variable to group users by a text property in their class
+    // uses value of filter variable to group donors by a text property in their class
     const groups = (function () {
       if (donors && donors.length > 0) {
         const uniques = [...new Set(donors?.map((u) => u.donorEmail))]; // array of unique vals
@@ -94,13 +94,13 @@ import {
             paddingTop={{ base: "7%", "2xl": "4%" }}
           >
             <Heading size="lg" fontFamily={fonts.oswald} fontWeight="extrabold">
-              USERS
+              HOSPITALITY
             </Heading>
             <Box>
               <Popover
                 placement="bottom-end"
                 isOpen={isOpenFilterPopover}
-                onClose={onCloseFilterPopeover}
+                onClose={onCloseFilterPopover}
               >
                 <PopoverTrigger>
                   <Button
@@ -109,7 +109,7 @@ import {
                     gap="0.5em"
                   >
                     <Text align="right" fontFamily={fonts.nunito} fontSize="sm">
-                      {filter == "donor"
+                      {filter == "donorName"
                         ? "View by Donor Name"
                         : "View by Student Name"}
                     </Text>
@@ -119,7 +119,7 @@ import {
                 <PopoverContent w="11.7em">
                   <PopoverBody w="10em">
                     <Stack>
-                      <Box onClick={() => handleFilterClick("donor name")}>
+                      <Box onClick={() => handleFilterClick("donorName")}>
                         <Text
                           align="right"
                           cursor="pointer"

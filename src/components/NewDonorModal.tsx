@@ -37,7 +37,7 @@ import {
   
   enum DonorError {
     None, // No error
-    Empty, // Empty user
+    Empty, // Empty donor
   }
   
   export const NewDonorModal = ({
@@ -48,9 +48,9 @@ import {
   }: NewDonorProps) => {
     // Form Data
     const [donorName, setDonorName] = useState(donorData.donorName);
-    const [studentName, setStudentName] = useState(donorData.donorName);
+    const [studentName, setStudentName] = useState(donorData.studentName);
     const [donorEmail, setDonorEmail] = useState(donorData.donorEmail);
-    const [status, setStatus] = useState("Waiting for Reply");
+    const [status, setStatus] = useState(donorData.status);
     const [source, setSource] = useState<Source>(donorData.source);
     const [sponsorLevel, setSponsorLevel] = useState<SponsorLevel>(donorData.sponsorLevel);
 
@@ -88,6 +88,28 @@ import {
       },
     });
 
+    useEffect(() => {
+      if (isOpen) {
+        // Set default values when the modal opens
+        if (create) {
+          setSponsorLevel("Platinum");
+          setStatus("Waiting for Reply");
+          setSource("Select Source");
+          setDonorName("");
+          setStudentName("");
+          setDonorEmail("");
+        } else {
+          // Set existing values when editing
+          setDonorName(donorData.donorName);
+          setStudentName(donorData.studentName);
+          setDonorEmail(donorData.donorEmail);
+          setStatus(donorData.status);
+          setSource(donorData.source);
+          setSponsorLevel(donorData.sponsorLevel);
+        }
+      }
+    }, [isOpen, create, donorData]);
+
     const onCloseModal = () => {
       if (create) {
         setSponsorLevel("Platinum");
@@ -102,7 +124,7 @@ import {
       onClose();
     };
   
-    // Create the user in the backend and update the frontend with dummy data temporarily on success
+    // Create the donor in the backend and update the frontend with dummy data temporarily on success
     const handleSave = () => {
       if (!validateFields()) {
         if (emailError !== EmailError.Empty) {
@@ -146,6 +168,10 @@ import {
       };
       setNameError(donorName === "" ? DonorError.Empty : DonorError.None);
       setEmailError(donorEmail === "" ? EmailError.Empty : EmailError.None);
+      const parseResult = donorSchema.safeParse(donor);
+      if (!parseResult.success) {
+        console.log(parseResult.error)
+      }
       return donorSchema.safeParse(donor).success;
     };
   
@@ -168,9 +194,9 @@ import {
       <Modal isOpen={isOpen} onClose={onCloseModal} isCentered>
         <ModalOverlay />
         <ModalContent
-          width="515px"
-          height="332px"
-          maxWidth="515px"
+          width="600px"
+          height="400px"
+          maxWidth="600px"
           borderRadius="none"
           boxShadow={"0px 4px 29px 0px #00000040"}
         >
@@ -211,44 +237,6 @@ import {
                     <FormErrorMessage mt={0}>Name is required</FormErrorMessage>
                   </Box>
                 </FormControl>
-                <FormControl isInvalid={nameError !== DonorError.None}>
-                  <FormLabel textColor="black" fontWeight="600" mb="4px">
-                    Student Name
-                  </FormLabel>
-                  <Input
-                    placeholder="Jane Doe"
-                    color="black"
-                    _placeholder={{ color: "#666666" }}
-                    border="1px solid #D9D9D9"
-                    borderRadius="0px"
-                    width="240px"
-                    height="30px"
-                    value={donorName}
-                    onChange={handleDonorNameChange}
-                    required
-                  />
-                  <Box minHeight="20px" mt={2}>
-                    <FormErrorMessage mt={0}>Name is required</FormErrorMessage>
-                  </Box>
-                </FormControl>
-                <FormControl>
-                  <FormLabel
-                    fontFamily="body"
-                    fontSize="16px"
-                    fontWeight="600"
-                    mb="4px"
-                  >
-                    Sponsorship Level
-                  </FormLabel>
-                  <RadioDropdown
-                    options={SponsorLevelOptions}
-                    selectedOption={sponsorLevel}
-                    setSelectedOption={handleSponsorLevelChange}
-                  />
-                  <FormErrorMessage minHeight="20px" />
-                </FormControl>
-              </HStack>
-              <HStack align="start" spacing="55px">
                 <FormControl isInvalid={emailError !== EmailError.None}>
                   <FormLabel textColor="black" fontWeight="600" mb="4px">
                     Donor Email
@@ -273,6 +261,28 @@ import {
                     </FormErrorMessage>
                   </Box>
                 </FormControl>
+              </HStack>
+              <HStack align="start" spacing="55px">
+              <FormControl isInvalid={nameError !== DonorError.None}>
+                  <FormLabel textColor="black" fontWeight="600" mb="4px">
+                    Student Name
+                  </FormLabel>
+                  <Input
+                    placeholder="Jane Doe"
+                    color="black"
+                    _placeholder={{ color: "#666666" }}
+                    border="1px solid #D9D9D9"
+                    borderRadius="0px"
+                    width="240px"
+                    height="30px"
+                    value={studentName}
+                    onChange={handleStudentNameChange}
+                    required
+                  />
+                  <Box minHeight="20px" mt={2}>
+                    <FormErrorMessage mt={0}>Student Name is required</FormErrorMessage>
+                  </Box>
+                </FormControl>
                 <FormControl>
                   <FormLabel
                     fontFamily="body"
@@ -289,6 +299,24 @@ import {
                   />
                   <FormErrorMessage minHeight="20px" />
                 </FormControl>
+              </HStack>
+              <HStack>
+                <FormControl>
+                  <FormLabel
+                    fontFamily="body"
+                    fontSize="16px"
+                    fontWeight="600"
+                    mb="4px"
+                  >
+                    Sponsorship Level
+                  </FormLabel>
+                  <RadioDropdown
+                    options={SponsorLevelOptions}
+                    selectedOption={sponsorLevel}
+                    setSelectedOption={handleSponsorLevelChange}
+                  />
+                  <FormErrorMessage minHeight="20px" />
+                </FormControl>
                 <FormControl>
                   <FormLabel
                     fontFamily="body"
@@ -300,8 +328,8 @@ import {
                   </FormLabel>
                   <RadioDropdown
                     options={StatusOptions}
-                    selectedOption={sponsorLevel}
-                    setSelectedOption={handleSponsorLevelChange}
+                    selectedOption={status}
+                    setSelectedOption={handleStatusChange}
                   />
                   <FormErrorMessage minHeight="20px" />
                 </FormControl>

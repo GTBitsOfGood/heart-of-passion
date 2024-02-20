@@ -20,11 +20,6 @@ export const sourceOptions = ["Event 1", "Event 2", "Event 3"];
 
 const DonorSchema = new Schema<IDonor>(
     {
-        _id: {
-            type: String,
-            required: true,
-            auto: true,
-        },
         donorName: {
             type: String,
             required: true,
@@ -56,8 +51,9 @@ const DonorSchema = new Schema<IDonor>(
         },
 
     },
-    { _id: false },
 );
 
-const Donor: mongoose.Model<IDonor> = mongoose.models.Donor || mongoose.model("Donor", DonorSchema);
-export { Donor };
+export const DonorModel =
+  (mongoose.models && mongoose.models.Donor
+    ? mongoose.models.Donor as mongoose.Model<IDonor>
+    : mongoose.model<IDonor>("Donor", DonorSchema));
