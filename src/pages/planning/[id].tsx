@@ -37,12 +37,9 @@ export default function Planning() {
     enabled: !!chapterId,
   })?.data;
 
-  //const [fundraisers, setFundraisers] = useState<Fundraiser[]>([]);
-
   const fundraiser = trpc.fundraiser.getFundraiser.useQuery(chapterId!, {
     enabled: !!chapterId,
   });
-  
 
   //const fundraiser = fundraiserRouter.getFundraisers()
 
