@@ -33,7 +33,7 @@ export const donorRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
         const { donorEmail, updatedDonor } = input;
-        await DonorModel.findByIdAndUpdate(donorEmail, updatedDonor).exec();
+        await DonorModel.findOneAndUpdate({ donorEmail: donorEmail }, updatedDonor).exec();
     }),
   getDonor: studentProcedure
     .input(z.string())
