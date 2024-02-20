@@ -94,7 +94,7 @@ import {
         if (create) {
           setSponsorLevel("Platinum");
           setStatus("Waiting for Reply");
-          setSource("Select Source");
+          setSource("Event 1");
           setDonorName("");
           setStudentName("");
           setDonorEmail("");
@@ -114,7 +114,7 @@ import {
       if (create) {
         setSponsorLevel("Platinum");
         setStatus("Waiting for Reply");
-        setSource("Select Source");
+        setSource("Event 1");
         setDonorName("");
         setStudentName("");
         setDonorEmail("");

@@ -18,8 +18,8 @@ export type Status = z.infer<typeof statusDonorSchema>;
 
 export const donorSchema = z
   .object({
-    studentName: z.string().optional(),
-    donorName: z.string().optional(),
+    studentName: z.string(),
+    donorName: z.string(),
     donorEmail: z.string().email(),
     source: sourceSchema,
     sponsorLevel: sponsorLevelSchema,

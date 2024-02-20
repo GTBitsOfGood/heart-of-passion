@@ -1,4 +1,4 @@
-import { Flex, Image, Box, Button, IconButton, useDisclosure } from "@chakra-ui/react";
+import { Flex, Image, Box, Button, IconButton, useDisclosure, HStack } from "@chakra-ui/react";
 import { EditIcon } from "@chakra-ui/icons";
 import { Donor } from "~/common/types";
 import fonts from "~/common/theme/fonts";
@@ -20,12 +20,16 @@ export default function Donors({ donorName, studentName, donorEmail, status, sou
           {donorName}
         </Box>
         <Box fontFamily={fonts.nunito} minW="20%">
-        <Image
+        <HStack>
+          <Image
             src="/student.png"
             alt="Student"
             height="30px"
           />
+          <Box fontFamily={fonts.nunito} minW="10%">
           {studentName}
+          </Box>
+        </HStack>
         </Box>
         <Box
           backgroundColor="#DEEBFF"

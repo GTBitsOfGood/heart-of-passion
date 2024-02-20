@@ -17,7 +17,6 @@ import {
   import { useEffect, useRef, useState } from "react";
   import DonorList from "~/components/donors/DonorList";
   import { Donor } from "~/common/types";
-  import logo from "public/hoplogo.png";
   import fonts from "src/common/theme/fonts";
   import { NewDonorModal } from "~/components/NewDonorModal";
   import { useRouter } from "next/router";
@@ -41,9 +40,9 @@ import {
     } = useDisclosure();
   
     const {
-      isOpen: isOpenAddUserModal,
-      onOpen: onOpenAddUserModal,
-      onClose: onCloseAddUserModal,
+      isOpen: isOpenAddDonorModal,
+      onOpen: onOpenAddDonorModal,
+      onClose: onCloseAddDonorModal,
     } = useDisclosure();
   
     function handleFilterClick(filter: string) {
@@ -53,7 +52,7 @@ import {
   
     const finalRef = useRef(null);
   
-    // Get user data from the backend and populate the frontend afterwards
+    // Get donor data from the backend and populate the frontend afterwards
     const donorData = trpc.donor.getDonors.useQuery().data;
     const [donors, setDonors] = useState([] as Donor[]);
   
@@ -65,44 +64,75 @@ import {
     // uses value of filter variable to group donors by a text property in their class
     const groups = (function () {
       if (donors && donors.length > 0) {
-        const uniques = [...new Set(donors?.map((u) => u.donorEmail))]; // array of unique vals
-        const dmap: Map<string, Donor[]> = new Map(
-          uniques.map((d) => [d, new Array()]),
-        ); // map of val to empty array
-        donors?.forEach((d) => dmap.get(d.donorEmail)?.push(d));
-        return uniques?.map((d) => ({
-          title: d,
-          donors: dmap.get(d) || [],
-        }));
+        if (filter === "studentName") {
+          const uniques = [...new Set(donors?.map((u) => u.studentName))]; // array of unique vals
+          const emap = new Map(
+            uniques.map((e) => [e, new Array()])
+          ); // map of val to empty array
+          donors?.forEach((e) => emap.get(e.studentName)?.push(e));
+          return uniques?.map((e) => ({
+            title: e,
+            donors: emap.get(e) || [],
+          }));
+        } else if (filter === "donorName") {
+          donors.sort((a, b) => a.donorName.localeCompare(b.donorName)); // Sort alphabetically
+        return [{ title: "Donor Names", donors: donors }];
+        } else if (filter === "status") {
+          const uniques = [...new Set(donors?.map((u) => u.status))]; // array of unique vals
+          const emap = new Map(
+            uniques.map((e) => [e, new Array()])
+          ); // map of val to empty array
+          donors?.forEach((e) => emap.get(e.status)?.push(e));
+          return uniques?.map((e) => ({
+            title: e,
+            donors: emap.get(e) || [],
+          }));
+        } else if (filter === "sponsorLevel") {
+          const uniques = [...new Set(donors?.map((u) => u.sponsorLevel))]; // array of unique vals
+          const emap = new Map(
+            uniques.map((e) => [e, new Array()])
+          ); // map of val to empty array
+          donors?.forEach((e) => emap.get(e.sponsorLevel)?.push(e));
+          return uniques?.map((e) => ({
+            title: e,
+            donors: emap.get(e) || [],
+          }));
+        } else {
+          const uniques = [...new Set(donors?.map((u) => u.source))]; // array of unique vals
+          const emap = new Map(
+            uniques.map((e) => [e, new Array()])
+          ); // map of val to empty array
+          donors?.forEach((e) => emap.get(e.source)?.push(e));
+          return uniques?.map((e) => ({
+            title: e,
+            donors: emap.get(e) || [],
+          }));
+        }
       } else {
         return [];
       }
     })();
-    console.log(groups)
     const groupsRendered = groups.map((gr: any) => (
       <DonorList key={gr.title} {...gr} />
     ));
   
     return (
-      <>
-        {chapter ? (
-          <Sidebar chapter={chapter!} retreatId={retreatId} />
-        ) : (
-          <Spinner />
-        )}
-        <Box
-          position="absolute"
-          w={{ base: "6em", "2xl": "10em" }}
-          m={{ base: "1em", "2xl": "2em" }}
-        >
-          <Link href="/chapters">
-            <Image src={logo} alt="logo" />
-          </Link>
-        </Box>
-        <Stack w="100%" alignItems="center">
-          <Flex
+      <Box>
+      {chapter ? (
+        <Sidebar chapter={chapter!} retreatId={retreatId} />
+      ) : (
+        <Spinner />
+      )}
+      <Stack
+        spacing={4}
+        alignItems={"right"}
+        paddingTop="10px"
+        paddingRight="5%"
+        paddingLeft="2%"
+        marginLeft="400px" // size of sidebar
+      >
+        <Flex
             justifyContent={"space-between"}
-            w="70%"
             borderBottom="solid 1px black"
             paddingTop={{ base: "7%", "2xl": "4%" }}
           >
@@ -122,10 +152,16 @@ import {
                     gap="0.5em"
                   >
                     <Text align="right" fontFamily={fonts.nunito} fontSize="sm">
-                      {filter == "donorName"
-                        ? "View by Donor Name"
-                        : "View by Student Name"}
-                    </Text>
+                    {filter == "donorName"
+                      ? "View by Donor Name"
+                      : filter == "studentName"
+                      ? "View by Student Name"
+                      : filter == "status"
+                      ? "View by Status"
+                      : filter == "sponsorLevel"
+                      ? "View by Sponsorship Level"
+                      : "View by Source"}
+                  </Text>
                     <TriangleDownIcon />
                   </Button>
                 </PopoverTrigger>
@@ -139,7 +175,47 @@ import {
                           fontFamily={fonts.nunito}
                           fontSize="sm"
                         >
-                          View by Donor Name
+                          Donor Name
+                        </Text>
+                      </Box>
+                      <Box onClick={() => handleFilterClick("studentName")}>
+                        <Text
+                          align="right"
+                          cursor="pointer"
+                          fontFamily={fonts.nunito}
+                          fontSize="sm"
+                        >
+                          Student Name
+                        </Text>
+                      </Box>
+                      <Box onClick={() => handleFilterClick("status")}>
+                        <Text
+                          align="right"
+                          cursor="pointer"
+                          fontFamily={fonts.nunito}
+                          fontSize="sm"
+                        >
+                          Student Name
+                        </Text>
+                      </Box>
+                      <Box onClick={() => handleFilterClick("sponsorLevel")}>
+                        <Text
+                          align="right"
+                          cursor="pointer"
+                          fontFamily={fonts.nunito}
+                          fontSize="sm"
+                        >
+                          Sponsorship Level
+                        </Text>
+                      </Box>
+                      <Box onClick={() => handleFilterClick("source")}>
+                        <Text
+                          align="right"
+                          cursor="pointer"
+                          fontFamily={fonts.nunito}
+                          fontSize="sm"
+                        >
+                          Source
                         </Text>
                       </Box>
                     </Stack>
@@ -147,32 +223,31 @@ import {
                 </PopoverContent>
               </Popover>
               <Button
-                backgroundColor="#26ACE2"
-                borderRadius="0"
-                h="80%"
-                w="4.5em"
-                onClick={onOpenAddUserModal}
+                colorScheme="twitter"
+                onClick={onOpenAddDonorModal}
+                fontWeight="400"
+                color="white"
+                bg="hop_blue.500"
+                fontFamily="oswald"
+                height="50px"
+                fontSize="20px"
+                marginBottom="10px"
               >
                 <Text color="white" fontFamily={fonts.oswald} fontWeight="light">
                   ADD DONOR
                 </Text>
               </Button>
               <NewDonorModal
-                isOpen={isOpenAddUserModal}
-                onClose={onCloseAddUserModal}
+                isOpen={isOpenAddDonorModal}
+                onClose={onCloseAddDonorModal}
                 donorData={{ donorName: "", studentName: "", donorEmail: "", status: "", source: "", sponsorLevel: ""}}
                 create={true}
               />
             </Box>
-            <SettingsIcon
-              boxSize="2.5em"
-              position="absolute"
-              right={{ base: "5em", "2xl": "12em" }}
-              top={{ base: "5.6em", "2xl": "6em" }}
-            />
           </Flex>
           {groupsRendered}
+          <Flex borderBottom="1px #AEAEAE solid"></Flex>
         </Stack>
-      </>
+      </Box>
     );
   }  
