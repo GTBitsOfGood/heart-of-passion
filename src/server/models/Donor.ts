@@ -1,15 +1,17 @@
 import mongoose from "mongoose";
+import { z } from "zod";
+import { donorSchema, SponsorLevel, Source, Status } from "~/common/types";
 
 const { Schema } = mongoose;
 
-export interface IDonor {
+export interface IDonor extends z.infer<typeof donorSchema> {
     _id: string;
     donorName: string;
     studentName: string;
     donorEmail: string;
-    source: "Event 1" | "Event 2" | "Event 3";
-    sponsorLevel: "Platinum" | "Gold" | "Silver" | "Star" | "Bronze";
-    status: "Waiting for Reply" | "Send Thank You Note" | "Note Sent" | "Send Email";
+    source: Source;
+    sponsorLevel: SponsorLevel;
+    status: Status;
 }
 
 export const sponsorLevelOptions = ["Platinum", "Gold", "Silver", "Star", "Bronze"];
@@ -57,6 +59,5 @@ const DonorSchema = new Schema<IDonor>(
     { _id: false },
 );
 
-export const DonorModel =
-  (mongoose.models.Donor as mongoose.Model<IDonor>) ??
-  mongoose.model("Donor", DonorSchema);
+const Donor: mongoose.Model<IDonor> = mongoose.models.Donor || mongoose.model("Donor", DonorSchema);
+export { Donor };
