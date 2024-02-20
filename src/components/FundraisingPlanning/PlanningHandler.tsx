@@ -10,29 +10,28 @@ import { PlanningSort } from "~/pages/planning/[id]";
 export default function PlanningHandler({
   sortMethod,
   eventsByYear,
-  fundraiser,
+  fundraisers,
 }: {
   sortMethod: PlanningSort;
   eventsByYear: EventsByYear;
-  fundraiser: Fundraiser;
-  openCopyModal: (event: Event) => void;
+  fundraisers: Fundraiser;
 }) {
   // Combine all events into a single array
   const allEvents = Object.values(eventsByYear).flat();
 
   return (
     <Box>
-      <BacklogYearContainer
+      <PlanningYearContainer
         events={allEvents}
         sortMethod={sortMethod}
-        fundraiser={fundraiser}
+        fundraiser={fundraisers}
       />
     </Box>
   );
 }
 
 
-function BacklogYearContainer({
+function PlanningYearContainer({
   events: unsortedEvents,
   sortMethod,
   fundraiser,

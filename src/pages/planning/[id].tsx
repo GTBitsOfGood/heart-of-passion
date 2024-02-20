@@ -43,16 +43,6 @@ export default function Planning() {
 
   //console.log(fundraiser)
 
-  const toast = useToast();
-  const trpcUtils = trpc.useUtils();
-  const createEventInLatestRetreat =
-    trpc.event.createEventInLatestRetreat.useMutation({
-      onSuccess: () => {
-        trpcUtils.event.invalidate();
-        trpcUtils.retreat.invalidate();
-      },
-    });
-
   const sortOptions = Object.values(PlanningSort).map((sortMethod) => ({
     value: sortMethod,
     label: sortMethod,
@@ -60,7 +50,6 @@ export default function Planning() {
   const [sortMethod, setSortMethod] = useState<PlanningSort>(
     PlanningSort.ViewByDate,
   );
-
 
   return (
     <>
