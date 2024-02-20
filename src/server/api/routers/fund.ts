@@ -29,11 +29,7 @@ export const fundRouter = createTRPCRouter({
     }),
 //get
   getFunds: studentProcedure
-    .input(
-      z.object({
-        retreatId: z.string()
-      }),
-    )
+    .input(z.string())
     .query( async (opts) => {
       const funds = await FundModel.find({ retreatId: opts.input }).exec();
       return funds;
@@ -92,18 +88,19 @@ export const fundRouter = createTRPCRouter({
       return fund;
     }),
 //delete
-  deleteEvent: studentProcedure
+  deleteFund: studentProcedure
     .input(z.string())
     .mutation(async ({ input }) => {
       await FundModel.findByIdAndDelete(input).exec();
     }),
-
+/*
   getLatestRetreatId: studentProcedure.input(z.string()).query(async (opts) => {
     const retreat = await RetreatModel.findOne({ chapterId: opts.input })
       .sort("-year")
       .exec();
     return retreat?._id;
   }),
+*/
 });
 
 /*

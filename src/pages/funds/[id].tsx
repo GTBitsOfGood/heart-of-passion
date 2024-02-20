@@ -11,6 +11,8 @@ import {
   useDisclosure,
   Text,
 } from "@chakra-ui/react";
+import { useRouter } from "next/router";
+import { trpc } from "~/utils/api";
 import React, { useMemo } from "react";
 import { TriangleDownIcon } from "@chakra-ui/icons";
 import fonts from "src/common/theme/fonts";
@@ -19,7 +21,7 @@ import { useEffect, useState } from "react";
 import FundList from "~/components/funds/FundList";
 import { Fund } from "~/common/types";
 import { NewFundModal } from "~/components/NewFundModal";
-
+/*
 const dummyFunds = [
   {
     name: "Nikola Tesla",
@@ -88,7 +90,7 @@ const dummyFunds = [
     source: "Event 2",
   },
 ];
-
+*/
 export default function RaisedFunds() {
   const [filter, setFilter] = useState("category");
 
@@ -118,6 +120,37 @@ export default function RaisedFunds() {
 
   let dummyYear = 2023;
 
+  const router = useRouter();
+  const { id: retreatId }: { id?: string } = router.query;
+
+  // const chapter
+  // const 
+  const fundsData = trpc.fund.getFunds.useQuery(retreatId!).data;
+
+  // const trpcUtils = trpc.useContext();
+  // const updateFund = trpc.fund.updateFund.useMutation({
+  //   onSuccess: () => {
+  //     trpcUtils.fund.invalidate();
+  //   },
+  // });
+  // const createFund = trpc.fund.createFund.useMutation({
+  //   onSuccess: () => {
+  //     trpcUtils.fund.invalidate();
+  //   },
+  // });
+  // const deleteFund = trpc.fund.deleteFund.useMutation({
+  //   onSuccess: () => {
+  //     trpcUtils.fund.invalidate();
+  //   },
+  // });
+
+  // const deleteEventHandler = () => {
+  //   if (eventToEdit) {
+  //     deleteEvent.mutate(eventToEdit._id);
+  //   }
+  //   onCloseModal();
+  // };
+  /*
   const dummy_funds = useMemo(
     () => [
       {
@@ -189,13 +222,14 @@ export default function RaisedFunds() {
     ],
     [],
   );
+  */
 
   const [funds, setFunds] = useState([] as Fund[]);
 
   useEffect(() => {
     // clear funds so it doesn't add every time the page is re-rendered
     setFunds([]);
-    dummy_funds?.forEach((fund: any) => {
+    fundsData?.forEach((fund: any) => {
       setFunds((funds) => [
         ...funds,
         {
@@ -206,7 +240,7 @@ export default function RaisedFunds() {
         },
       ]);
     });
-  }, [dummy_funds]);
+  }, [fundsData]);
 
   const totalAmount = funds.reduce((total, fund) => total + fund.amount, 0);
 
@@ -242,7 +276,10 @@ export default function RaisedFunds() {
         // Sort by date ascending (earliest to latest)
         funds.sort((a, b) => {
           // Convert dates to timestamps explicitly
-          return new Date(a.date).getTime() - new Date(b.date).getTime();
+          const dateA = new Date(a.date.year, a.date.month - 1, a.date.date);
+          const dateB = new Date(b.date.year, b.date.month - 1, b.date.date);
+          return dateA.getTime() - dateB.getTime();
+          // return new Date(a.date).getTime() - new Date(b.date).getTime();
         });
         return [{ title: "Date", funds: funds }];
       }
@@ -257,7 +294,7 @@ export default function RaisedFunds() {
 
   return (
     <Box>
-      <Sidebar chapter={dummyChapter} year={dummyYear} retreatId={"dummy"} />
+      <Sidebar chapter={dummyChapter} year={dummyYear} retreatId={retreatId} />
       <Stack
         spacing={4}
         alignItems={"right"}

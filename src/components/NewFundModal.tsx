@@ -83,6 +83,7 @@ export const NewFundModal = ({
       setAmountError(FundError.Empty);
       return false; // Return false to prevent saving
     }
+    
     onCloseModal();
     return true;
   };
