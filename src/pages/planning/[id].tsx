@@ -18,7 +18,7 @@ export enum PlanningSort {
 
 export default function Planning() {
   const router = useRouter();
-  const { id: chapterId }: { id?: string } = router.query;
+  const { id: chapterId, id: fundraiserId }: { id?: string } = router.query;
 
   const {
     isOpen: isOpenFundraisingPlanningModal,
@@ -37,11 +37,11 @@ export default function Planning() {
     enabled: !!chapterId,
   })?.data;
 
-  const fundraiser = trpc.fundraiser.getFundraiser.useQuery(chapterId!, {
-    enabled: !!chapterId,
-  });
+  const fundraiser = trpc.fundraiser.getFundraisers.useQuery(fundraiserId!, {
+    enabled: !!fundraiserId,
+  }).data;
 
-  //const fundraiser = fundraiserRouter.getFundraisers()
+  //console.log(fundraiser)
 
   const toast = useToast();
   const trpcUtils = trpc.useUtils();
@@ -132,7 +132,7 @@ export default function Planning() {
               <PlanningHandler
                 sortMethod={sortMethod}
                 eventsByYear={eventsByYear}
-                fundraiser={fundraiser.data}
+                fundraiser={fundraiser}
               />
             </Box>
           </Box>
