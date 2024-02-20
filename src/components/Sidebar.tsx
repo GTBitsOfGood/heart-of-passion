@@ -273,6 +273,7 @@ const Sidebar = ({
                 justifyContent="left"
                 backgroundColor={clicked == 5 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
+                  router.push(`/fundraising-expenses/${retreatId}/`);
                   setClicked(5);
                 }}
               >
