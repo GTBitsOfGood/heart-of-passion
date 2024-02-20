@@ -77,9 +77,7 @@ function BacklogYearContainer({
             sortedEvents.map((event) => {
               return (
                 <PlanningCard
-                  openCopyModal={openCopyModal}
                   key={event.name}
-                  event={event}
                   fundraiser={fundraiser}
                 />
               );

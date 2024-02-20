@@ -7,6 +7,7 @@ import Sidebar from "~/components/Sidebar";
 import Select from "react-select";
 import PlanningHandler from "~/components/FundraisingPlanning/PlanningHandler";
 import BacklogCopyModal from "~/components/Backlog/BacklogCopyModal";
+import { FundraisingPlanningModal } from "~/components/FundraisingPlanningModal";
 import { Event } from "~/common/types";
 
 export enum BacklogSort {
@@ -15,9 +16,16 @@ export enum BacklogSort {
   HighestCost = "Highest Cost",
 }
 
+
 export default function Backlog() {
   const router = useRouter();
   const { id: chapterId }: { id?: string } = router.query;
+
+  const {
+    isOpen: isOpenFundraisingPlanningModal,
+    onOpen: onOpenFundraisingPlanningModal,
+    onClose: onCloseFundraisingPlanningModal,
+  } = useDisclosure();
 
   const eventsByYear = trpc.retreat.getAllEventsForChapter.useQuery(
     chapterId!,
@@ -128,7 +136,7 @@ export default function Backlog() {
                   />
                     <Button
                         colorScheme="twitter"
-                        // onClick={null}
+                        onClick={onOpenFundraisingPlanningModal}
                         fontWeight="400"
                         color="white"
                         bg="hop_blue.500"
@@ -139,6 +147,10 @@ export default function Backlog() {
                         >
                         ADD FUNDRAISER
                     </Button>
+                    <FundraisingPlanningModal
+                      isOpen={isOpenFundraisingPlanningModal}
+                      onClose={onCloseFundraisingPlanningModal}
+                    />
                 </Box>
               </Box>
               <PlanningHandler

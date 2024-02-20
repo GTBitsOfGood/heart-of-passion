@@ -2,18 +2,13 @@ import { Box, Text } from "@chakra-ui/react";
 import { DateObject, Event, Fundraiser } from "~/common/types";
 
 export default function PlanningCard({
-  event,
   fundraiser,
-  openCopyModal,
 }: {
-  event: Event;
   fundraiser: Fundraiser;
-  openCopyModal: (event: Event) => void;
 }) {
 
   return (
     <Box
-      onClick={() => openCopyModal(event)}
       border={"2px solid #D9D9D9"}
       paddingX={4}
       paddingY={6}
