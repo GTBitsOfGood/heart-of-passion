@@ -34,10 +34,11 @@ export default function BacklogCopyModal({
       <NewEventModal
         isOpen={isOpen}
         onClose={onClose}
-        isCopy={true}
+        isCopy={false}
         copyToCurrentRetreat={copyToCurrentRetreat}
         retreatId="temp"
         copyEvent={event}
+        isFundraiser={true}
       />
     </>
   );
