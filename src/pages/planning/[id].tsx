@@ -6,18 +6,17 @@ import "@fontsource/oswald/700.css";
 import Sidebar from "~/components/Sidebar";
 import Select from "react-select";
 import PlanningHandler from "~/components/FundraisingPlanning/PlanningHandler";
-import BacklogCopyModal from "~/components/Backlog/BacklogCopyModal";
 import { FundraisingPlanningModal } from "~/components/FundraisingPlanningModal";
-import { Event } from "~/common/types";
+import { Fundraiser } from "~/common/types";
+import { fundraiserRouter } from "~/server/api/routers/fundraiser";
 
-export enum BacklogSort {
+export enum PlanningSort {
   ViewByDate = "View by Date",
   LowestCost = "Lowest Cost",
   HighestCost = "Highest Cost",
 }
 
-
-export default function Backlog() {
+export default function Planning() {
   const router = useRouter();
   const { id: chapterId }: { id?: string } = router.query;
 
@@ -38,9 +37,14 @@ export default function Backlog() {
     enabled: !!chapterId,
   })?.data;
 
+  //const [fundraisers, setFundraisers] = useState<Fundraiser[]>([]);
+
   const fundraiser = trpc.fundraiser.getFundraiser.useQuery(chapterId!, {
     enabled: !!chapterId,
   });
+  
+
+  //const fundraiser = fundraiserRouter.getFundraisers()
 
   const toast = useToast();
   const trpcUtils = trpc.useUtils();
@@ -52,39 +56,14 @@ export default function Backlog() {
       },
     });
 
-  const sortOptions = Object.values(BacklogSort).map((sortMethod) => ({
+  const sortOptions = Object.values(PlanningSort).map((sortMethod) => ({
     value: sortMethod,
     label: sortMethod,
   }));
-  const [sortMethod, setSortMethod] = useState<BacklogSort>(
-    BacklogSort.ViewByDate,
+  const [sortMethod, setSortMethod] = useState<PlanningSort>(
+    PlanningSort.ViewByDate,
   );
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const [eventToCopy, setEventToCopy] = useState<Event | undefined>(undefined);
-
-  const openCopyModal = (event: Event) => {
-    setEventToCopy(event);
-    onOpen();
-  };
-
-  const copyToCurrentRetreat = () => {
-    if (!eventToCopy) return;
-
-    createEventInLatestRetreat.mutate({
-      chapterId: chapterId!,
-      eventDetails: eventToCopy,
-    });
-    toast({
-      title: "Success",
-      description: "You successfully copied the event!",
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
-    onClose();
-  };
 
   return (
     <>
@@ -154,7 +133,6 @@ export default function Backlog() {
                 </Box>
               </Box>
               <PlanningHandler
-                openCopyModal={openCopyModal}
                 sortMethod={sortMethod}
                 eventsByYear={eventsByYear}
                 fundraiser={fundraiser.data}
@@ -163,14 +141,6 @@ export default function Backlog() {
           </Box>
         )}
       </Box>
-
-      <BacklogCopyModal
-        event={eventToCopy}
-        copyToCurrentRetreat={copyToCurrentRetreat}
-        isOpen={isOpen}
-        onOpen={onOpen}
-        onClose={onClose}
-      />
     </>
   );
 }

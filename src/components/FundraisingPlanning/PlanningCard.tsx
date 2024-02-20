@@ -20,7 +20,7 @@ export default function PlanningCard({
         fontSize={20}
         height={70}
         marginBottom={49}
-      >
+      >  
         {fundraiser.name}
       </Text>
       <Box display={"flex"} justifyContent={"space-between"}>

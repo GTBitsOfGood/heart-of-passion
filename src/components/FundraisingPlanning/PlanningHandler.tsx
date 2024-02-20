@@ -5,15 +5,14 @@ import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 
 import PlanningCard from "~/components/FundraisingPlanning/PlanningCard";
 import { Event, EventsByYear, Fundraiser } from "~/common/types";
-import { BacklogSort } from "~/pages/backlog/[id]";
+import { PlanningSort } from "~/pages/planning/[id]";
 
 export default function PlanningHandler({
   sortMethod,
   eventsByYear,
   fundraiser,
-  openCopyModal,
 }: {
-  sortMethod: BacklogSort;
+  sortMethod: PlanningSort;
   eventsByYear: EventsByYear;
   fundraiser: Fundraiser;
   openCopyModal: (event: Event) => void;
@@ -24,7 +23,6 @@ export default function PlanningHandler({
   return (
     <Box>
       <BacklogYearContainer
-        openCopyModal={openCopyModal}
         events={allEvents}
         sortMethod={sortMethod}
         fundraiser={fundraiser}
@@ -37,16 +35,13 @@ export default function PlanningHandler({
 function BacklogYearContainer({
   events: unsortedEvents,
   sortMethod,
-  openCopyModal,
   fundraiser,
 }: {
   events: Event[];
-  sortMethod: BacklogSort;
-  openCopyModal: (event: Event) => void;
+  sortMethod: PlanningSort;
   fundraiser: Fundraiser;
 }) {
   const [open, setOpen] = useState(true);
-  const toggleOpen = () => setOpen(!open);
 
   const sortedEvents = useMemo(() => {
     const eventsWithCost = unsortedEvents.map((event) => {
@@ -74,10 +69,9 @@ function BacklogYearContainer({
   return (
         <Box display={"flex"} gap={10} flexWrap={"wrap"} marginTop={7}>
           {open &&
-            sortedEvents.map((event) => {
+            sortedEvents.map((fundraiser) => {
               return (
                 <PlanningCard
-                  key={event.name}
                   fundraiser={fundraiser}
                 />
               );

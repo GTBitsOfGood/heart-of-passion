@@ -62,7 +62,6 @@ const Sidebar = ({
       router.push(`/chapters/${chapterId}`);
       return;
     }
-
     router.push(`/${path}/${retreatId}`);
   }
 
