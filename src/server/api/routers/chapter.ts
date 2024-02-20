@@ -78,7 +78,6 @@ export const chapterRouter = createTRPCRouter({
           throw new TRPCError({ code: "UNAUTHORIZED" });
         }
       }
-
       const chapter = await ChapterModel.findOneAndUpdate(
         { name: opts.input.oldChapterName },
         { name: opts.input.newChapterName },
