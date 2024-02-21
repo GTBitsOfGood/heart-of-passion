@@ -40,7 +40,7 @@ import {
     expenses: ExpenseWithDateAndEvent[];
   };
   
-  export default function RetreatExpenses() {
+  export default function FundraiserExpenses() {
     const [filter, setFilter] = useState("category");
   
     const {
@@ -61,9 +61,9 @@ import {
     }
   
     const router = useRouter();
-    const { id: retreatId }: { id?: string } = router.query;
-    const eventData = trpc.event.getEvents.useQuery(retreatId!).data;
-    const expenseData = trpc.event.getExpenses.useQuery(retreatId!).data;
+    const { id: retreatId, id: fundraiserId }: { id?: string } = router.query;
+    const eventData = trpc.fundraiser.getFundraisers.useQuery(fundraiserId!).data;
+    const expenseData = trpc.fundraiser.getExpenses.useQuery(fundraiserId!).data;
   
     const chapter = trpc.chapter.getChapterByRetreatId.useQuery(retreatId!).data;
   
