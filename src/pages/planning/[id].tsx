@@ -120,7 +120,6 @@ export default function Planning() {
               </Box>
               <PlanningHandler
                 sortMethod={sortMethod}
-                eventsByYear={eventsByYear}
                 fundraiser={fundraiser}
               />
             </Box>
