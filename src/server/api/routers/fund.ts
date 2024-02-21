@@ -9,7 +9,7 @@ import {
 } from "~/server/api/trpc";
 
 import { FundModel, IFund } from "~/server/models/Fund";
-import { Chapter, Expense, fundSchema, fundDateSchema } from "~/common/types";
+import { Chapter, Expense, fundSchema } from "~/common/types";
 import { EventModel, IEvent } from "~/server/models/Event";
 import { RetreatModel, IRetreat } from "~/server/models/Retreat";
 
@@ -24,6 +24,7 @@ export const fundRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       const { retreatId, fundDetails } = input;
+      console.log(fundDetails);
       const fund = new FundModel({ retreatId, ...fundDetails });
       await fund.save();
     }),

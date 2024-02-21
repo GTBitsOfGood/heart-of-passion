@@ -20,12 +20,14 @@ import { useEffect, useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
 import { Fund } from "~/common/types";
 import { FloatingAlert } from "./FloatingAlert";
+import { trpc } from "~/utils/api";
 
 type NewFundProps = {
   isOpen: boolean;
   onClose: () => void;
   fundData: Fund;
   create: boolean;
+  retreatId: string;
 };
 
 // Validate and parse date
@@ -58,12 +60,13 @@ export const NewFundModal = ({
   onClose,
   fundData,
   create,
+  retreatId,
 }: NewFundProps) => {
   // Form Data
-  const [name, setName] = useState("");
-  const [date, setDate] = useState("");
-  const [amount, setAmount] = useState("");
-  const [source, setSource] = useState("Select Source");
+  const [name, setName] = useState(fundData.name);
+  const [date, setDate] = useState(fundData.date);
+  const [amount, setAmount] = useState(fundData.amount);
+  const [source, setSource] = useState(fundData.source);
 
   // Error
   const [amountError, setAmountError] = useState<FundError>(FundError.None);
@@ -74,6 +77,40 @@ export const NewFundModal = ({
     onOpen: onOpenError,
   } = useDisclosure({ defaultIsOpen: false });
 
+  const trpcUtils = trpc.useContext();
+  const updateFund = trpc.fund.updateFund.useMutation({
+    onSuccess: () => {
+      trpcUtils.fund.invalidate();
+    },
+  });
+  const createFund = trpc.fund.createFund.useMutation({
+    onSuccess: () => {
+      trpcUtils.fund.invalidate();
+    },
+  });
+  const deleteFund = trpc.fund.deleteFund.useMutation({
+    onSuccess: () => {
+      trpcUtils.fund.invalidate();
+    },
+  });
+
+  /*
+  const toast = useToast();
+  const submit = () => {
+    if (!validate()) {
+      return;
+    }
+
+    if (eventToEdit) {
+      updateEvent.mutate({ event: state.event, eventId: eventToEdit._id });
+    } else {
+      console.log(state.event);
+      createEvent.mutate({ eventDetails: state.event, retreatId });
+    }
+    onCloseModal();
+  };
+  */
+
   const onCloseModal = () => {
     onClose();
   };
@@ -83,7 +120,11 @@ export const NewFundModal = ({
       setAmountError(FundError.Empty);
       return false; // Return false to prevent saving
     }
-    
+    console.log(retreatId);
+    console.log(date);
+    console.log(name);
+    createFund.mutate({ retreatId: retreatId, fundDetails: { name: name, date: date, amount: amount, source: source} });
+    onCloseModal();
     onCloseModal();
     return true;
   };
@@ -102,7 +143,7 @@ export const NewFundModal = ({
     setSource(selectedOption);
   const handleAmountChange = (event: React.FormEvent<HTMLInputElement>) => {
     const inputValue = event.currentTarget.value;
-    setAmount(inputValue);
+    setAmount(Number(inputValue));
 
     // Validate the input and update the error state
     if (!inputValue) {
@@ -191,7 +232,7 @@ export const NewFundModal = ({
                   height="30px"
                   value={date}
                   onChange={handleDateChange}
-                  type="email"
+                  type="date"
                   required
                 />
                 <Box minHeight="20px" mt={2}>

@@ -121,11 +121,10 @@ export default function RaisedFunds() {
   let dummyYear = 2023;
 
   const router = useRouter();
-  const { id: retreatId }: { id?: string } = router.query;
+  const { id } = router.query;
+  const retreatId = id as string;
 
-  // const chapter
-  // const 
-  const fundsData = trpc.fund.getFunds.useQuery(retreatId!).data;
+  const fundsData = trpc.fund.getFunds.useQuery(retreatId).data;
 
   // const trpcUtils = trpc.useContext();
   // const updateFund = trpc.fund.updateFund.useMutation({
@@ -276,8 +275,8 @@ export default function RaisedFunds() {
         // Sort by date ascending (earliest to latest)
         funds.sort((a, b) => {
           // Convert dates to timestamps explicitly
-          const dateA = new Date(a.date.year, a.date.month - 1, a.date.date);
-          const dateB = new Date(b.date.year, b.date.month - 1, b.date.date);
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
           return dateA.getTime() - dateB.getTime();
           // return new Date(a.date).getTime() - new Date(b.date).getTime();
         });
@@ -405,6 +404,7 @@ export default function RaisedFunds() {
                 source: "Select Source",
               }}
               create={true}
+              retreatId={retreatId}
             />
           </Box>
         </Flex>
