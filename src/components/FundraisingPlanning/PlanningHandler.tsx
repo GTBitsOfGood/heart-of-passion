@@ -9,30 +9,29 @@ import { PlanningSort } from "~/pages/planning/[id]";
 
 export default function PlanningHandler({
   sortMethod,
-  fundraiser,
+  eventsByYear,
 }: {
   sortMethod: PlanningSort;
-  fundraiser: Fundraiser;
+  eventsByYear: EventsByYear;
 }) {
   // Combine all events into a single array
-  const allFundraisers = Object.values(fundraiser).flat();
+  //const allFundraisers = Object.values(eventsByYear).flat();
 
   return (
     <Box>
       <PlanningYearContainer
-        fundraiser={allFundraisers}
+        events={eventsByYear}
         sortMethod={sortMethod}
       />
     </Box>
   );
 }
 
-
 function PlanningYearContainer({
-  fundraiser: unsortedEvents,
+  events: unsortedEvents,
   sortMethod,
 }: {
-  fundraiser: Fundraiser[];
+  events: Fundraiser[];
   sortMethod: PlanningSort;
 }) {
   const [open, setOpen] = useState(true);

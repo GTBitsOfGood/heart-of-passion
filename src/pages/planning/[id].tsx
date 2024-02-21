@@ -26,20 +26,17 @@ export default function Planning() {
     onClose: onCloseFundraisingPlanningModal,
   } = useDisclosure();
 
-  const eventsByYear = trpc.retreat.getAllEventsForChapter.useQuery(
-    chapterId!,
-    {
-      enabled: !!chapterId,
-    },
-  )?.data;
+  const eventsByYear = trpc.fundraiser.getFundraisers.useQuery(fundraiserId!, {
+    enabled: !!fundraiserId,
+  }).data;
 
   const chapter = trpc.chapter.getChapterById.useQuery(chapterId!, {
     enabled: !!chapterId,
   })?.data;
 
-  const fundraiser = trpc.fundraiser.getFundraisers.useQuery(fundraiserId!, {
-    enabled: !!fundraiserId,
-  }).data;
+  // const fundraiser = trpc.fundraiser.getFundraisers.useQuery(fundraiserId!, {
+  //   enabled: !!fundraiserId,
+  // }).data;
 
   //console.log(fundraiser)
 
@@ -120,7 +117,7 @@ export default function Planning() {
               </Box>
               <PlanningHandler
                 sortMethod={sortMethod}
-                fundraiser={fundraiser}
+                eventsByYear={eventsByYear}
               />
             </Box>
           </Box>
