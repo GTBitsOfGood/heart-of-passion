@@ -4,19 +4,10 @@ import { fundSchema } from "~/common/types";
 
 const { Schema } = mongoose;
 
-// interface IFundDate extends z.infer<typeof fundDateSchema> {}
-
 export interface IFund extends z.infer<typeof fundSchema> {
   retreatId: mongoose.Types.ObjectId;
 }
 
-/*
-const FundDateSchema = new Schema<IFundDate>({
-  month: { type: Number, required: true },
-  date: { type: Number, required: true },
-  year: { type: Number, required: true },
-});
-*/
 
 export const FundSchema = new Schema<IFund>({
   retreatId: {
@@ -26,9 +17,11 @@ export const FundSchema = new Schema<IFund>({
   },
   name: {
     type: String,
+    required: true,
   },
   date: {
     type: String, // [{date: Date, from: time, to: time}]
+    required: true,
   },
   amount: {
     type: Number,
@@ -37,7 +30,7 @@ export const FundSchema = new Schema<IFund>({
   source: {
     ref: "Event",
     type: String,
-    // required: true,
+    required: true,
   },
 });
 

@@ -33,7 +33,16 @@ export const fundRouter = createTRPCRouter({
     .input(z.string())
     .query( async (opts) => {
       const funds = await FundModel.find({ retreatId: opts.input }).exec();
-      return funds;
+      return funds.map((f) => {
+        return {
+          retreatId: f.retreatId,
+          name: f.name,
+          date: f.date,
+          amount: f.amount,
+          source: f.source,
+          _id: f._id,
+        };
+      });
     }),
 /*
   getChapterByName: studentProcedure

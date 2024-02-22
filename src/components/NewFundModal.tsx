@@ -25,7 +25,6 @@ import { trpc } from "~/utils/api";
 type NewFundProps = {
   isOpen: boolean;
   onClose: () => void;
-  fundData: Fund;
   fund: Fund | null;
   create: boolean;
   retreatId: string;
@@ -59,7 +58,6 @@ const eventOptions = [
 export const NewFundModal = ({
   isOpen,
   onClose,
-  fundData,
   fund,
   create,
   retreatId,
@@ -72,12 +70,10 @@ export const NewFundModal = ({
 
   useEffect(() => {
     // clear funds so it doesn't add every time the page is re-rendered
-    if (fund) {
-      setName(fund?.name);
-      setDate(fund?.date);
-      setAmount(fund?.amount);
-      setSource(fund?.source);
-    }
+    setName(fund?fund.name:"");
+    setDate(fund?fund.date:"");
+    setAmount(fund?fund.amount:0);
+    setSource(fund?fund.source:"Select Source");
   }, [fund]);
 
   // Error
@@ -106,22 +102,6 @@ export const NewFundModal = ({
     },
   });
 
-  /*
-  const toast = useToast();
-  const submit = () => {
-    if (!validate()) {
-      return;
-    }
-
-    if (eventToEdit) {
-      updateEvent.mutate({ event: state.event, eventId: eventToEdit._id });
-    } else {
-      console.log(state.event);
-      createEvent.mutate({ eventDetails: state.event, retreatId });
-    }
-    onCloseModal();
-  };
-  */
 
   const onCloseModal = () => {
     onClose();
@@ -132,16 +112,21 @@ export const NewFundModal = ({
       setAmountError(FundError.Empty);
       return false; // Return false to prevent saving
     }
-    console.log(retreatId);
-    console.log(date);
-    console.log(name);
-    createFund.mutate({ retreatId: retreatId, fundDetails: { name: name, date: date, amount: amount, source: source} });
+    // console.log(retreatId);
+    // console.log(date);
+    // console.log(name);
+    console.log(fund?._id);
+    console.log(fund);
+    console.log(create);
+    if (create) createFund.mutate({ retreatId: retreatId, fundDetails: { name: name, date: date, amount: amount, source: source} });
+    else updateFund.mutate({fundId: fund?._id!, updates: { name: name, date: date, amount: amount, source: source} });
     onCloseModal();
     onCloseModal();
     return true;
   };
 
   const handleDelete = () => {
+    deleteFund.mutate(fund?._id!);
     onCloseModal();
     onCloseError();
     return true;
@@ -194,7 +179,7 @@ export const NewFundModal = ({
             <HStack align="start" spacing="55px">
               <FormControl>
                 <FormLabel textColor="black" fontWeight="600" mb="4px">
-                  Name
+                  Name*
                 </FormLabel>
                 <Input
                   placeholder="Jane Doe"
@@ -219,7 +204,7 @@ export const NewFundModal = ({
                   fontWeight="600"
                   mb="4px"
                 >
-                  Source
+                  Source*
                 </FormLabel>
                 <RadioDropdown
                   options={eventOptions}
@@ -232,7 +217,7 @@ export const NewFundModal = ({
             <HStack align="start" spacing="55px">
               <FormControl>
                 <FormLabel textColor="black" fontWeight="600" mb="4px">
-                  Date
+                  Date*
                 </FormLabel>
                 <Input
                   placeholder="2/24/2022"

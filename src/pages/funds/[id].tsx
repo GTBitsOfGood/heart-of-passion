@@ -46,9 +46,15 @@ export default function RaisedFunds() {
   }
   function handleSelectFund(fund: Fund) {
     console.log('Fund selected', fund);
+    console.log(funds);
     setSelectedFund(fund);
     onOpenAddFundModal();
   };
+  function handleClose() {
+    console.log('close new fund model');
+    setSelectedFund(null);
+    onCloseAddFundModal();
+  }
 
   const router = useRouter();
   const { id } = router.query;
@@ -85,6 +91,7 @@ export default function RaisedFunds() {
           date: fund.date,
           amount: fund.amount,
           source: fund.source,
+          _id: fund._id,
         },
       ]);
     });
@@ -246,28 +253,16 @@ export default function RaisedFunds() {
             </Button>
             <NewFundModal
               isOpen={isOpenAddFundModal}
-              onClose={onCloseAddFundModal}
-              fundData={{
-                name: "",
-                date: "",
-                amount: 0,
-                source: "Select Source",
-              }}
+              onClose={handleClose}
               fund={selectedFund}
               create={true}
               retreatId={retreatId}
             />
             {selectedFund != null && (<NewFundModal
               isOpen={isOpenAddFundModal}
-              onClose={onCloseAddFundModal}
-              fundData={{
-                name: "",
-                date: "",
-                amount: 0,
-                source: "Select Source",
-              }}
+              onClose={handleClose}
               fund={selectedFund}
-              create={true}
+              create={false}
               retreatId={retreatId}
             />)}
           </Box>
