@@ -21,78 +21,13 @@ import { useEffect, useState } from "react";
 import FundList from "~/components/funds/FundList";
 import { Fund } from "~/common/types";
 import { NewFundModal } from "~/components/NewFundModal";
-/*
-const dummyFunds = [
-  {
-    name: "Nikola Tesla",
-    date: "11/01/2023",
-    amount: 500,
-    source: "Donation",
-  },
-  {
-    name: "Rosalind Franklin",
-    date: "10/15/2023",
-    amount: 120,
-    source: "Event 1",
-  },
-  {
-    name: "Stephen Hawking",
-    date: "09/20/2023",
-    amount: 200,
-    source: "Event 1",
-  },
-  {
-    name: "Ada Lovelace",
-    date: "08/05/2023",
-    amount: 750,
-    source: "Event 2",
-  },
-  {
-    name: "Albert Einstein",
-    date: "11/01/2023",
-    amount: 500,
-    source: "Donation",
-  },
-  {
-    name: "Galileo Galilei",
-    date: "10/15/2023",
-    amount: 120,
-    source: "Event 1",
-  },
-  {
-    name: "Grace Hopper",
-    date: "09/20/2023",
-    amount: 200,
-    source: "Event 1",
-  },
-  {
-    name: "Carl Sagan",
-    date: "08/05/2023",
-    amount: 750,
-    source: "Event 2",
-  },
-  {
-    name: "Marie Curie",
-    date: "11/01/2023",
-    amount: 500,
-    source: "Donation",
-  },
-  {
-    name: "Gregor Mendel",
-    date: "10/15/2023",
-    amount: 120,
-    source: "Event 1",
-  },
-  {
-    name: "Leonardo da Vinci",
-    date: "08/05/2023",
-    amount: 750,
-    source: "Event 2",
-  },
-];
-*/
+import { IRetreat } from "~/server/models/Retreat";
+import { IChapter } from "~/server/models/Chapter";
+
+
 export default function RaisedFunds() {
   const [filter, setFilter] = useState("category");
+  const [selectedFund, setSelectedFund] = useState<Fund | null>(null);
 
   const {
     isOpen: isOpenFilterPopover,
@@ -109,6 +44,15 @@ export default function RaisedFunds() {
     setFilter(filter);
     onCloseFilterPopover();
   }
+  function handleSelectFund(fund: Fund) {
+    console.log('Fund selected', fund);
+    setSelectedFund(fund);
+    onOpenAddFundModal();
+  };
+
+  const router = useRouter();
+  const { id } = router.query;
+  const retreatId = id as string;
 
   let dummyChapter = {
     id: "1",
@@ -117,112 +61,17 @@ export default function RaisedFunds() {
     fundExpected: 5180,
     fundActual: 2600,
   };
-
   let dummyYear = 2023;
 
-  const router = useRouter();
-  const { id } = router.query;
-  const retreatId = id as string;
+  const [retreat, setRetreat] = useState<IRetreat>();
+  const [chapter, setChapter] = useState<IChapter>();
+  const retreatData = trpc.retreat.getRetreatById.useQuery(retreatId).data!;
+  const chapterData = trpc.chapter.getChapterById.useQuery(retreatData?.chapterId, {
+    // The query will run only if the chapterId is available
+    enabled: !!retreatData?.chapterId,
+  });
 
   const fundsData = trpc.fund.getFunds.useQuery(retreatId).data;
-
-  // const trpcUtils = trpc.useContext();
-  // const updateFund = trpc.fund.updateFund.useMutation({
-  //   onSuccess: () => {
-  //     trpcUtils.fund.invalidate();
-  //   },
-  // });
-  // const createFund = trpc.fund.createFund.useMutation({
-  //   onSuccess: () => {
-  //     trpcUtils.fund.invalidate();
-  //   },
-  // });
-  // const deleteFund = trpc.fund.deleteFund.useMutation({
-  //   onSuccess: () => {
-  //     trpcUtils.fund.invalidate();
-  //   },
-  // });
-
-  // const deleteEventHandler = () => {
-  //   if (eventToEdit) {
-  //     deleteEvent.mutate(eventToEdit._id);
-  //   }
-  //   onCloseModal();
-  // };
-  /*
-  const dummy_funds = useMemo(
-    () => [
-      {
-        name: "Nikola Tesla",
-        date: "11/01/2023",
-        amount: 500,
-        source: "Donation",
-      },
-      {
-        name: "Rosalind Franklin",
-        date: "10/15/2023",
-        amount: 120,
-        source: "Event 1",
-      },
-      {
-        name: "Stephen Hawking",
-        date: "09/20/2023",
-        amount: 200,
-        source: "Event 1",
-      },
-      {
-        name: "Ada Lovelace",
-        date: "08/05/2023",
-        amount: 750,
-        source: "Event 2",
-      },
-      {
-        name: "Albert Einstein",
-        date: "11/01/2023",
-        amount: 500,
-        source: "Donation",
-      },
-      {
-        name: "Galileo Galilei",
-        date: "10/15/2023",
-        amount: 120,
-        source: "Event 1",
-      },
-      {
-        name: "Grace Hopper",
-        date: "09/20/2023",
-        amount: 200,
-        source: "Event 1",
-      },
-      {
-        name: "Carl Sagan",
-        date: "08/05/2023",
-        amount: 750,
-        source: "Event 2",
-      },
-      {
-        name: "Marie Curie",
-        date: "11/01/2023",
-        amount: 500,
-        source: "Donation",
-      },
-      {
-        name: "Gregor Mendel",
-        date: "10/15/2023",
-        amount: 120,
-        source: "Event 1",
-      },
-      {
-        name: "Leonardo da Vinci",
-        date: "08/05/2023",
-        amount: 750,
-        source: "Event 2",
-      },
-    ],
-    [],
-  );
-  */
-
   const [funds, setFunds] = useState([] as Fund[]);
 
   useEffect(() => {
@@ -240,6 +89,7 @@ export default function RaisedFunds() {
       ]);
     });
   }, [fundsData]);
+
 
   const totalAmount = funds.reduce((total, fund) => total + fund.amount, 0);
 
@@ -288,12 +138,12 @@ export default function RaisedFunds() {
   })();
 
   const groupsRendered = groups.map((gr: any) => (
-    <FundList key={gr.title} {...gr} />
+    <FundList handleSelectFund = {handleSelectFund} key={gr.title} {...gr} />
   ));
 
   return (
     <Box>
-      <Sidebar chapter={dummyChapter} year={dummyYear} retreatId={retreatId} />
+      <Sidebar chapter={chapter?chapter:dummyChapter} year={retreat?retreat.year:dummyYear} retreatId={retreatId} />
       <Stack
         spacing={4}
         alignItems={"right"}
@@ -403,9 +253,23 @@ export default function RaisedFunds() {
                 amount: 0,
                 source: "Select Source",
               }}
+              fund={selectedFund}
               create={true}
               retreatId={retreatId}
             />
+            {selectedFund != null && (<NewFundModal
+              isOpen={isOpenAddFundModal}
+              onClose={onCloseAddFundModal}
+              fundData={{
+                name: "",
+                date: "",
+                amount: 0,
+                source: "Select Source",
+              }}
+              fund={selectedFund}
+              create={true}
+              retreatId={retreatId}
+            />)}
           </Box>
         </Flex>
         {groupsRendered}

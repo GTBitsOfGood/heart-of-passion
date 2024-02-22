@@ -26,6 +26,7 @@ type NewFundProps = {
   isOpen: boolean;
   onClose: () => void;
   fundData: Fund;
+  fund: Fund | null;
   create: boolean;
   retreatId: string;
 };
@@ -59,14 +60,25 @@ export const NewFundModal = ({
   isOpen,
   onClose,
   fundData,
+  fund,
   create,
   retreatId,
 }: NewFundProps) => {
   // Form Data
-  const [name, setName] = useState(fundData.name);
-  const [date, setDate] = useState(fundData.date);
-  const [amount, setAmount] = useState(fundData.amount);
-  const [source, setSource] = useState(fundData.source);
+  const [name, setName] = useState(fund?fund.name:"");
+  const [date, setDate] = useState(fund?fund.date:"");
+  const [amount, setAmount] = useState(fund?fund.amount:0);
+  const [source, setSource] = useState(fund?fund.source:"Select Source");
+
+  useEffect(() => {
+    // clear funds so it doesn't add every time the page is re-rendered
+    if (fund) {
+      setName(fund?.name);
+      setDate(fund?.date);
+      setAmount(fund?.amount);
+      setSource(fund?.source);
+    }
+  }, [fund]);
 
   // Error
   const [amountError, setAmountError] = useState<FundError>(FundError.None);

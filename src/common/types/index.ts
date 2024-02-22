@@ -114,6 +114,7 @@ export const fundDateSchema = z.object({
 });
 */
 export const fundSchema = z.object({
+  _id: z.string().optional(),
   name: z.string(),
   date: z.string(),
   amount: z.number(),

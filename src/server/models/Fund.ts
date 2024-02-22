@@ -7,7 +7,6 @@ const { Schema } = mongoose;
 // interface IFundDate extends z.infer<typeof fundDateSchema> {}
 
 export interface IFund extends z.infer<typeof fundSchema> {
-  _id: string;
   retreatId: mongoose.Types.ObjectId;
 }
 
