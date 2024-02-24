@@ -6,10 +6,14 @@ type FundEntryProps = {
   handleSelectFund: (arg0: Fund) => void;
   fund: Fund;
 };
-export default function Fund({ handleSelectFund, fund }:FundEntryProps) {
+export default function Fund({ handleSelectFund, fund }: FundEntryProps) {
   return (
     <>
-      <Grid templateColumns="repeat(9, 1fr)" gap={4} onClick={() => handleSelectFund(fund)}>
+      <Grid
+        templateColumns="repeat(9, 1fr)"
+        gap={4}
+        onClick={() => handleSelectFund(fund)}
+      >
         <GridItem colSpan={2}>
           <Box fontFamily={fonts.nunito}>{fund.date}</Box>
         </GridItem>

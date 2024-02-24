@@ -1,4 +1,11 @@
-import { Box, Spinner, Text, useDisclosure, useToast, Button } from "@chakra-ui/react";
+import {
+  Box,
+  Spinner,
+  Text,
+  useDisclosure,
+  useToast,
+  Button,
+} from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { trpc } from "~/utils/api";
@@ -96,23 +103,23 @@ export default function Planning() {
                       IndicatorSeparator: () => null,
                     }}
                   />
-                    <Button
-                        colorScheme="twitter"
-                        onClick={onOpenFundraisingPlanningModal}
-                        fontWeight="400"
-                        color="white"
-                        bg="hop_blue.500"
-                        fontFamily="oswald"
-                        height="50px"
-                        fontSize="20px"
-                        marginBottom="10px"
-                        >
-                        ADD FUNDRAISER
-                    </Button>
-                    <FundraisingPlanningModal
-                      isOpen={isOpenFundraisingPlanningModal}
-                      onClose={onCloseFundraisingPlanningModal}
-                    />
+                  <Button
+                    colorScheme="twitter"
+                    onClick={onOpenFundraisingPlanningModal}
+                    fontWeight="400"
+                    color="white"
+                    bg="hop_blue.500"
+                    fontFamily="oswald"
+                    height="50px"
+                    fontSize="20px"
+                    marginBottom="10px"
+                  >
+                    ADD FUNDRAISER
+                  </Button>
+                  <FundraisingPlanningModal
+                    isOpen={isOpenFundraisingPlanningModal}
+                    onClose={onCloseFundraisingPlanningModal}
+                  />
                 </Box>
               </Box>
               <PlanningHandler

@@ -26,7 +26,14 @@ export default function DonorList({ title, donors }: DonorList) {
           {open ? (
             donors?.map((donor: Donor) => (
               <DonorEntry
-                key={donor.donorEmail + donor.donorName + donor.studentName + donor.status + donor.sponsorLevel + donor.source}
+                key={
+                  donor.donorEmail +
+                  donor.donorName +
+                  donor.studentName +
+                  donor.status +
+                  donor.sponsorLevel +
+                  donor.source
+                }
                 {...donor}
               />
             ))

@@ -165,8 +165,10 @@ export default function DummyPage() {
         >
           ADD FUNDRAISER
         </Button>
-        <FundraisingPlanningModal isOpen={isOpenFundraisingModal}
-          onClose={onCloseFundraisingModal}/>
+        <FundraisingPlanningModal
+          isOpen={isOpenFundraisingModal}
+          onClose={onCloseFundraisingModal}
+        />
         <NewExpenseModal
           isOpen={isOpenAddExpenseModal}
           onClose={onCloseAddExpenseModal}

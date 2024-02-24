@@ -24,7 +24,6 @@ import { NewFundModal } from "~/components/NewFundModal";
 import { IRetreat } from "~/server/models/Retreat";
 import { IChapter } from "~/server/models/Chapter";
 
-
 export default function RaisedFunds() {
   const [filter, setFilter] = useState("category");
   const [selectedFund, setSelectedFund] = useState<Fund | null>(null);
@@ -45,13 +44,13 @@ export default function RaisedFunds() {
     onCloseFilterPopover();
   }
   function handleSelectFund(fund: Fund) {
-    console.log('Fund selected', fund);
+    console.log("Fund selected", fund);
     console.log(funds);
     setSelectedFund(fund);
     onOpenAddFundModal();
-  };
+  }
   function handleClose() {
-    console.log('close new fund model');
+    console.log("close new fund model");
     setSelectedFund(null);
     onCloseAddFundModal();
   }
@@ -72,10 +71,13 @@ export default function RaisedFunds() {
   const [retreat, setRetreat] = useState<IRetreat>();
   const [chapter, setChapter] = useState<IChapter>();
   const retreatData = trpc.retreat.getRetreatById.useQuery(retreatId).data!;
-  const chapterData = trpc.chapter.getChapterById.useQuery(retreatData?.chapterId, {
-    // The query will run only if the chapterId is available
-    enabled: !!retreatData?.chapterId,
-  });
+  const chapterData = trpc.chapter.getChapterById.useQuery(
+    retreatData?.chapterId,
+    {
+      // The query will run only if the chapterId is available
+      enabled: !!retreatData?.chapterId,
+    },
+  );
 
   const fundsData = trpc.fund.getFunds.useQuery(retreatId).data;
   const [funds, setFunds] = useState([] as Fund[]);
@@ -96,7 +98,6 @@ export default function RaisedFunds() {
       ]);
     });
   }, [fundsData]);
-
 
   const totalAmount = funds.reduce((total, fund) => total + fund.amount, 0);
 
@@ -145,12 +146,16 @@ export default function RaisedFunds() {
   })();
 
   const groupsRendered = groups.map((gr: any) => (
-    <FundList handleSelectFund = {handleSelectFund} key={gr.title} {...gr} />
+    <FundList handleSelectFund={handleSelectFund} key={gr.title} {...gr} />
   ));
 
   return (
     <Box>
-      <Sidebar chapter={chapter?chapter:dummyChapter} year={retreat?retreat.year:dummyYear} retreatId={retreatId} />
+      <Sidebar
+        chapter={chapter ? chapter : dummyChapter}
+        year={retreat ? retreat.year : dummyYear}
+        retreatId={retreatId}
+      />
       <Stack
         spacing={4}
         alignItems={"right"}
@@ -258,13 +263,15 @@ export default function RaisedFunds() {
               create={true}
               retreatId={retreatId}
             />
-            {selectedFund != null && (<NewFundModal
-              isOpen={isOpenAddFundModal}
-              onClose={handleClose}
-              fund={selectedFund}
-              create={false}
-              retreatId={retreatId}
-            />)}
+            {selectedFund != null && (
+              <NewFundModal
+                isOpen={isOpenAddFundModal}
+                onClose={handleClose}
+                fund={selectedFund}
+                create={false}
+                retreatId={retreatId}
+              />
+            )}
           </Box>
         </Flex>
         {groupsRendered}

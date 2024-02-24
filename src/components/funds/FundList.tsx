@@ -9,11 +9,14 @@ interface FundListProps extends FundListType {
 }
 
 // export default function FundList({ title, funds }: FundListType) {
-export default function FundList({ handleSelectFund, title, funds }: FundListProps) {
-
+export default function FundList({
+  handleSelectFund,
+  title,
+  funds,
+}: FundListProps) {
   const [open, setOpen] = useState(true);
   const fundsRendered = funds.map((fund: Fund) => (
-    <FundEntry handleSelectFund = {handleSelectFund} fund={fund} />
+    <FundEntry handleSelectFund={handleSelectFund} fund={fund} />
     // <FundEntry setSelectedFund = {setSelectedFund} fundId = {fund._id!} key={fund.name} {...fund} /> //key needs to be from backend once we wire it up, cannot have duplicates
   ));
   return (

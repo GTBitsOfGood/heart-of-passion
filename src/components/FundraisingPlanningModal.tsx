@@ -508,7 +508,6 @@ export const FundraisingPlanningModal = ({
             </ModalBody>
           )}
         </HStack>
-        
       </ModalContent>
     </Modal>
   );

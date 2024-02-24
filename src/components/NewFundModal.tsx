@@ -63,17 +63,17 @@ export const NewFundModal = ({
   retreatId,
 }: NewFundProps) => {
   // Form Data
-  const [name, setName] = useState(fund?fund.name:"");
-  const [date, setDate] = useState(fund?fund.date:"");
-  const [amount, setAmount] = useState(fund?fund.amount:0);
-  const [source, setSource] = useState(fund?fund.source:"Select Source");
+  const [name, setName] = useState(fund ? fund.name : "");
+  const [date, setDate] = useState(fund ? fund.date : "");
+  const [amount, setAmount] = useState(fund ? fund.amount : 0);
+  const [source, setSource] = useState(fund ? fund.source : "Select Source");
 
   useEffect(() => {
     // clear funds so it doesn't add every time the page is re-rendered
-    setName(fund?fund.name:"");
-    setDate(fund?fund.date:"");
-    setAmount(fund?fund.amount:0);
-    setSource(fund?fund.source:"Select Source");
+    setName(fund ? fund.name : "");
+    setDate(fund ? fund.date : "");
+    setAmount(fund ? fund.amount : 0);
+    setSource(fund ? fund.source : "Select Source");
   }, [fund]);
 
   // Error
@@ -102,7 +102,6 @@ export const NewFundModal = ({
     },
   });
 
-
   const onCloseModal = () => {
     onClose();
   };
@@ -118,8 +117,16 @@ export const NewFundModal = ({
     console.log(fund?._id);
     console.log(fund);
     console.log(create);
-    if (create) createFund.mutate({ retreatId: retreatId, fundDetails: { name: name, date: date, amount: amount, source: source} });
-    else updateFund.mutate({fundId: fund?._id!, updates: { name: name, date: date, amount: amount, source: source} });
+    if (create)
+      createFund.mutate({
+        retreatId: retreatId,
+        fundDetails: { name: name, date: date, amount: amount, source: source },
+      });
+    else
+      updateFund.mutate({
+        fundId: fund?._id!,
+        updates: { name: name, date: date, amount: amount, source: source },
+      });
     onCloseModal();
     onCloseModal();
     return true;

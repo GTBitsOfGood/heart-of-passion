@@ -19,10 +19,7 @@ export default function PlanningHandler({
 
   return (
     <Box>
-      <PlanningYearContainer
-        events={eventsByYear}
-        sortMethod={sortMethod}
-      />
+      <PlanningYearContainer events={eventsByYear} sortMethod={sortMethod} />
     </Box>
   );
 }
@@ -60,15 +57,11 @@ function PlanningYearContainer({
   }, [unsortedEvents, sortMethod]);
 
   return (
-        <Box display={"flex"} gap={10} flexWrap={"wrap"} marginTop={7}>
-          {open &&
-            sortedEvents.map((f) => {
-              return (
-                <PlanningCard
-                  fundraiser={f}
-                />
-              );
-            })}
-        </Box>
+    <Box display={"flex"} gap={10} flexWrap={"wrap"} marginTop={7}>
+      {open &&
+        sortedEvents.map((f) => {
+          return <PlanningCard fundraiser={f} />;
+        })}
+    </Box>
   );
 }

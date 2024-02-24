@@ -8,7 +8,6 @@ export interface IFund extends z.infer<typeof fundSchema> {
   retreatId: mongoose.Types.ObjectId;
 }
 
-
 export const FundSchema = new Schema<IFund>({
   retreatId: {
     ref: "Retreat",

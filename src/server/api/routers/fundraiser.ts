@@ -32,7 +32,10 @@ export const fundraiserRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       const { retreatId, fundraiserDetails } = input;
-      const fundraiser = new FundraiserModel({ retreatId, ...fundraiserDetails });
+      const fundraiser = new FundraiserModel({
+        retreatId,
+        ...fundraiserDetails,
+      });
       await fundraiser.save();
     }),
   updateExpense: studentProcedure

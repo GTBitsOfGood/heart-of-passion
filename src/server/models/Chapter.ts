@@ -3,8 +3,7 @@ import { chapterSchema } from "~/common/types";
 import { number, z } from "zod";
 const { Schema } = mongoose;
 
-export interface IChapter extends z.infer<typeof chapterSchema>{
-}
+export interface IChapter extends z.infer<typeof chapterSchema> {}
 
 const ChapterSchema = new Schema<IChapter>({
   name: {

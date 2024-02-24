@@ -14,7 +14,7 @@ import { EventModel, IEvent } from "~/server/models/Event";
 import { RetreatModel, IRetreat } from "~/server/models/Retreat";
 
 export const fundRouter = createTRPCRouter({
-//create
+  //create
   createFund: studentProcedure
     .input(
       z.object({
@@ -28,23 +28,21 @@ export const fundRouter = createTRPCRouter({
       const fund = new FundModel({ retreatId, ...fundDetails });
       await fund.save();
     }),
-//get
-  getFunds: studentProcedure
-    .input(z.string())
-    .query( async (opts) => {
-      const funds = await FundModel.find({ retreatId: opts.input }).exec();
-      return funds.map((f) => {
-        return {
-          retreatId: f.retreatId,
-          name: f.name,
-          date: f.date,
-          amount: f.amount,
-          source: f.source,
-          _id: f._id,
-        };
-      });
-    }),
-/*
+  //get
+  getFunds: studentProcedure.input(z.string()).query(async (opts) => {
+    const funds = await FundModel.find({ retreatId: opts.input }).exec();
+    return funds.map((f) => {
+      return {
+        retreatId: f.retreatId,
+        name: f.name,
+        date: f.date,
+        amount: f.amount,
+        source: f.source,
+        _id: f._id,
+      };
+    });
+  }),
+  /*
   getChapterByName: studentProcedure
     .input(z.string())
     .query(async (opts): Promise<Chapter> => {
@@ -83,7 +81,7 @@ export const fundRouter = createTRPCRouter({
     return await Promise.all(chapters.map(processChapter));
   }),
 */
-//update
+  //update
   updateFund: studentProcedure
     .input(
       z.object({
@@ -94,16 +92,16 @@ export const fundRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       const { fundId, updates } = input;
       const updateData = { ...updates };
-      const fund = await FundModel.findByIdAndUpdate(fundId, updateData, { new: true }).exec();
+      const fund = await FundModel.findByIdAndUpdate(fundId, updateData, {
+        new: true,
+      }).exec();
       return fund;
     }),
-//delete
-  deleteFund: studentProcedure
-    .input(z.string())
-    .mutation(async ({ input }) => {
-      await FundModel.findByIdAndDelete(input).exec();
-    }),
-/*
+  //delete
+  deleteFund: studentProcedure.input(z.string()).mutation(async ({ input }) => {
+    await FundModel.findByIdAndDelete(input).exec();
+  }),
+  /*
   getLatestRetreatId: studentProcedure.input(z.string()).query(async (opts) => {
     const retreat = await RetreatModel.findOne({ chapterId: opts.input })
       .sort("-year")
