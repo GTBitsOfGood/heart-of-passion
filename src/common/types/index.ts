@@ -123,7 +123,15 @@ export const eventsByYearSchema = z.record(z.number(), z.array(eventSchema));
 export type EventsByYear = z.infer<typeof eventsByYearSchema>;
 
 // Fund
+/*
+export const fundDateSchema = z.object({
+  month: z.number(),
+  date: z.number(),
+  year: z.number(),
+});
+*/
 export const fundSchema = z.object({
+  _id: z.string().optional(),
   name: z.string(),
   date: z.string(),
   amount: z.number(),

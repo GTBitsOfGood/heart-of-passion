@@ -304,7 +304,7 @@ const Sidebar = ({
                 justifyContent="left"
                 backgroundColor={clicked == 7 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
-                  setClicked(7);
+                  router.push(`/backlog/fundraiser/${chapterId}/`);
                 }}
               >
                 Previous Fundraiser Events
@@ -320,6 +320,7 @@ const Sidebar = ({
             backgroundColor={clicked == 8 ? "#54A9DD" : "#F9F9F9"}
             onClick={() => {
               setClicked(8);
+              router.push(`/funds/${retreatId}/`);
             }}
           >
             Raised Funds
