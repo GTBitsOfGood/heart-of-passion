@@ -142,6 +142,7 @@ export default function CalendarCard({
         display={"flex"}
         border="1px solid #D9D9D9"
         marginBottom={"16px"}
+        cursor="pointer"
         onClick={onOpen}
         overflow={variant < -1 ? "visible" : "hidden"}
         ref={parentRef}
