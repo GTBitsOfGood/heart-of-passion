@@ -28,11 +28,13 @@ const generateData = async (chapterId: string) => {
         name: "Venue Rental",
         cost: 2000,
         type: "Miscellaneous",
+        numUnits: 1,
       },
       {
         name: "Transportation",
         cost: 500,
         type: "Transportation",
+        numUnits: 1,
       },
       {
         name: "Guest Speaker",
@@ -67,6 +69,7 @@ const generateData = async (chapterId: string) => {
         cost: 600,
         type: "Transportation",
         notes: "Professional art instructor.",
+        numUnits: 1,
       },
     ],
   });

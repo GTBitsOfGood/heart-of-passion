@@ -12,6 +12,7 @@ import { ChapterModel, IChapter } from "~/server/models/Chapter";
 import { Chapter, Expense } from "~/common/types";
 import { EventModel, IEvent } from "~/server/models/Event";
 import { RetreatModel, IRetreat } from "~/server/models/Retreat";
+import { TRPCError } from "@trpc/server";
 
 export const chapterRouter = createTRPCRouter({
   createChapter: adminProcedure
@@ -69,6 +70,14 @@ export const chapterRouter = createTRPCRouter({
   updateChapter: mentorProcedure
     .input(z.object({ oldChapterName: z.string(), newChapterName: z.string() }))
     .mutation(async (opts) => {
+      if (opts.ctx.user?.role == "mentor") {
+        const chapterID = await ChapterModel.findOne({
+          name: opts.input.oldChapterName,
+        });
+        if (opts.ctx.user?.chapter != chapterID?._id) {
+          throw new TRPCError({ code: "UNAUTHORIZED" });
+        }
+      }
       const chapter = await ChapterModel.findOneAndUpdate(
         { name: opts.input.oldChapterName },
         { name: opts.input.newChapterName },
