@@ -11,7 +11,7 @@ import {
 import { EventModel, ExpenseModel, IEvent } from "~/server/models/Event";
 import { RetreatModel } from "~/server/models/Retreat";
 export const eventRouter = createTRPCRouter({
-  updateEvent: studentProcedure
+  updateEvent: mentorProcedure
     .input(
       z.object({
         eventId: z.string(),
@@ -22,7 +22,7 @@ export const eventRouter = createTRPCRouter({
       const { eventId, event } = input;
       await EventModel.findByIdAndUpdate(eventId, event).exec();
     }),
-  createEvent: studentProcedure
+  createEvent: mentorProcedure
     .input(
       z.object({
         retreatId: z.string(),
@@ -34,7 +34,7 @@ export const eventRouter = createTRPCRouter({
       const event = new EventModel({ retreatId, ...eventDetails });
       await event.save();
     }),
-  updateExpense: studentProcedure
+  updateExpense: mentorProcedure
     .input(
       z.object({
         expenseId: z.string(),
@@ -45,7 +45,7 @@ export const eventRouter = createTRPCRouter({
       const { expenseId, expense } = input;
       await ExpenseModel.findByIdAndUpdate(expenseId, expense).exec();
     }),
-  updateExpenseByEvent: studentProcedure
+  updateExpenseByEvent: mentorProcedure
     .input(
       z.object({
         expenseId: z.string(),
@@ -68,7 +68,7 @@ export const eventRouter = createTRPCRouter({
       event.expenses[expenseIndex] = expense;
       await event.save();
     }),
-  createExpense: studentProcedure
+  createExpense: mentorProcedure
     .input(
       z.object({
         retreatId: z.string().optional(),
@@ -86,7 +86,7 @@ export const eventRouter = createTRPCRouter({
         await expense.save();
       }
     }),
-  createEventInLatestRetreat: studentProcedure
+  createEventInLatestRetreat: mentorProcedure
     .input(
       z.object({
         chapterId: z.string(),
@@ -110,11 +110,9 @@ export const eventRouter = createTRPCRouter({
       await event.save();
     }),
 
-  deleteEvent: studentProcedure
-    .input(z.string())
-    .mutation(async ({ input }) => {
-      await EventModel.findByIdAndDelete(input).exec();
-    }),
+  deleteEvent: mentorProcedure.input(z.string()).mutation(async ({ input }) => {
+    await EventModel.findByIdAndDelete(input).exec();
+  }),
 
   getEvent: studentProcedure.input(z.string()).query(async (opts) => {
     const event = await EventModel.findOne({ _id: opts.input }).exec();
