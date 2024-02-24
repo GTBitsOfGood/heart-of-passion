@@ -4,7 +4,6 @@ import {
   adminProcedure,
   createTRPCRouter,
   mentorProcedure,
-  publicProcedure,
   studentProcedure,
 } from "~/server/api/trpc";
 
@@ -60,7 +59,7 @@ export const chapterRouter = createTRPCRouter({
     const chapter = await ChapterModel.findOne({
       name: opts.input,
     }).exec();
-    return chapter?._id ?? "";
+    return chapter?._id.toString() ?? "";
   }),
   getChapters: studentProcedure.query(async (opts): Promise<Chapter[]> => {
     const chapters = (await ChapterModel.find().exec())!;
@@ -93,9 +92,9 @@ export const chapterRouter = createTRPCRouter({
   }),
 });
 
-async function processChapter(chapterModel: IChapter): Promise<Chapter> {
+async function processChapter(chapterModel: Chapter): Promise<Chapter> {
   let retreat: IRetreat | null = (await RetreatModel.findOne({
-    chapterId: chapterModel._id,
+    chapterId: chapterModel.id,
   })
     .sort("-year")
     .exec())!;
@@ -116,6 +115,6 @@ async function processChapter(chapterModel: IChapter): Promise<Chapter> {
     totalCost: cost,
     fundExpected: 5100,
     fundActual: 2600,
-    id: chapterModel._id,
+    id: chapterModel.id,
   };
 }

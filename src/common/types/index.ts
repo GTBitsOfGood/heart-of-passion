@@ -145,8 +145,8 @@ export const fundraiserSchema = z.object({
   email: z.string().email(),
   profit: z
     .number({
-      required_error: "Age is required",
-      invalid_type_error: "Age must be a number",
+      required_error: "Profit is required",
+      invalid_type_error: "Profit must be a number",
     })
     .nonnegative(),
   expenses: z.array(expenseSchema),

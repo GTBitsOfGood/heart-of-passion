@@ -12,7 +12,7 @@ import { ExpenseModel } from "~/server/models/Event";
 import { FundraiserModel } from "~/server/models/Fundraiser";
 
 export const fundraiserRouter = createTRPCRouter({
-  updateEvent: studentProcedure
+  updateFundraiser: studentProcedure
     .input(
       z.object({
         fundraiserId: z.string(),
@@ -23,7 +23,7 @@ export const fundraiserRouter = createTRPCRouter({
       const { fundraiserId, fundraiser } = input;
       await FundraiserModel.findByIdAndUpdate(fundraiserId, fundraiser).exec();
     }),
-  createEvent: studentProcedure
+  createFundraiser: studentProcedure
     .input(
       z.object({
         retreatId: z.string(),

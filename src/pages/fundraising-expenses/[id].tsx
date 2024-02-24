@@ -30,12 +30,12 @@ function getTotalCost(expense: Expense) {
 }
 
 type ExpenseWithDateAndEvent = Expense & {
-  dates: DateObject[];
+  date: string;
   event: string;
   eventId?: string;
 };
 
-export type ExpenseGroup = {
+type ExpenseGroup = {
   title: string;
   expenses: ExpenseWithDateAndEvent[];
 };
@@ -63,23 +63,8 @@ export default function FundraiserExpenses() {
   const router = useRouter();
   const { id: retreatId, id: fundraiserId }: { id?: string } = router.query;
   const eventData = trpc.fundraiser.getFundraisers.useQuery(fundraiserId!).data;
-  const expenseData = trpc.fundraiser.getExpenses.useQuery(fundraiserId!).data;
 
   const chapter = trpc.chapter.getChapterByRetreatId.useQuery(retreatId!).data;
-
-  // const expenses: ExpenseWithDateAndEvent[] =
-  //   eventData
-  //     ?.map((event) => {
-  //       return event.expenses.map((expense) => {
-  //         return {
-  //           ...expense,
-  //           dates: event.dates,
-  //           event: event.name,
-  //         };
-  //       });
-  //     })
-  //     ?.flat() ?? [];
-
   const expenses: ExpenseWithDateAndEvent[] = [];
 
   if (eventData) {
@@ -87,20 +72,10 @@ export default function FundraiserExpenses() {
       event.expenses.forEach((expense) => {
         expenses.push({
           ...expense,
-          dates: event.dates,
+          date: event.date,
           event: event.name,
           eventId: event._id,
         });
-      });
-    });
-  }
-
-  if (expenseData) {
-    expenseData.forEach((expense) => {
-      expenses.push({
-        ...expense,
-        dates: [],
-        event: "General",
       });
     });
   }
@@ -130,25 +105,13 @@ export default function FundraiserExpenses() {
         return [{ title: "Lowest to Highest", expenses: expenses }];
       } else {
         // filter === "date"
-        const uniques = [
-          ...new Set(
-            expenses
-              .filter((u) => u.dates.length === 1)
-              .map((u) => u.dates[0]!.day.toString()),
-          ),
-        ];
+        const uniques = [...new Set(expenses.map((u) => u.date))];
         uniques.push("Other Expenses"); // for expenses with multiple dates
         const emap: Map<string, ExpenseWithDateAndEvent[]> = new Map(
           uniques.map((e) => [e, new Array()]),
         ); // map of val to empty array
         expenses?.forEach((e) => {
-          emap
-            .get(
-              e.dates.length !== 1
-                ? "Other Expenses"
-                : e.dates[0]!.day.toString(),
-            )
-            ?.push(e);
+          emap.get(e.date)?.push(e);
         });
         const categories = uniques?.map((e) => ({
           title: e,

@@ -44,13 +44,10 @@ export default function RaisedFunds() {
     onCloseFilterPopover();
   }
   function handleSelectFund(fund: Fund) {
-    console.log("Fund selected", fund);
-    console.log(funds);
     setSelectedFund(fund);
     onOpenAddFundModal();
   }
   function handleClose() {
-    console.log("close new fund model");
     setSelectedFund(null);
     onCloseAddFundModal();
   }
@@ -79,27 +76,9 @@ export default function RaisedFunds() {
     },
   );
 
-  const fundsData = trpc.fund.getFunds.useQuery(retreatId).data;
-  const [funds, setFunds] = useState([] as Fund[]);
+  const funds = trpc.fundraiser.getFundraisers.useQuery(retreatId).data!;
 
-  useEffect(() => {
-    // clear funds so it doesn't add every time the page is re-rendered
-    setFunds([]);
-    fundsData?.forEach((fund: any) => {
-      setFunds((funds) => [
-        ...funds,
-        {
-          name: fund.name,
-          date: fund.date,
-          amount: fund.amount,
-          source: fund.source,
-          _id: fund._id,
-        },
-      ]);
-    });
-  }, [fundsData]);
-
-  const totalAmount = funds.reduce((total, fund) => total + fund.amount, 0);
+  const totalAmount = funds?.reduce((total, fund) => total + fund.profit, 0);
 
   const groups = (function () {
     if (funds && funds.length > 0) {
@@ -123,11 +102,11 @@ export default function RaisedFunds() {
           .sort((a, b) => a.title.localeCompare(b.title));
       } else if (filter === "highest amount") {
         // Sort by amount descending (highest to lowest)
-        funds.sort((a, b) => b.amount - a.amount);
+        funds.sort((a, b) => b.profit - a.profit);
         return [{ title: "Highest to Lowest", funds: funds }];
       } else if (filter === "lowest amount") {
         // Sort by amount ascending (lowest to highest)
-        funds.sort((a, b) => a.amount - b.amount);
+        funds.sort((a, b) => a.profit - b.profit);
         return [{ title: "Lowest to Highest", funds: funds }];
       } else {
         // Sort by date ascending (earliest to latest)

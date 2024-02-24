@@ -86,19 +86,19 @@ export const NewFundModal = ({
   } = useDisclosure({ defaultIsOpen: false });
 
   const trpcUtils = trpc.useContext();
-  const updateFund = trpc.fund.updateFund.useMutation({
+  const updateFund = trpc.fundraiser.updateFundraiser.useMutation({
     onSuccess: () => {
-      trpcUtils.fund.invalidate();
+      trpcUtils.fundraiser.invalidate();
     },
   });
-  const createFund = trpc.fund.createFund.useMutation({
+  const createFund = trpc.fundraiser.createFundraiser.useMutation({
     onSuccess: () => {
-      trpcUtils.fund.invalidate();
+      trpcUtils.fundraiser.invalidate();
     },
   });
-  const deleteFund = trpc.fund.deleteFund.useMutation({
+  const deleteFund = trpc.fundraiser.deleteFundraiser.useMutation({
     onSuccess: () => {
-      trpcUtils.fund.invalidate();
+      trpcUtils.fundraiser.invalidate();
     },
   });
 
@@ -111,21 +111,32 @@ export const NewFundModal = ({
       setAmountError(FundError.Empty);
       return false; // Return false to prevent saving
     }
-    // console.log(retreatId);
-    // console.log(date);
-    // console.log(name);
-    console.log(fund?._id);
-    console.log(fund);
-    console.log(create);
+
     if (create)
       createFund.mutate({
         retreatId: retreatId,
-        fundDetails: { name: name, date: date, amount: amount, source: source },
+        fundraiserDetails: {
+          name: name,
+          location: "TODO LOCATION",
+          date: date,
+          contactName: "TODO DATE",
+          email: "TODO@todo.com",
+          profit: 1, // TODOj
+          expenses: [],
+        },
       });
     else
       updateFund.mutate({
-        fundId: fund?._id!,
-        updates: { name: name, date: date, amount: amount, source: source },
+        fundraiserId: fund?._id!,
+        fundraiser: {
+          name: name,
+          location: "TODO LOCATION",
+          date: date,
+          contactName: "TODO DATE",
+          email: "TODO@todo.com",
+          profit: 1, // TODOj
+          expenses: [],
+        },
       });
     onCloseModal();
     onCloseModal();

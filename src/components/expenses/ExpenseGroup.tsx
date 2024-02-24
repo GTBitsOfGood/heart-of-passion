@@ -5,7 +5,13 @@ import ExpenseEntry from "./ExpenseEntry";
 import { Expense } from "src/common/types";
 import { ExpenseGroup } from "~/pages/retreat-expenses/[id]";
 
-export default function ExpenseGroup({ title, expenses }: ExpenseGroup) {
+export default function ExpenseGroup({
+  title,
+  expenses,
+}: {
+  title: string;
+  expenses: Expense[];
+}) {
   const [open, setOpen] = useState(true);
 
   return (

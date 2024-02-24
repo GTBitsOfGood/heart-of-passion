@@ -9,32 +9,35 @@ import { PlanningSort } from "~/pages/planning/[id]";
 
 export default function PlanningHandler({
   sortMethod,
-  eventsByYear,
+  fundraisers,
 }: {
   sortMethod: PlanningSort;
-  eventsByYear: EventsByYear;
+  fundraisers: Fundraiser[];
 }) {
   // Combine all events into a single array
   //const allFundraisers = Object.values(eventsByYear).flat();
 
   return (
     <Box>
-      <PlanningYearContainer events={eventsByYear} sortMethod={sortMethod} />
+      <PlanningYearContainer
+        fundraisers={fundraisers}
+        sortMethod={sortMethod}
+      />
     </Box>
   );
 }
 
 function PlanningYearContainer({
-  events: unsortedEvents,
+  fundraisers,
   sortMethod,
 }: {
-  events: Fundraiser[];
+  fundraisers: Fundraiser[];
   sortMethod: PlanningSort;
 }) {
   const [open, setOpen] = useState(true);
 
   const sortedEvents = useMemo(() => {
-    const eventsWithCost = unsortedEvents.map((event) => {
+    const fundraisersWithCost = fundraisers.map((event) => {
       const totalCost = event.expenses.reduce((acc, { cost }) => acc + cost, 0);
 
       return { ...event, totalCost };
@@ -42,25 +45,27 @@ function PlanningYearContainer({
 
     switch (sortMethod) {
       case "View by Date":
-        return eventsWithCost;
+        return fundraisersWithCost;
       case "Lowest Cost":
-        return eventsWithCost.sort((event1, event2) => {
+        return fundraisersWithCost.sort((event1, event2) => {
           return event1.totalCost - event2.totalCost;
         });
       case "Highest Cost":
-        return eventsWithCost.sort((event1, event2) => {
+        return fundraisersWithCost.sort((event1, event2) => {
           return event2.totalCost - event1.totalCost;
         });
       default:
-        return eventsWithCost;
+        return fundraisersWithCost;
     }
-  }, [unsortedEvents, sortMethod]);
+  }, [fundraisers, sortMethod]);
 
   return (
     <Box display={"flex"} gap={10} flexWrap={"wrap"} marginTop={7}>
       {open &&
         sortedEvents.map((f) => {
-          return <PlanningCard fundraiser={f} />;
+          return (
+            <PlanningCard key={f.name + f.date + f.location} fundraiser={f} />
+          );
         })}
     </Box>
   );
