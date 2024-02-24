@@ -1,8 +1,38 @@
 import { z } from "zod";
+import { sponsorLevelOptions, sourceOptions, statusOptions } from "~/server/models/Donor";
 
 // Role
 export const roleSchema = z.enum(["student", "mentor", "admin"]);
 export type Role = z.infer<typeof roleSchema>;
+
+// Donor
+
+export const sponsorLevelSchema = z.enum(sponsorLevelOptions as [string, ...string[]])
+export type SponsorLevel = z.infer<typeof sponsorLevelSchema>;
+
+export const sourceSchema = z.enum(sourceOptions as [string, ...string[]])
+export type Source = z.infer<typeof sourceSchema>;
+
+export const statusDonorSchema = z.enum(statusOptions as [string, ...string[]])
+export type Status = z.infer<typeof statusDonorSchema>;
+
+export const donorSchema = z
+  .object({
+    studentName: z.string(),
+    donorName: z.string(),
+    donorEmail: z.string().email(),
+    source: sourceSchema,
+    sponsorLevel: sponsorLevelSchema,
+    status: statusDonorSchema,
+  });
+export type Donor = z.infer<typeof donorSchema>;
+
+//DonorList
+export const donorListSchema = z.object({
+  title: z.string(),
+  donors: z.array(donorSchema),
+});
+export type DonorList = z.infer<typeof donorListSchema>;
 
 // User
 export const userSchema = z

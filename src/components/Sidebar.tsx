@@ -289,7 +289,7 @@ const Sidebar = ({
                 justifyContent="left"
                 backgroundColor={clicked == 6 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
-                  setClicked(6);
+                  handleClick("hospitality");;
                 }}
               >
                 Hospitality

@@ -3,6 +3,7 @@ import { userRouter } from "./routers/user";
 import { chapterRouter } from "./routers/chapter";
 import { retreatRouter } from "./routers/retreat";
 import { eventRouter } from "./routers/event";
+import { donorRouter } from "./routers/donor";
 import { fundraiserRouter } from "./routers/fundraiser";
 
 /**
@@ -15,6 +16,7 @@ export const appRouter = createTRPCRouter({
   chapter: chapterRouter,
   retreat: retreatRouter,
   event: eventRouter,
+  donor: donorRouter,
   fundraiser: fundraiserRouter
 });
 
