@@ -4,10 +4,17 @@ import { useState } from "react";
 import FundEntry from "./FundEntry";
 import { Fund, FundList as FundListType } from "src/common/types";
 
-export default function FundList({ title, funds }: FundListType) {
+interface FundListProps extends FundListType {
+  handleSelectFund: (arg0: Fund) => void;
+}
+
+// export default function FundList({ title, funds }: FundListType) {
+export default function FundList({ handleSelectFund, title, funds }: FundListProps) {
+
   const [open, setOpen] = useState(true);
   const fundsRendered = funds.map((fund: Fund) => (
-    <FundEntry key={fund.name} {...fund} /> //key needs to be from backend once we wire it up, cannot have duplicates
+    <FundEntry handleSelectFund = {handleSelectFund} fund={fund} />
+    // <FundEntry setSelectedFund = {setSelectedFund} fundId = {fund._id!} key={fund.name} {...fund} /> //key needs to be from backend once we wire it up, cannot have duplicates
   ));
   return (
     <>

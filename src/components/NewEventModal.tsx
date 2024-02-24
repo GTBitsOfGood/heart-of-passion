@@ -48,6 +48,7 @@ type NewEventProps = {
   isCopy: boolean;
   copyEvent?: Event;
   copyToCurrentRetreat?: () => void;
+  isFundraiser?: boolean;
 };
 
 type Action<T extends keyof Event = keyof Event> =
@@ -105,6 +106,7 @@ export const NewEventModal = ({
   isCopy,
   copyEvent,
   copyToCurrentRetreat,
+  isFundraiser,
 }: NewEventProps) => {
   let [state, dispatch] = useReducer(
     reducer,
@@ -580,28 +582,50 @@ export const NewEventModal = ({
                     0,
                   )}`}</Text>
                 </HStack>
-                <FormControl marginTop="29px">
-                  <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
-                    Notes
-                  </FormLabel>
-                  <Textarea
-                    color="black"
-                    border="1px solid #D9D9D9"
-                    borderRadius="0px"
-                    height="150px"
-                    width="389px"
-                    value={state.event.notes}
-                    onChange={(e) =>
-                      dispatch({
-                        type: "UPDATE_EVENT",
-                        field: "notes",
-                        value: e.target.value,
-                      })
-                    }
-                  />
-                </FormControl>
+                {state.event.notes && (
+                  <FormControl marginTop="29px">
+                    <FormLabel
+                      fontWeight="500"
+                      fontSize="20px"
+                      lineHeight="27px"
+                    >
+                      Notes
+                    </FormLabel>
+                    <Textarea
+                      color="black"
+                      border="1px solid #D9D9D9"
+                      borderRadius="0px"
+                      height="150px"
+                      width="389px"
+                      value={state.event.notes}
+                      onChange={(e) =>
+                        dispatch({
+                          type: "UPDATE_EVENT",
+                          field: "notes",
+                          value: e.target.value,
+                        })
+                      }
+                    />
+                  </FormControl>
+                )}
               </VStack>
-              {!sidebarOpen && isCopy ? (
+              {!sidebarOpen && isFundraiser ? (
+                <>
+                  <HStack width="100%" justifyContent="end" mb="34px">
+                    <Button
+                      colorScheme="twitter"
+                      bg="hop_blue.500"
+                      onClick={submit}
+                      borderRadius="6px"
+                      fontFamily="heading"
+                      fontSize="20px"
+                      fontWeight="400"
+                    >
+                      ADD TO FUNDRAISING PLANNING
+                    </Button>
+                  </HStack>
+                </>
+              ) : isCopy ? (
                 <>
                   <HStack width="100%" justifyContent="end" mb="34px">
                     <Button
