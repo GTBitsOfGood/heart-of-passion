@@ -2,15 +2,19 @@ import { Box, Grid, GridItem } from "@chakra-ui/react";
 import { Fund } from "~/common/types";
 import fonts from "~/common/theme/fonts";
 
-export default function Fund({ name, date, amount, source }: Fund) {
+type FundEntryProps = {
+  handleSelectFund: (arg0: Fund) => void;
+  fund: Fund;
+};
+export default function Fund({ handleSelectFund, fund }:FundEntryProps) {
   return (
     <>
-      <Grid templateColumns="repeat(9, 1fr)" gap={4}>
+      <Grid templateColumns="repeat(9, 1fr)" gap={4} onClick={() => handleSelectFund(fund)}>
         <GridItem colSpan={2}>
-          <Box fontFamily={fonts.nunito}>{date}</Box>
+          <Box fontFamily={fonts.nunito}>{fund.date}</Box>
         </GridItem>
         <GridItem colSpan={2}>
-          <Box fontFamily={fonts.nunito}>{name}</Box>
+          <Box fontFamily={fonts.nunito}>{fund.name}</Box>
         </GridItem>
         <GridItem colSpan={2}>
           <Box
@@ -23,11 +27,11 @@ export default function Fund({ name, date, amount, source }: Fund) {
             textTransform="capitalize"
             mr="3em"
           >
-            {source}
+            {fund.source}
           </Box>
         </GridItem>
         <GridItem colSpan={1}>
-          <Box fontFamily={fonts.nunito}>${amount}</Box>
+          <Box fontFamily={fonts.nunito}>${fund.amount}</Box>
         </GridItem>
       </Grid>
     </>
