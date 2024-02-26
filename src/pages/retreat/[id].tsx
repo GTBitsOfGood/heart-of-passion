@@ -5,8 +5,13 @@ import {
   Grid,
   GridItem,
   HStack,
+  Slider,
+  SliderFilledTrack,
+  SliderThumb,
+  SliderTrack,
   Spacer,
   Text,
+  Tooltip,
   useDisclosure,
 } from "@chakra-ui/react";
 import CalendarCard from "src/components/Calendar/CalendarCard";
@@ -33,7 +38,6 @@ export default function Calendar() {
     onOpen: onAddEventOpen,
   } = useDisclosure();
 
-  const [zoomLevel, setZoomLevel] = useState<boolean>(false)
 
   const openAddEventModal = () => {
     onAddEventOpen();
@@ -50,7 +54,9 @@ export default function Calendar() {
   }).data;
 
   const counter = 0; // used to check if next element was within the "from" and "to" time range, if it is then preents duplicate entries
-  const zoom = zoomLevel ? 2.0 : 1;
+  const [zoomLevel, setZoomLevel] = useState<number>(1);
+  const [showToolTip, setShowToolTip] = useState<boolean>(false);
+  const zoom = zoomLevel;
   return (
     <Grid gridTemplateColumns="436px 1fr" h="100vh">
       <GridItem zIndex={1000}>
@@ -73,24 +79,56 @@ export default function Calendar() {
         )}
         <Box
           position="fixed"
-          bottom="10px"
-          right="10px"
+          bottom="40px"
+          right="20px"
+          display="flex"
+          flexDirection="row"
+          gap="10px"
         >
-          <Button
-            colorScheme="twitter"
-            fontWeight="400"
-            color="white"
-            bg="hop_blue.500"
-            fontFamily="oswald"
-            height="50px"
-            fontSize="20px"
-            onClick={openAddEventModal}
+          <Box display="flex" flexDirection="column" justifyContent="space-between">
+            <Button onClick={() => setZoomLevel(zoomLevel < 2 ? 2 : 1)}>
+              {zoomLevel > 1 ? "Zoom 1x" : "Zoom 2x"}
+            </Button>
+            <Button
+              colorScheme="twitter"
+              fontWeight="400"
+              color="white"
+              bg="hop_blue.500"
+              fontFamily="oswald"
+              height="50px"
+              fontSize="20px"
+              onClick={openAddEventModal}
+            >
+              ADD EVENT
+            </Button>
+          </Box>
+          <Slider
+            min={1}
+            max={5}
+            defaultValue={1}
+            step={0.001}
+            onChange={v => setZoomLevel(v)}
+            orientation='vertical'
+            minH='32'
           >
-            ADD EVENT
-          </Button>
-          <Button onClick={() => setZoomLevel(!zoomLevel)}>
-            {zoomLevel ? "Zoom out" : "Zoom in"}
-          </Button>
+            <SliderTrack>
+              <SliderFilledTrack />
+            </SliderTrack>
+            <Tooltip
+              hasArrow
+              bg='teal.500'
+              color='white'
+              placement='top'
+              isOpen={showToolTip}
+              label={`${zoomLevel}x`}
+            >
+              <SliderThumb
+                onMouseEnter={() => setShowToolTip(true)}
+                onMouseLeave={() => setShowToolTip(false)}
+              />
+
+            </Tooltip>
+          </Slider>
         </Box>
         <NewEventModal
           retreatId={retreat?._id ?? ""}
