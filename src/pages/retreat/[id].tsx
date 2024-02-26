@@ -26,7 +26,7 @@ import { useState, useEffect, useRef } from "react";
 import { computeHeight } from "~/components/Calendar/computeHeight";
 import { IEvent } from "~/server/models/Event";
 import { NewEventModal } from "~/components/NewEventModal";
-import CalendarContent from "./CalendarContent";
+import CalendarContent from "../../components/Calendar/CalendarContent";
 
 export default function Calendar() {
   const router = useRouter();
