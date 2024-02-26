@@ -31,10 +31,12 @@ export default function CalendarContent({
   events,
   counter,
   retreatId,
+  zoom
 }: {
   events: IEvent[];
   counter: number;
   retreatId: string;
+  zoom: number;
 }) {
   const StrToMinutes = (timeStr: string): number => {
     const parts = timeStr.match(/(\d+):(\d+) (\w+)/);
@@ -134,7 +136,7 @@ export default function CalendarContent({
             dates: [nextDateObject],
           };
 
-          var topY = computeHeight(nextFrom, currFrom, screen.height);
+          var topY = computeHeight(nextFrom, currFrom, screen.height, zoom);
           if (prevTop) {
             topY += prevTop;
           }
@@ -165,6 +167,7 @@ export default function CalendarContent({
                 date={dateObject}
                 event={event.event}
                 width={207}
+                zoom={zoom}
               />
             ) : (
               <>
@@ -174,6 +177,7 @@ export default function CalendarContent({
                   event={event.event}
                   width={103}
                   retreatId={retreatId}
+                  zoom={zoom}
                 />
                 <Box>
                   {nextEventsArray.map((nextEvent: any, index) => {
@@ -186,6 +190,7 @@ export default function CalendarContent({
                         date={nextEvent.nextDateObject}
                         event={nextEvent.nextEventObject}
                         width={103}
+                        zoom={zoom}
                       />
                     );
                   })}
@@ -203,6 +208,7 @@ export default function CalendarContent({
           date={dateObject}
           event={event.event}
           width={207}
+          zoom={zoom}
         />
       );
     };

@@ -33,6 +33,8 @@ export default function Calendar() {
     onOpen: onAddEventOpen,
   } = useDisclosure();
 
+  const [zoomLevel, setZoomLevel] = useState<boolean>(false)
+
   const openAddEventModal = () => {
     onAddEventOpen();
   };
@@ -48,6 +50,7 @@ export default function Calendar() {
   }).data;
 
   const counter = 0; // used to check if next element was within the "from" and "to" time range, if it is then preents duplicate entries
+  const zoom = zoomLevel ? 2.0 : 1;
   return (
     <Grid gridTemplateColumns="436px 1fr" h="100vh">
       <GridItem zIndex={1000}>
@@ -65,23 +68,30 @@ export default function Calendar() {
             retreatId={retreat?._id ?? ""}
             events={events}
             counter={counter}
+            zoom={zoom}
           />
         )}
-        <Button
-          colorScheme="twitter"
-          fontWeight="400"
-          color="white"
-          bg="hop_blue.500"
-          fontFamily="oswald"
-          height="50px"
-          fontSize="20px"
+        <Box
           position="fixed"
           bottom="10px"
           right="10px"
-          onClick={openAddEventModal}
         >
-          ADD EVENT
-        </Button>
+          <Button
+            colorScheme="twitter"
+            fontWeight="400"
+            color="white"
+            bg="hop_blue.500"
+            fontFamily="oswald"
+            height="50px"
+            fontSize="20px"
+            onClick={openAddEventModal}
+          >
+            ADD EVENT
+          </Button>
+          <Button onClick={() => setZoomLevel(!zoomLevel)}>
+            {zoomLevel ? "Zoom out" : "Zoom in"}
+          </Button>
+        </Box>
         <NewEventModal
           retreatId={retreat?._id ?? ""}
           isOpen={isAddEventOpen}
