@@ -130,6 +130,9 @@ export const NewEventModal = ({
   }, [eventToEdit]);
 
   const save = useCallbackRef(() => {
+    if (!state.event.name) {
+      return;
+    }
     if (!validate()) {
       return;
     }
