@@ -2,6 +2,8 @@ import {
   Box,
   Button,
   Flex,
+  Grid,
+  GridItem,
   HStack,
   Spacer,
   Text,
@@ -47,50 +49,46 @@ export default function Calendar() {
 
   const counter = 0; // used to check if next element was within the "from" and "to" time range, if it is then preents duplicate entries
   return (
-    <Box>
-      <Box display="flex">
-        <Box zIndex={1000}>
-          {chapter && retreat && (
-            <Sidebar
-              chapter={chapter}
-              year={retreat.year}
-              retreatId={retreat._id}
-            />
-          )}
-        </Box>
-        <Box position="relative" left="436px" overflowX={"visible"}>
-          {events && (
-            <CalendarContent
-              retreatId={retreat?._id ?? ""}
-              events={events}
-              counter={counter}
-            />
-          )}
-          <Flex alignItems={"right"}>
-            <Spacer />
-            <Button
-              colorScheme="twitter"
-              marginLeft="auto"
-              fontWeight="400"
-              color="white"
-              bg="hop_blue.500"
-              fontFamily="oswald"
-              height="50px"
-              fontSize="20px"
-              marginBottom="10px"
-              onClick={openAddEventModal}
-            >
-              ADD EVENT
-            </Button>
-            <NewEventModal
-              retreatId={retreat?._id ?? ""}
-              isOpen={isAddEventOpen}
-              onClose={onAddEventClose}
-              isCopy={false}
-            />
-          </Flex>
-        </Box>
-      </Box>
-    </Box>
+    <Grid gridTemplateColumns="436px 1fr" h="100vh">
+      <GridItem zIndex={1000}>
+        {chapter && retreat && (
+          <Sidebar
+            chapter={chapter}
+            year={retreat.year}
+            retreatId={retreat._id}
+          />
+        )}
+      </GridItem>
+      <GridItem overflow="scroll" className="no-scroll-bar">
+        {events && (
+          <CalendarContent
+            retreatId={retreat?._id ?? ""}
+            events={events}
+            counter={counter}
+          />
+        )}
+        <Button
+          colorScheme="twitter"
+          fontWeight="400"
+          color="white"
+          bg="hop_blue.500"
+          fontFamily="oswald"
+          height="50px"
+          fontSize="20px"
+          position="fixed"
+          bottom="10px"
+          right="10px"
+          onClick={openAddEventModal}
+        >
+          ADD EVENT
+        </Button>
+        <NewEventModal
+          retreatId={retreat?._id ?? ""}
+          isOpen={isAddEventOpen}
+          onClose={onAddEventClose}
+          isCopy={false}
+        />
+      </GridItem>
+    </Grid>
   );
 }
