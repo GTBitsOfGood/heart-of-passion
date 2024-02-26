@@ -54,13 +54,15 @@ export default function Calendar() {
   }).data;
 
   const counter = 0; // used to check if next element was within the "from" and "to" time range, if it is then preents duplicate entries
-  const [zoomLevel, setZoomLevel] = useState<number>(1);
-  const [showToolTip, setShowToolTip] = useState<boolean>(false);
-  const zoom = zoomLevel;
   const zoomMin = 0.25;
   const zoomMax = 5;
   const zoomSens = 0.25;
+  const zoomDefault = 1;
+  
   const calendarArea = useRef<any>();
+  const [zoomLevel, setZoomLevel] = useState<number>(zoomDefault);
+  const [showToolTip, setShowToolTip] = useState<boolean>(false);
+  const zoom = zoomLevel;
   const slider = useRef<any>();
   useEffect(() => {
     const e = calendarArea.current;
@@ -131,7 +133,7 @@ export default function Calendar() {
             min={zoomMin}
             max={zoomMax}
             ref={slider}
-            defaultValue={1}
+            value={zoomLevel}
             step={0.001}
             onChange={v => setZoomLevel(v)}
             orientation='vertical'
