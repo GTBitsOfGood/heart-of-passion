@@ -85,10 +85,10 @@ const reducer = (state: State, action: Action): State => {
   }
 };
 
-const initialState: State = {
+let initialState: State = {
   event: {
     name: "",
-    energyLevel: undefined,
+    energyLevel: "high",
     location: "",
     dates: [{ day: 1, from: "09:00 am", to: "10:00 am" }],
     expenses: [],
@@ -137,31 +137,32 @@ export const NewEventModal = ({
     if (eventToEdit) {
       updateEvent.mutate({ event: state.event, eventId: eventToEdit._id });
     } else {
-      console.log(state.event);
       createEvent.mutate({ eventDetails: state.event, retreatId });
     }
   });
 
-  const debouncedSave = useCallbackRef(debounce(save, 50000), [save]);
+  // const debouncedSave = useCallbackRef(debounce(save, 50000), [save]);
 
-  useEffect(() => {
-    // You might want to check if the form is in a valid state before auto-saving.
-    // For example, only auto-save if the name field is not empty.
-    if (state.event.name) {
-      debouncedSave();
-    }
+  // useEffect(() => {
+  //   // You might want to check if the form is in a valid state before auto-saving.
+  //   // For example, only auto-save if the name field is not empty.
+  //   if (state.event.name) {
+  //     debouncedSave();
+  //   }
 
-    // return () => {
-    //   debouncedSave.cancel();
-    // };
-    // save();
-  }, [state.event, debouncedSave]); // Run this effect whenever the event data changes
+  //   // return () => {
+  //   //   debouncedSave.cancel();
+  //   // };
+  //   // save();
+  // }, [state.event, debouncedSave]); // Run this effect whenever the event data changes
 
   const sidebarOpen = state.timeFormOpen || state.expenseFormOpen;
 
   const onCloseModal = () => {
     // debouncedSave.cancel();
-    save();
+    if (!isCopy) {
+      save();
+    }
     dispatch({ type: "RESET_FORM", event: eventToEdit });
     onClose();
   };
@@ -226,12 +227,12 @@ export const NewEventModal = ({
       return;
     }
 
-    if (eventToEdit) {
-      updateEvent.mutate({ event: state.event, eventId: eventToEdit._id });
-    } else {
-      console.log(state.event);
-      createEvent.mutate({ eventDetails: state.event, retreatId });
-    }
+    // if (eventToEdit) {
+    //   updateEvent.mutate({ event: state.event, eventId: eventToEdit._id });
+    // } else {
+    //   console.log(state.event);
+    //   createEvent.mutate({ eventDetails: state.event, retreatId });
+    // }
     onCloseModal();
   };
 
@@ -367,6 +368,7 @@ export const NewEventModal = ({
                     padding="0px"
                     textColor={"black"}
                     borderColor={"#D9D9D9"}
+                    isDisabled={isCopy ? true : false}
                     value={state.event.status}
                     onChange={(e) => {
                       dispatch({
@@ -423,7 +425,7 @@ export const NewEventModal = ({
                   alignItems="end"
                   mb="8px"
                   alignSelf="end"
-                  maxHeight="167px"
+                  maxHeight="90px"
                   overflowY="scroll"
                   sx={{
                     "::-webkit-scrollbar": {
@@ -527,28 +529,43 @@ export const NewEventModal = ({
                     },
                   }}
                   // height="148px"
-                  maxHeight="148px"
+                  maxHeight="90px"
                 >
                   {(isCopy ? copyEvent?.expenses : state.event.expenses)?.map(
                     (e, i) => {
-                      const isSelected = e === selectedExpense;
+                      const isSelected = selectedExpense === e;
+                      const isHovered = hoveredExpense === e;
                       return (
                         <button
                           onClick={() => {
-                            if (isCopy) {
+                            if (!isCopy) {
                               setSelectedTime(undefined);
                               setSelectedExpense(e);
                               dispatch({ type: "OPEN_EXPENSE_SIDEBAR" });
                             }
                           }}
+                          onMouseOver={() => setHoveredExpense(e)}
+                          onMouseOut={() => setHoveredTime(null)}
                           key={i}
                         >
                           <HStack
                             width="372px"
                             height="39px"
                             justifyContent="space-between"
-                            textColor={isSelected ? "white" : "black"}
-                            bg={isSelected ? "hop_blue.500" : "white"}
+                            color={
+                              isHovered
+                                ? "black"
+                                : isSelected
+                                ? "white"
+                                : "black"
+                            }
+                            bg={
+                              isHovered
+                                ? "#E2E8F0"
+                                : isSelected
+                                ? "hop_blue.500"
+                                : "white"
+                            }
                             paddingLeft="10px"
                             paddingRight="10px"
                           >
@@ -716,23 +733,25 @@ export const NewEventModal = ({
                   setSelectedTime={setSelectedTime}
                 ></NewTimeForm>
               )}
-              <NewExpenseForm
-                expenses={state.event.expenses}
-                setExpenses={(expenses) => {
-                  dispatch({
-                    type: "UPDATE_EVENT",
-                    field: "expenses",
-                    value: expenses,
-                  });
-                }}
-                onOpenError={onOpenError}
-                onCloseError={onCloseError}
-                onCloseSide={() => dispatch({ type: "CLOSE_SIDEBAR" })}
-                selectedExpense={selectedExpense}
-                setSelectedExpense={(e: Expense | undefined) =>
-                  setSelectedExpense(e)
-                }
-              />
+              {state.expenseFormOpen && (
+                <NewExpenseForm
+                  expenses={state.event.expenses}
+                  setExpenses={(expenses) => {
+                    dispatch({
+                      type: "UPDATE_EVENT",
+                      field: "expenses",
+                      value: expenses,
+                    });
+                  }}
+                  onOpenError={onOpenError}
+                  onCloseError={onCloseError}
+                  onCloseSide={() => dispatch({ type: "CLOSE_SIDEBAR" })}
+                  selectedExpense={selectedExpense}
+                  setSelectedExpense={(e: Expense | undefined) =>
+                    setSelectedExpense(e)
+                  }
+                />
+              )}
             </ModalBody>
           )}
         </HStack>

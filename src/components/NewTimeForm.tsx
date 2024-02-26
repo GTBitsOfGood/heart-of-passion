@@ -129,6 +129,16 @@ export const NewTimeForm = ({
     setSelectedTime(undefined);
   };
 
+  const handleDelete = () => {
+    onCloseError();
+    onCloseSide();
+    setTimes((prevTimes) => {
+      let updatedTimes = prevTimes.filter((e) => e !== selectedTime);
+      return updatedTimes;
+    });
+    setSelectedTime(undefined);
+  };
+
   const validateFields = () => {
     if (toMinutes(endTime) <= toMinutes(startTime)) {
       setEndTimeError(true);
@@ -208,6 +218,7 @@ export const NewTimeForm = ({
           variant="outline"
           borderRadius="6px"
           mr="13px"
+          onClick={handleDelete}
         >
           DELETE
         </Button>
