@@ -22,7 +22,7 @@ import { trpc } from "~/utils/api";
 import Sidebar from "~/components/Sidebar";
 import { DateObject } from "~/common/types";
 import { Event } from "~/common/types";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { computeHeight } from "~/components/Calendar/computeHeight";
 import { IEvent } from "~/server/models/Event";
 import { NewEventModal } from "~/components/NewEventModal";
@@ -57,6 +57,28 @@ export default function Calendar() {
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [showToolTip, setShowToolTip] = useState<boolean>(false);
   const zoom = zoomLevel;
+  const zoomMin = 0.25;
+  const zoomMax = 5;
+  const zoomSens = 0.25;
+  const calendarArea = useRef<any>();
+  const slider = useRef<any>();
+  useEffect(() => {
+    const e = calendarArea.current;
+    const handler = (event: any) => {
+      if (event.ctrlKey) {
+        
+        setZoomLevel(prev => {
+          const delta = event.deltaY > 0 ? zoomSens : -zoomSens;
+          return Math.max(zoomMin, Math.min(prev + delta, zoomMax));
+        })
+        event.preventDefault()
+      }
+    }
+    e.addEventListener('wheel', handler, { passive: false })
+    return () => {
+      e.removeEventListener('wheel', handler)
+    }
+  }, [])
   return (
     <Grid gridTemplateColumns="436px 1fr" h="100vh">
       <GridItem zIndex={1000}>
@@ -68,7 +90,7 @@ export default function Calendar() {
           />
         )}
       </GridItem>
-      <GridItem overflow="scroll" className="no-scroll-bar">
+      <GridItem overflow="scroll" className="no-scroll-bar" ref={calendarArea}>
         {events && (
           <CalendarContent
             retreatId={retreat?._id ?? ""}
@@ -89,6 +111,9 @@ export default function Calendar() {
             <Button onClick={() => setZoomLevel(zoomLevel < 2 ? 2 : 1)}>
               {zoomLevel > 1 ? "Zoom 1x" : "Zoom 2x"}
             </Button>
+            Current zoom: {zoomLevel}
+            <br/>
+            Ctrl+Scroll enabled
             <Button
               colorScheme="twitter"
               fontWeight="400"
@@ -103,8 +128,9 @@ export default function Calendar() {
             </Button>
           </Box>
           <Slider
-            min={1}
-            max={5}
+            min={zoomMin}
+            max={zoomMax}
+            ref={slider}
             defaultValue={1}
             step={0.001}
             onChange={v => setZoomLevel(v)}
