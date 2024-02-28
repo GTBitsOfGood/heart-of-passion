@@ -346,7 +346,7 @@ export const NewExpenseForm = ({
             height="100px"
           />
         </FormControl> */}
-        <Button
+        {/* <Button
           width="100%"
           height="50px"
           bg="#FF6B6B"
@@ -359,36 +359,34 @@ export const NewExpenseForm = ({
           marginTop="80px"
         >
           {create ? "Add Expense" : "Update Expense"}
-        </Button>
+        </Button> */}
       </VStack>
-      <HStack>
+      <HStack width="100%" justifyContent="end" mb="34px">
         {editing && (
           <Button
-            width="100%"
-            height="50px"
-            bg="#FF6B6B"
-            color="white"
-            fontSize="18px"
-            fontWeight="500"
-            lineHeight="24px"
-            borderRadius="none"
+            fontFamily="heading"
+            fontSize="20px"
+            fontWeight="400"
+            colorScheme="red"
+            color="hop_red.500"
+            variant="outline"
             onClick={handleDelete}
+            borderRadius="6px"
+            mr="13px"
           >
-            {"Delete expense"}
+            {"Delete"}
           </Button>
         )}
         <Button
-          width="100%"
-          height="50px"
-          bg="#FF6B6B"
-          color="white"
-          fontSize="18px"
-          fontWeight="500"
-          lineHeight="24px"
-          borderRadius="none"
+          colorScheme="twitter"
+          bg="hop_blue.500"
+          borderRadius="6px"
+          fontFamily="heading"
+          fontSize="20px"
+          fontWeight="400"
           onClick={handleApply}
         >
-          {editing ? "Update Expense" : "Add Expense"}
+          {editing ? "Update" : "Add"}
         </Button>
       </HStack>
     </VStack>

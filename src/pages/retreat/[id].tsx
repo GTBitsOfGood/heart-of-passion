@@ -87,7 +87,6 @@ function Content({
     for (const date of dates) {
       const { from, to, day } = date;
       eventsByDay[day - 1]!.push({ event, from, to });
-      console.log(from);
     }
   }
   for (const dayEvents of eventsByDay) {
