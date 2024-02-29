@@ -50,7 +50,7 @@ export const NewFundModal = ({
   create,
   retreatId,
 }: NewFundProps) => {
-  // Form Data
+  // form data
   const [name, setName] = useState(fund ? fund.name : "");
   const [date, setDate] = useState(fund ? fund.date : "");
   const [amount, setAmount] = useState(fund ? fund.amount : 0);
@@ -74,19 +74,19 @@ export const NewFundModal = ({
   } = useDisclosure({ defaultIsOpen: false });
 
   const trpcUtils = trpc.useContext();
-  const updateFund = trpc.fundraiser.updateFundraiser.useMutation({
+  const updateFund = trpc.fund.updateFund.useMutation({
     onSuccess: () => {
-      trpcUtils.fundraiser.invalidate();
+      trpcUtils.fund.invalidate();
     },
   });
-  const createFund = trpc.fundraiser.createFundraiser.useMutation({
+  const createFund = trpc.fund.createFund.useMutation({
     onSuccess: () => {
-      trpcUtils.fundraiser.invalidate();
+      trpcUtils.fund.invalidate();
     },
   });
-  const deleteFund = trpc.fundraiser.deleteFundraiser.useMutation({
+  const deleteFund = trpc.fund.deleteFund.useMutation({
     onSuccess: () => {
-      trpcUtils.fundraiser.invalidate();
+      trpcUtils.fund.invalidate();
     },
   });
 
@@ -103,29 +103,14 @@ export const NewFundModal = ({
     if (create)
       createFund.mutate({
         retreatId: retreatId,
-        fundraiserDetails: {
-          name: name,
-          location: "TODO LOCATION",
-          date: date,
-          contactName: "TODO DATE",
-          email: "TODO@todo.com",
-          profit: 1, // TODOj
-          expenses: [],
-        },
+        fundDetails: { name: name, date: date, amount: amount, source: source },
       });
     else
       updateFund.mutate({
-        fundraiserId: fund?._id!,
-        fundraiser: {
-          name: name,
-          location: "TODO LOCATION",
-          date: date,
-          contactName: "TODO DATE",
-          email: "TODO@todo.com",
-          profit: 1, // TODOj
-          expenses: [],
-        },
+        fundId: fund?._id!,
+        updates: { name: name, date: date, amount: amount, source: source },
       });
+
     onCloseModal();
     onCloseModal();
     return true;

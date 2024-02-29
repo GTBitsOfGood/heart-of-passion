@@ -22,7 +22,7 @@ import FundList from "~/components/funds/FundList";
 import { Fund } from "~/common/types";
 import { IRetreat } from "~/server/models/Retreat";
 import { IChapter } from "~/server/models/Chapter";
-import { FundraisingPlanningModal } from "~/components/FundraisingPlanningModal";
+import { NewFundModal } from "~/components/NewFundModal";
 
 export default function RaisedFunds() {
   const [filter, setFilter] = useState("category");
@@ -76,9 +76,9 @@ export default function RaisedFunds() {
     },
   );
 
-  const funds = trpc.fundraiser.getFundraisers.useQuery(retreatId).data!;
+  const funds = trpc.fund.getFunds.useQuery(retreatId).data!;
 
-  const totalAmount = funds?.reduce((total, fund) => total + fund.profit, 0);
+  const totalAmount = funds?.reduce((total, fund) => total + fund.amount, 0);
 
   const groups = (function () {
     if (funds && funds.length > 0) {
@@ -102,11 +102,11 @@ export default function RaisedFunds() {
           .sort((a, b) => a.title.localeCompare(b.title));
       } else if (filter === "highest amount") {
         // Sort by amount descending (highest to lowest)
-        funds.sort((a, b) => b.profit - a.profit);
+        funds.sort((a, b) => b.amount - a.amount);
         return [{ title: "Highest to Lowest", funds: funds }];
       } else if (filter === "lowest amount") {
         // Sort by amount ascending (lowest to highest)
-        funds.sort((a, b) => a.profit - b.profit);
+        funds.sort((a, b) => a.amount - b.amount);
         return [{ title: "Lowest to Highest", funds: funds }];
       } else {
         // Sort by date ascending (earliest to latest)
@@ -235,22 +235,14 @@ export default function RaisedFunds() {
             >
               ADD FUND
             </Button>
+
             <NewFundModal
               isOpen={isOpenAddFundModal}
               onClose={handleClose}
+              create={selectedFund === null}
               fund={selectedFund}
-              create={true}
               retreatId={retreatId}
             />
-            {selectedFund != null && (
-              <FundraisingPlanningModal
-                isOpen={isOpenAddFundModal}
-                onClose={handleClose}
-                fundraiser={selectedFund}
-                create={false}
-                retreatId={retreatId}
-              />
-            )}
           </Box>
         </Flex>
         {groupsRendered}

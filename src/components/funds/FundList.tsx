@@ -5,7 +5,7 @@ import FundEntry from "./FundEntry";
 import { Fund, FundList as FundListType } from "src/common/types";
 
 interface FundListProps extends FundListType {
-  handleSelectFund: (arg0: Fund) => void;
+  handleSelectFund: (fund: Fund) => void;
 }
 
 // export default function FundList({ title, funds }: FundListType) {
