@@ -16,6 +16,8 @@ import { NewExpenseModal } from "~/components/NewExpenseModal";
 import { NewUserModal } from "~/components/NewUserModal";
 import Sidebar from "~/components/Sidebar";
 import { Expense } from "~/common/types";
+import { FundraiserModel } from "~/server/models/Fundraiser";
+import { FundraisingPlanningModal } from "~/components/FundraisingPlanningModal";
 
 export default function DummyPage() {
   const {
@@ -43,6 +45,12 @@ export default function DummyPage() {
     isOpen: isOpenAddExpenseModal,
     onOpen: onOpenAddExpenseModal,
     onClose: onCloseAddExpenseModal,
+  } = useDisclosure();
+
+  const {
+    isOpen: isOpenFundraisingModal,
+    onOpen: onOpenFundraisingModal,
+    onClose: onCloseFundraisingModal,
   } = useDisclosure();
 
   const finalRef = React.useRef(null);
@@ -146,6 +154,21 @@ export default function DummyPage() {
           isOpen={isOpenAddEventModal}
           onClose={onCloseAddEventModal}
         /> */}
+        <Button
+          colorScheme="twitter"
+          bg="hop_blue.500"
+          borderRadius="none"
+          onClick={onOpenFundraisingModal}
+          fontFamily="heading"
+          fontWeight="400"
+          fontSize="24px"
+        >
+          ADD FUNDRAISER
+        </Button>
+        <FundraisingPlanningModal
+          isOpen={isOpenFundraisingModal}
+          onClose={onCloseFundraisingModal}
+        />
         <NewExpenseModal
           isOpen={isOpenAddExpenseModal}
           onClose={onCloseAddExpenseModal}

@@ -2,11 +2,11 @@ import "dotenv/config";
 
 import dbConnect from "../src/server/db";
 import { ChapterModel } from "../src/server/models/Chapter";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { RetreatModel } from "~/server/models/Retreat";
 import { EventModel } from "~/server/models/Event";
 
-const generateData = async (chapterId: string) => {
+const generateData = async (chapterId: Types.ObjectId) => {
   var retreat = await RetreatModel.create({
     year: 2023,
     chapterId: chapterId,

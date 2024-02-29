@@ -36,8 +36,9 @@ export default function BacklogCopyModal({
         onClose={onClose}
         isCopy={true}
         copyToCurrentRetreat={copyToCurrentRetreat}
-        retreatId="temp"
+        retreatId="test"
         copyEvent={event}
+        isFundraiser={true}
       />
     </>
   );

@@ -62,7 +62,6 @@ const Sidebar = ({
       router.push(`/chapters/${chapterId}`);
       return;
     }
-
     router.push(`/${path}/${retreatId}`);
   }
 
@@ -246,6 +245,7 @@ const Sidebar = ({
             mb="2px"
             p="10px"
             onClick={() => {
+              router.push(`/planning/${chapterId}/`);
               setClicked(4);
             }}
           >
@@ -274,6 +274,7 @@ const Sidebar = ({
                 justifyContent="left"
                 backgroundColor={clicked == 5 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
+                  router.push(`/fundraising-expenses/${retreatId}/`);
                   setClicked(5);
                 }}
               >
@@ -289,7 +290,7 @@ const Sidebar = ({
                 justifyContent="left"
                 backgroundColor={clicked == 6 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
-                  setClicked(6);
+                  handleClick("hospitality");
                 }}
               >
                 Hospitality
@@ -304,7 +305,7 @@ const Sidebar = ({
                 justifyContent="left"
                 backgroundColor={clicked == 7 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
-                  setClicked(7);
+                  router.push(`/backlog/fundraiser/${chapterId}/`);
                 }}
               >
                 Previous Fundraiser Events
@@ -320,6 +321,7 @@ const Sidebar = ({
             backgroundColor={clicked == 8 ? "#54A9DD" : "#F9F9F9"}
             onClick={() => {
               setClicked(8);
+              router.push(`/funds/${retreatId}/`);
             }}
           >
             Raised Funds

@@ -30,11 +30,9 @@ export const NewExpenseModal = ({
   expenses,
   setExpenses,
 }: NewExpenseProps) => {
-  const {
-    isOpen: isError,
-    onClose: onCloseError,
-    onOpen: onOpenError,
-  } = useDisclosure({ defaultIsOpen: false });
+  const { onClose: onCloseError, onOpen: onOpenError } = useDisclosure({
+    defaultIsOpen: false,
+  });
 
   const onCloseModal = () => {
     onClose();
@@ -91,7 +89,6 @@ export const NewExpenseModal = ({
             />
           </ModalBody>
         </HStack>
-        {isError && <FloatingAlert onClose={onCloseError} />}
       </ModalContent>
     </Modal>
   );

@@ -1,17 +1,10 @@
 import { Heading, Stack, Flex } from "@chakra-ui/react";
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 import { useState } from "react";
-import ExpenseEntry from "./ExpenseEntry";
-import { Expense } from "src/common/types";
-import { ExpenseGroup } from "~/pages/retreat-expenses/[id]";
+import DonorEntry from "./DonorEntry";
+import { Donor, DonorList } from "src/common/types";
 
-export default function ExpenseGroup({
-  title,
-  expenses,
-}: {
-  title: string;
-  expenses: Expense[];
-}) {
+export default function DonorList({ title, donors }: DonorList) {
   const [open, setOpen] = useState(true);
 
   return (
@@ -31,17 +24,17 @@ export default function ExpenseGroup({
         </Flex>
         <Stack pl="3em" gap="1em">
           {open ? (
-            expenses.map((expense: Expense) => (
-              <ExpenseEntry
+            donors?.map((donor: Donor) => (
+              <DonorEntry
                 key={
-                  expense._id +
-                  expense.name +
-                  expense.type +
-                  expense.cost +
-                  expense.event +
-                  expense.eventId
+                  donor.donorEmail +
+                  donor.donorName +
+                  donor.studentName +
+                  donor.status +
+                  donor.sponsorLevel +
+                  donor.source
                 }
-                {...expense}
+                {...donor}
               />
             ))
           ) : (

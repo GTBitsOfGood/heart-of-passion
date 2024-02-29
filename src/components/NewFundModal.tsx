@@ -20,25 +20,15 @@ import { useEffect, useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
 import { Fund } from "~/common/types";
 import { FloatingAlert } from "./FloatingAlert";
+import { trpc } from "~/utils/api";
 
 type NewFundProps = {
   isOpen: boolean;
   onClose: () => void;
-  fundData: Fund;
+  fund: Fund | null;
   create: boolean;
+  retreatId: string;
 };
-
-// Validate and parse date
-function isValidDate(dateString: string): boolean {
-  const datePattern = /^(0?[1-9]|1[0-2])\/(0?[1-9]|[12][0-9]|3[01])\/\d{4}$/;
-  return datePattern.test(dateString);
-}
-
-// Parse amount as a number (dollars with two decimal places)
-function parseAmount(amountString: string): number {
-  const amount = parseFloat(amountString.replace(/[$,]/g, ""));
-  return isNaN(amount) ? 0 : amount;
-}
 
 enum FundError {
   None, // No error
@@ -56,14 +46,23 @@ const eventOptions = [
 export const NewFundModal = ({
   isOpen,
   onClose,
-  fundData,
+  fund,
   create,
+  retreatId,
 }: NewFundProps) => {
-  // Form Data
-  const [name, setName] = useState("");
-  const [date, setDate] = useState("");
-  const [amount, setAmount] = useState("");
-  const [source, setSource] = useState("Select Source");
+  // form data
+  const [name, setName] = useState(fund ? fund.name : "");
+  const [date, setDate] = useState(fund ? fund.date : "");
+  const [amount, setAmount] = useState(fund ? fund.amount : 0);
+  const [source, setSource] = useState(fund ? fund.source : "Select Source");
+
+  useEffect(() => {
+    // clear funds so it doesn't add every time the page is re-rendered
+    setName(fund ? fund.name : "");
+    setDate(fund ? fund.date : "");
+    setAmount(fund ? fund.amount : 0);
+    setSource(fund ? fund.source : "Select Source");
+  }, [fund]);
 
   // Error
   const [amountError, setAmountError] = useState<FundError>(FundError.None);
@@ -74,6 +73,23 @@ export const NewFundModal = ({
     onOpen: onOpenError,
   } = useDisclosure({ defaultIsOpen: false });
 
+  const trpcUtils = trpc.useContext();
+  const updateFund = trpc.fund.updateFund.useMutation({
+    onSuccess: () => {
+      trpcUtils.fund.invalidate();
+    },
+  });
+  const createFund = trpc.fund.createFund.useMutation({
+    onSuccess: () => {
+      trpcUtils.fund.invalidate();
+    },
+  });
+  const deleteFund = trpc.fund.deleteFund.useMutation({
+    onSuccess: () => {
+      trpcUtils.fund.invalidate();
+    },
+  });
+
   const onCloseModal = () => {
     onClose();
   };
@@ -83,11 +99,25 @@ export const NewFundModal = ({
       setAmountError(FundError.Empty);
       return false; // Return false to prevent saving
     }
+
+    if (create)
+      createFund.mutate({
+        retreatId: retreatId,
+        fundDetails: { name: name, date: date, amount: amount, source: source },
+      });
+    else
+      updateFund.mutate({
+        fundId: fund?._id!,
+        updates: { name: name, date: date, amount: amount, source: source },
+      });
+
+    onCloseModal();
     onCloseModal();
     return true;
   };
 
   const handleDelete = () => {
+    deleteFund.mutate(fund?._id!);
     onCloseModal();
     onCloseError();
     return true;
@@ -101,7 +131,7 @@ export const NewFundModal = ({
     setSource(selectedOption);
   const handleAmountChange = (event: React.FormEvent<HTMLInputElement>) => {
     const inputValue = event.currentTarget.value;
-    setAmount(inputValue);
+    setAmount(Number(inputValue));
 
     // Validate the input and update the error state
     if (!inputValue) {
@@ -140,7 +170,7 @@ export const NewFundModal = ({
             <HStack align="start" spacing="55px">
               <FormControl>
                 <FormLabel textColor="black" fontWeight="600" mb="4px">
-                  Name
+                  Name*
                 </FormLabel>
                 <Input
                   placeholder="Jane Doe"
@@ -165,7 +195,7 @@ export const NewFundModal = ({
                   fontWeight="600"
                   mb="4px"
                 >
-                  Source
+                  Source*
                 </FormLabel>
                 <RadioDropdown
                   options={eventOptions}
@@ -178,7 +208,7 @@ export const NewFundModal = ({
             <HStack align="start" spacing="55px">
               <FormControl>
                 <FormLabel textColor="black" fontWeight="600" mb="4px">
-                  Date
+                  Date*
                 </FormLabel>
                 <Input
                   placeholder="2/24/2022"
@@ -190,7 +220,7 @@ export const NewFundModal = ({
                   height="30px"
                   value={date}
                   onChange={handleDateChange}
-                  type="email"
+                  type="date"
                   required
                 />
                 <Box minHeight="20px" mt={2}>
