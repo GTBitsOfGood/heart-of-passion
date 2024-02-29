@@ -423,7 +423,7 @@ export const NewEventModal = ({
                   mb="8px"
                   alignSelf="end"
                   maxHeight="90px"
-                  overflowY="scroll"
+                  overflowY="auto"
                 >
                   {(isCopy ? copyEvent?.dates : state.event.dates)?.map((t) => {
                     // const isSelected =
