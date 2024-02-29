@@ -30,18 +30,6 @@ type NewFundProps = {
   retreatId: string;
 };
 
-// Validate and parse date
-function isValidDate(dateString: string): boolean {
-  const datePattern = /^(0?[1-9]|1[0-2])\/(0?[1-9]|[12][0-9]|3[01])\/\d{4}$/;
-  return datePattern.test(dateString);
-}
-
-// Parse amount as a number (dollars with two decimal places)
-function parseAmount(amountString: string): number {
-  const amount = parseFloat(amountString.replace(/[$,]/g, ""));
-  return isNaN(amount) ? 0 : amount;
-}
-
 enum FundError {
   None, // No error
   Empty, // Empty user

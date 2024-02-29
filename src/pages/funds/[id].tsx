@@ -20,9 +20,9 @@ import Sidebar from "~/components/Sidebar";
 import { useEffect, useState } from "react";
 import FundList from "~/components/funds/FundList";
 import { Fund } from "~/common/types";
-import { NewFundModal } from "~/components/NewFundModal";
 import { IRetreat } from "~/server/models/Retreat";
 import { IChapter } from "~/server/models/Chapter";
+import { FundraisingPlanningModal } from "~/components/FundraisingPlanningModal";
 
 export default function RaisedFunds() {
   const [filter, setFilter] = useState("category");
@@ -243,10 +243,10 @@ export default function RaisedFunds() {
               retreatId={retreatId}
             />
             {selectedFund != null && (
-              <NewFundModal
+              <FundraisingPlanningModal
                 isOpen={isOpenAddFundModal}
                 onClose={handleClose}
-                fund={selectedFund}
+                fundraiser={selectedFund}
                 create={false}
                 retreatId={retreatId}
               />

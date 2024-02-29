@@ -25,6 +25,7 @@ import { NewExpenseForm } from "./NewExpenseForm";
 type FundraisingPlanningModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  fundraiser?: Fundraiser;
 };
 
 type State = {
@@ -75,32 +76,15 @@ const initialState: State = {
 export const FundraisingPlanningModal = ({
   isOpen,
   onClose,
+  fundraiser,
 }: FundraisingPlanningModalProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [selectedExpense, setSelectedExpense] = useState<Expense>();
 
   const onCloseModal = () => {
     onClose();
   };
-
-  const dateToYMD = (dateToConvert: Date) => {
-    const dd = String(dateToConvert.getDay() + 1).padStart(2, "0");
-    const mm = String(dateToConvert.getMonth() + 1).padStart(2, "0");
-    const yyyy = String(dateToConvert.getFullYear());
-    return `${yyyy}-${mm}-${dd}`;
-  };
-  const dateToMYD = (dateToConvert: Date) => {
-    const dd = String(dateToConvert.getDay() + 1).padStart(2, "0");
-    const mm = String(dateToConvert.getMonth() + 1).padStart(2, "0");
-    const yyyy = String(dateToConvert.getFullYear());
-    return `${mm}-${dd}-${yyyy}`;
-  };
-
   const sidebarOpen = state.expenseFormOpen;
-
-  const [date, setDate] = useState("");
-  const [profit, setProfit] = useState(0);
-
-  const [selectedExpense, setSelectedExpense] = useState<Expense>();
 
   return (
     <Modal
@@ -211,12 +195,13 @@ export const FundraisingPlanningModal = ({
                     border="1px solid #D9D9D9"
                     borderRadius="0px"
                     // defaultValue={date}
-                    value={date}
+                    value={state.fundraiser.date}
                     onChange={(e) => {
-                      // console.log(e.target.value);
-                      // const newDate = new Date(e.target.value);
-                      // console.log(newDate);
-                      setDate(e.target.value);
+                      dispatch({
+                        type: "UPDATE_FUNDRAISER",
+                        field: "date",
+                        value: e.target.value,
+                      });
                     }}
                   />
                 </FormControl>
@@ -444,7 +429,7 @@ export const FundraisingPlanningModal = ({
                       (acc, cv) =>
                         acc + cv.cost * (cv.numUnits ? cv.numUnits : 1),
                       0,
-                    ) + profit
+                    ) + state.fundraiser.profit
                   }`}
                 </Text>
               </HStack>
@@ -465,7 +450,6 @@ export const FundraisingPlanningModal = ({
                 <Button
                   colorScheme="twitter"
                   bg="hop_blue.500"
-                  // onClick={submit}
                   borderRadius="6px"
                   fontFamily="heading"
                   fontSize="20px"

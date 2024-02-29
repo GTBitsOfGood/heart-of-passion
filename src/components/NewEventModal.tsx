@@ -117,11 +117,9 @@ export const NewEventModal = ({
   const [selectedExpense, setSelectedExpense] = useState<Expense>();
   const [hoveredExpense, setHoveredExpense] = useState<Expense | null>(null);
 
-  const {
-    isOpen: isError,
-    onClose: onCloseError,
-    onOpen: onOpenError,
-  } = useDisclosure({ defaultIsOpen: false });
+  const { onClose: onCloseError, onOpen: onOpenError } = useDisclosure({
+    defaultIsOpen: false,
+  });
 
   useEffect(() => {
     if (eventToEdit) {
@@ -419,19 +417,13 @@ export const NewEventModal = ({
                 </HStack>
                 <VStack
                   mt="8px"
-                  // minHeight="19px"
                   spacing="0px"
-                  width="372px"
+                  width="380px"
                   alignItems="end"
                   mb="8px"
                   alignSelf="end"
                   maxHeight="90px"
                   overflowY="scroll"
-                  sx={{
-                    "::-webkit-scrollbar": {
-                      display: "none",
-                    },
-                  }}
                 >
                   {(isCopy ? copyEvent?.dates : state.event.dates)?.map((t) => {
                     // const isSelected =
@@ -755,7 +747,6 @@ export const NewEventModal = ({
             </ModalBody>
           )}
         </HStack>
-        {isError && <FloatingAlert onClose={onCloseError} />}
       </ModalContent>
     </Modal>
   );

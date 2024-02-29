@@ -21,7 +21,6 @@ import ExpenseGroup from "~/components/expenses/ExpenseGroup";
 import { trpc } from "~/utils/api";
 import { DateObject, Expense } from "~/common/types";
 import { useRouter } from "next/router";
-import { NewExpenseModal } from "~/components/NewExpenseModal";
 
 function getTotalCost(expense: Expense) {
   const numUnits = expense.numUnits || 1;
@@ -248,25 +247,6 @@ export default function FundraiserExpenses() {
                 </PopoverBody>
               </PopoverContent>
             </Popover>
-            <Button
-              colorScheme="twitter"
-              onClick={onOpenAddExpenseModal}
-              fontWeight="400"
-              color="white"
-              bg="hop_blue.500"
-              fontFamily="oswald"
-              height="50px"
-              fontSize="20px"
-              marginBottom="10px"
-            >
-              ADD EXPENSE
-            </Button>
-            <NewExpenseModal
-              isOpen={isOpenAddExpenseModal}
-              onClose={onCloseAddExpenseModal}
-              thisExpense={undefined}
-              retreatId={retreatId}
-            />
           </Box>
         </Flex>
         {groupsRendered}
