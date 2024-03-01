@@ -18,6 +18,7 @@ import Sidebar from "~/components/Sidebar";
 import { Expense } from "~/common/types";
 import { FundraiserModel } from "~/server/models/Fundraiser";
 import { FundraisingPlanningModal } from "~/components/FundraisingPlanningModal";
+import { trpc } from "~/utils/api";
 
 export default function DummyPage() {
   const {
@@ -72,6 +73,14 @@ export default function DummyPage() {
   const [selectedExpense, setSelectedExpense] = useState<Expense>();
 
   let dummyYear = 2023;
+
+  const date = new Date();
+  const earlierDate = new Date();
+  earlierDate.setDate(earlierDate.getDate()-5);
+  const txHistory = trpc.transaction.getRecentTransactions.useQuery({
+    startDate: earlierDate.toISOString(),
+    endDate: date.toISOString(),
+  }, {enabled: false});
 
   return (
     <>
@@ -176,6 +185,10 @@ export default function DummyPage() {
           expenses={expenses}
           thisExpense={selectedExpense}
         />
+        <Button onClick={()=>{
+          txHistory.refetch()
+          console.log(txHistory.data)
+        }}>LOG TRANSACTIONS</Button>
       </Stack>
       {/* Remove Center element */}
       <Center w="100%">

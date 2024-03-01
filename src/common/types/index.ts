@@ -154,6 +154,14 @@ export const fundraiserSchema = z.object({
 
 export type Fundraiser = z.infer<typeof fundraiserSchema>;
 
+export const transactionSchema = z.object({
+  transactionId: z.string(),
+  transaction_date: z.string().datetime(),
+  payer_email: z.string().email(),
+  message: z.string(),
+});
+export type Transaction = z.infer<typeof transactionSchema>;
+
 export const eventsByYearSchema = z.record(z.number(), z.array(eventSchema));
 export type EventsByYear = z.infer<typeof eventsByYearSchema>;
 
