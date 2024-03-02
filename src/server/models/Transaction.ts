@@ -18,17 +18,27 @@ const TransactionSchema = new Schema<ITransaction>({
   transactionId: {
     type: String,
     required: true,
+    unique: true,
   },
-  transaction_date: {
+  transactionDate: {
     type: String,
     required: true,
   },
-  payer_email: {
+  payerEmail: {
     type: String,
-    required: true,
+    required: false,
   },
   message: {
     type: String,
+    required: false,
+  },
+  payerName: {
+    type: String,
+    required: false,
+  },
+  amount: {
+    type: Number,
+    required: true
   }
 });
 

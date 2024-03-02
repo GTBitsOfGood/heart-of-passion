@@ -21,6 +21,14 @@ import { FundraisingPlanningModal } from "~/components/FundraisingPlanningModal"
 import { trpc } from "~/utils/api";
 
 export default function DummyPage() {
+
+  const trpcUtils = trpc.useUtils();
+  const storeTransaction = trpc.transaction.storeTransaction.useMutation({
+    onSuccess: () => {
+      trpcUtils.transaction.invalidate();
+    },
+  });
+
   const {
     isOpen: isOpenAddUserModal,
     onOpen: onOpenAddUserModal,
@@ -77,10 +85,10 @@ export default function DummyPage() {
   const date = new Date();
   const earlierDate = new Date();
   earlierDate.setDate(earlierDate.getDate()-5);
-  const txHistory = trpc.transaction.getRecentTransactions.useQuery({
-    startDate: earlierDate.toISOString(),
-    endDate: date.toISOString(),
-  }, {enabled: false});
+  // const txHistory = trpc.transaction.getRecentTransactions.useQuery({
+  //   startDate: earlierDate.toISOString(),
+  //   endDate: date.toISOString(),
+  // }, {enabled: false});
 
   return (
     <>
@@ -185,9 +193,15 @@ export default function DummyPage() {
           expenses={expenses}
           thisExpense={selectedExpense}
         />
-        <Button onClick={()=>{
-          txHistory.refetch()
-          console.log(txHistory.data)
+        <Button onClick={async ()=>{
+          // await txHistory.refetch();
+          // const data = txHistory.data;
+          const txHistory = await trpcUtils.transaction.getRecentTransactions.fetch({
+            startDate: earlierDate.toISOString(),
+            endDate: date.toISOString(),
+          });
+          storeTransaction.mutate({chapterId: "65b29ab8d35b2f536e2bdc4a", transactionDetails: txHistory[1]});
+          // console.log(txHistory)
         }}>LOG TRANSACTIONS</Button>
       </Stack>
       {/* Remove Center element */}
