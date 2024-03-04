@@ -136,7 +136,16 @@ import {
     };
 
     const handleDelete = () => {
-        deleteTransaction.mutate(transactionData.transactionId);
+      const transaction: Transaction = {
+        transactionId,
+        transactionDate,
+        amount,
+        payerEmail,
+        message,
+        payerName,
+        chapter,
+      };
+        deleteTransaction.mutate({transaction : transactionData});
         onCloseModal();
         onCloseError();
         return true;

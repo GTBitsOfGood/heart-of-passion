@@ -54,9 +54,9 @@ import {
           <GridItem colSpan={2}>
             {transactionDate}
           </GridItem>
-          <GridItem colSpan={1}>
+          <GridItem colSpan={2}>
             <Box
-            backgroundColor="#DEEBFF"
+            backgroundColor={chapter === "Unclassified" ? "#FFDEDF" : "#DEEBFF"}
             borderRadius=".2em"
             fontFamily={fonts.nunito}
             justifySelf="center"

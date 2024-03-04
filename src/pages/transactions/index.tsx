@@ -10,7 +10,6 @@ import {
     Box,
     useDisclosure,
     Text,
-    Spinner,
   } from "@chakra-ui/react";
   import Image from "next/image";
   import { TriangleDownIcon, SettingsIcon } from "@chakra-ui/icons";
@@ -61,13 +60,8 @@ import {
     const groups = (function () {
       if (transactions && transactions.length > 0) {
         if (filter === "date") {
-          const uniques = [...new Set(transactions?.map((u) => u.transactionDate))];
-          const emap = new Map(uniques.map((e) => [e, new Array()]));
-          transactions?.forEach((e) => emap.get(e.transactionDate)?.push(e));
-          return uniques?.map((e) => ({
-            title: e,
-            transactions: emap.get(e) || [],
-          }));
+          transactions.sort((a, b) => b.transactionDate.localeCompare(a.transactionDate));
+          return [{ title: "Date", transactions: transactions }];
         } else if (filter === "chapter") {
           const uniques = [...new Set(transactions?.map((u) => u.chapter))];
           const emap = new Map(uniques.map((e) => [e, new Array()]));
