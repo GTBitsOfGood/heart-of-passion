@@ -6,13 +6,11 @@ const { Schema } = mongoose;
 
 export interface ITransaction extends z.infer<typeof transactionSchema> {
   _id: string;
-  chapterId: mongoose.Types.ObjectId;
 }
 
 const TransactionSchema = new Schema<ITransaction>({
-  chapterId: {
-    ref: "Chapter",
-    type: Schema.Types.ObjectId,
+  chapter: {
+    type: String,
     required: true,
   },
   transactionId: {

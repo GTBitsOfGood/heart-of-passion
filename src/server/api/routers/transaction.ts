@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { Transaction, transactionSchema } from "~/common/types";
+import { Chapter, Transaction, transactionSchema } from "~/common/types";
 
 import {
   createTRPCRouter,
@@ -9,6 +9,7 @@ import {
   studentProcedure,
 } from "~/server/api/trpc";
 
+import { ChapterModel } from "~/server/models/Chapter";
 import { TransactionModel } from "~/server/models/Transaction";
 
 const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = process.env;
@@ -80,6 +81,7 @@ export const transactionRouter = createTRPCRouter({
           message: tx_info.transaction_note ?? "",
           payerName: e.payer_info?.payer_name?.alternate_full_name ?? "",
           amount: parseFloat(tx_info.transaction_amount.value),
+          chapter: (tx_info.chapter) ? tx_info.chapter : "Unclassified",
         };
 
         return tx;
@@ -96,12 +98,11 @@ export const transactionRouter = createTRPCRouter({
   storeTransaction: studentProcedure
     .input(
       z.object({
-        chapterId: z.string(),
         transactionDetails: transactionSchema,
       }),
     )
     .mutation(async ({ input }) => {
-      const { chapterId, transactionDetails } = input;
+      const { transactionDetails } = input;
       // const transaction = new TransactionModel({
       //   chapterId,
       //   ...transactionDetails,
@@ -110,8 +111,49 @@ export const transactionRouter = createTRPCRouter({
       const transactionId = transactionDetails.transactionId;
       await TransactionModel.updateOne(
         { transactionId },
-        { $set: { chapterId, ...transactionDetails } },
+        { $set: { ...transactionDetails } },
         { upsert: true },
       );
     }),
+    updateTransaction: studentProcedure
+    .input(
+      z.object({
+        transactionId: z.string(),
+        updatedTransaction: transactionSchema,
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const { transactionId, updatedTransaction } = input;
+      await TransactionModel.findOneAndUpdate(
+        { transactionId: transactionId },
+        updatedTransaction,
+      ).exec();
+    }),
+    deleteTransaction: studentProcedure
+    .input(z.string())
+    .mutation(async ({ input }) => {
+      await TransactionModel.findOneAndDelete({transactionId : input}).exec();
+    }),
+    getTransaction: studentProcedure
+    .input(z.string())
+    .query(async ({ input }): Promise<Transaction> => {
+      const transaction = await TransactionModel.findById(input).exec();
+      return processTransactions(transaction);
+    }),
+  getTransactions: studentProcedure.query(async () => {
+    const transactions = await TransactionModel.find().exec();
+    return transactions.map(processTransactions);
+  }),
 });
+
+function processTransactions(obj: any): Transaction {
+  return {
+    transactionId: obj.transactionId,
+    transactionDate: obj.transactionDate,
+    amount: obj.amount,
+    payerEmail: obj.payerEmail,
+    message: obj.message,
+    payerName: obj.payerName,
+    chapter: obj.chapter,
+  };
+}
