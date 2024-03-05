@@ -62,7 +62,7 @@ export const RadioDropdown = ({
         >
           <Stack direction="column" justify="center" spacing="11px">
             {options.map((option) => (
-              <Radio key={option} value={option} variant="customRadio">
+              <Radio key={option} value={option} variant={option == "Unclassified" ? "customRadioUnclassified" : "customRadio"}>
                 {option}
               </Radio>
             ))}
