@@ -3,8 +3,9 @@ import "dotenv/config";
 import dbConnect from "../src/server/db";
 import { ChapterModel } from "../src/server/models/Chapter";
 import mongoose, { Types } from "mongoose";
-import { RetreatModel } from "~/server/models/Retreat";
-import { EventModel } from "~/server/models/Event";
+import { RetreatModel } from "../src/server/models/Retreat";
+import { EventModel } from "../src/server/models/Event";
+import { FundraiserModel } from "../src/server/models/Fundraiser";
 
 const generateData = async (chapterId: Types.ObjectId) => {
   var retreat = await RetreatModel.create({
@@ -73,6 +74,58 @@ const generateData = async (chapterId: Types.ObjectId) => {
       },
     ],
   });
+
+  var fundraiser1 = await FundraiserModel.create({
+    retreatId: retreat._id,
+    name: "School Fundraising Activity",
+    date: "2024-03-05",
+    contactName: "J",
+    email: "J@gmail.com",
+    profit: 50000,
+    expenses: [
+      {
+        name: "Preparation",
+        cost: 400,
+        type: "Miscellaneous",
+        numUnits: 1,
+      },
+      {
+        name: "Transportation",
+        cost: 50,
+        type: "Transportation",
+        numUnits: 1,
+      },
+    ],
+  });
+
+  var fundraiser2 = await FundraiserModel.create({
+    retreatId: retreat._id,
+    name: "Museum Fundraising Activity",
+    date: "2023-12-01",
+    contactName: "Q",
+    email: "Q@gmail.com",
+    profit: 10000,
+    expenses: [
+      {
+        name: "Preparation Materials",
+        cost: 200,
+        type: "Miscellaneous",
+        numUnits: 1,
+      },      
+      {
+        name: "Lunch",
+        cost: 20,
+        type: "Food",
+        numUnits: 10,
+      },
+      {
+        name: "Transportation",
+        cost: 100,
+        type: "Transportation",
+        numUnits: 1,
+      },
+    ],
+  });
   return retreat._id;
 };
 
@@ -82,14 +135,14 @@ const generateData = async (chapterId: Types.ObjectId) => {
     var chapter = await ChapterModel.create({
       name: "Test Chapter",
     });
-    const id = await generateData(chapter._id);
+    const id = await generateData(chapter._id as Types.ObjectId);
     console.log(`Retreat Generated: ${id}\nChapter Generated: ${chapter._id}`);
   } catch (e) {
     await ChapterModel.findOneAndDelete({ name: "Test Chapter" });
     var chapter = await ChapterModel.create({
       name: "Test Chapter",
     });
-    const id = await generateData(chapter._id);
+    const id = await generateData(chapter._id as Types.ObjectId);
     console.log(`Retreat Generated: ${id}\nChapter Generated: ${chapter._id}`);
   }
   mongoose.connection.close();

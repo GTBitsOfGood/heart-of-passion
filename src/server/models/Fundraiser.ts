@@ -35,5 +35,5 @@ const FundraiserSchema = new Schema<IFundraiser>({
 });
 
 export const FundraiserModel =
-  (mongoose.models.Chapter as mongoose.Model<IFundraiser>) ??
+  (mongoose.models.Fundraiser as mongoose.Model<IFundraiser>) ??
   mongoose.model("Fundraiser", FundraiserSchema);
