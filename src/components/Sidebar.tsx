@@ -244,7 +244,7 @@ const Sidebar = ({
             mb="2px"
             p="10px"
             onClick={() => {
-              router.push(`/planning/${chapterId}/`);
+              router.push(`/planning/${retreatId}/`);
               setClicked(4);
             }}
           >
