@@ -6,6 +6,7 @@ import {
   Radio,
   RadioGroup,
   Stack,
+  Box,
 } from "@chakra-ui/react";
 import { DownArrowIcon } from "~/common/theme/icons";
 
@@ -22,10 +23,6 @@ export const RadioDropdown = ({
   setSelectedOption,
   isDisabled,
 }: Props) => {
-  const handleMenuButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-  };
-
   return (
     <Menu closeOnSelect={false}>
       <MenuButton
@@ -33,7 +30,7 @@ export const RadioDropdown = ({
         variant="outline"
         rightIcon={<DownArrowIcon width="22px" height="auto" />}
         fontWeight="400"
-        bg="#DEEBFF"
+        bg={selectedOption == "Unclassified" ? "#FFDEDF" : "#DEEBFF"}
         minWidth="103px"
         width="fit-content"
         height="fit-content"
@@ -43,7 +40,6 @@ export const RadioDropdown = ({
         fontSize="16px"
         lineHeight="24px"
         isDisabled={isDisabled ?? false}
-        onClick={handleMenuButtonClick}
       >
         {selectedOption}
       </MenuButton>

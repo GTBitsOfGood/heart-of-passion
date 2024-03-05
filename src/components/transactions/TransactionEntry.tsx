@@ -58,7 +58,6 @@ import {
     return (
       <>
         <Grid
-          onClick={onOpenAddTransactionModal}
           templateColumns="repeat(9, 1fr)"
           gap={4}
           _hover={{
@@ -66,17 +65,17 @@ import {
             cursor: "pointer",
           }}
         >
-          <GridItem colSpan={1}>
+          <GridItem colSpan={1} onClick={onOpenAddTransactionModal}>
             <Box fontFamily={fonts.nunito} minW="10%">
               {payerName}
             </Box>
           </GridItem>
-          <GridItem colSpan={1}>
+          <GridItem colSpan={1} onClick={onOpenAddTransactionModal}>
             <Box fontFamily={fonts.nunito} minW="20%">
                 ${amount}
             </Box>
           </GridItem>
-          <GridItem colSpan={2}>
+          <GridItem colSpan={2} onClick={onOpenAddTransactionModal}>
             {formattedDate}
           </GridItem>
           <GridItem colSpan={2} display="flex" justifyContent="flex-start">
@@ -86,7 +85,7 @@ import {
                     setSelectedOption={handleChapterChange}
             />
           </GridItem>
-          <GridItem colSpan={3}>
+          <GridItem colSpan={3} onClick={onOpenAddTransactionModal}>
             <Box fontFamily={fonts.nunito} minW="10%">
               {message}
             </Box>
