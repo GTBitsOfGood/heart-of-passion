@@ -157,7 +157,7 @@ import {
       setAmount(Number(event.currentTarget.value));
     const handleTransactionDateChange = (event: React.FormEvent<HTMLInputElement>) =>
       setTransactionDate(event.currentTarget.value);
-      const handleChapterChange = (chapter: string) =>
+    const handleChapterChange = (chapter: string) =>
       setChapter(chapter);
     
     return (

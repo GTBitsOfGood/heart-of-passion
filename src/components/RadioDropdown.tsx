@@ -22,6 +22,10 @@ export const RadioDropdown = ({
   setSelectedOption,
   isDisabled,
 }: Props) => {
+  const handleMenuButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+  };
+
   return (
     <Menu closeOnSelect={false}>
       <MenuButton
@@ -39,6 +43,7 @@ export const RadioDropdown = ({
         fontSize="16px"
         lineHeight="24px"
         isDisabled={isDisabled ?? false}
+        onClick={handleMenuButtonClick}
       >
         {selectedOption}
       </MenuButton>

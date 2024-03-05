@@ -25,7 +25,7 @@ import { IChapter } from "~/server/models/Chapter";
 import { NewFundModal } from "~/components/NewFundModal";
 
 export default function RaisedFunds() {
-  const [filter, setFilter] = useState("category");
+  const [filter, setFilter] = useState("date");
   const [selectedFund, setSelectedFund] = useState<Fund | null>(null);
 
   const {

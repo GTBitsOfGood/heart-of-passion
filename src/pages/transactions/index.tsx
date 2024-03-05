@@ -60,7 +60,12 @@ import {
     const groups = (function () {
       if (transactions && transactions.length > 0) {
         if (filter === "date") {
-          transactions.sort((a, b) => b.transactionDate.localeCompare(a.transactionDate));
+          // transactions.sort((a, b) => b.transactionDate.localeCompare(a.transactionDate));
+          transactions.sort((a, b) => {
+            const dateA = new Date(a.transactionDate);
+            const dateB = new Date(b.transactionDate);
+            return dateA.getTime() - dateB.getTime();
+          });
           return [{ title: "Date", transactions: transactions }];
         } else if (filter === "chapter") {
           const uniques = [...new Set(transactions?.map((u) => u.chapter))];

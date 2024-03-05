@@ -9,10 +9,12 @@ import {
     useDisclosure,
     HStack,
   } from "@chakra-ui/react";
-  import { Transaction } from "~/common/types";
+  import { Transaction, Chapter } from "~/common/types";
   import fonts from "~/common/theme/fonts";
   import { NewTransactionModal } from "../NewTransactionModal";
   import { useRef } from "react";
+  import { RadioDropdown } from "../RadioDropdown";
+  import { trpc } from "../../utils/api";
   
   export default function Transactions({
     transactionId,
@@ -29,7 +31,30 @@ import {
       onClose: onCloseAddTransactionModal,
     } = useDisclosure();
     const finalRef = useRef(null);
+    
+    const trpcUtils = trpc.useContext();
+
+    const chapters = trpc.chapter.getChapters.useQuery();
   
+    const updateTransactionChapter = trpc.transaction.updateTransactionChapter.useMutation({
+      onSuccess: () => {
+        trpcUtils.transaction.invalidate();
+      },
+    });
+
+    const handleChapterChange = (chapter: string) =>
+    updateTransactionChapter.mutate({
+      transactionId: transactionId,
+      chapter: chapter,
+      amount: amount,
+    });
+
+    const formattedDate = new Date(transactionDate).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+    });
+
     return (
       <>
         <Grid
@@ -48,23 +73,18 @@ import {
           </GridItem>
           <GridItem colSpan={1}>
             <Box fontFamily={fonts.nunito} minW="20%">
-                {amount}
+                ${amount}
             </Box>
           </GridItem>
           <GridItem colSpan={2}>
-            {transactionDate}
+            {formattedDate}
           </GridItem>
-          <GridItem colSpan={2}>
-            <Box
-            backgroundColor={chapter === "Unclassified" ? "#FFDEDF" : "#DEEBFF"}
-            borderRadius=".2em"
-            fontFamily={fonts.nunito}
-            justifySelf="center"
-            py=".1em"
-            px=".5em"
-            >
-            {chapter}
-            </Box>
+          <GridItem colSpan={2} display="flex" justifyContent="flex-start">
+            <RadioDropdown
+                    options={[...(chapters.data?.map((ch: Chapter) => ch.name) ?? []), "Unclassified"]}
+                    selectedOption={chapter}
+                    setSelectedOption={handleChapterChange}
+            />
           </GridItem>
           <GridItem colSpan={3}>
             <Box fontFamily={fonts.nunito} minW="10%">

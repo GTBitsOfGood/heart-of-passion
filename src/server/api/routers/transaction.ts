@@ -144,6 +144,36 @@ export const transactionRouter = createTRPCRouter({
         }
       }
     }),
+    updateTransactionChapter: studentProcedure
+    .input(
+      z.object({
+        transactionId: z.string(),
+        chapter: z.string(),
+        amount: z.number(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const { transactionId, chapter, amount } = input;
+      const originalTransaction = await TransactionModel.findOne({ transactionId }).exec();
+      await TransactionModel.findOneAndUpdate(
+        { transactionId: transactionId },
+        {chapter: chapter},
+      ).exec();
+      if (originalTransaction && originalTransaction.chapter !== "Unclassified") {
+        const originalChapter = await ChapterModel.findOne({ name: originalTransaction.chapter }).exec();
+        if (originalChapter) {
+          originalChapter.fundActual -= originalTransaction.amount;
+          await originalChapter.save();
+        }
+      }
+      if (chapter !== "Unclassified") {
+        const chapterToUpdate = await ChapterModel.findOne({ name: chapter }).exec();
+        if (chapterToUpdate) {
+          chapterToUpdate.fundActual += amount;
+          await chapterToUpdate.save();
+        }
+      }
+    }),
     deleteTransaction: studentProcedure
     .input(
       z.object({
