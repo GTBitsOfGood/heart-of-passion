@@ -4,7 +4,7 @@ import { useState } from "react";
 import DonorEntry from "./DonorEntry";
 import { Donor, DonorList } from "src/common/types";
 
-export default function DonorList({ title, donors }: DonorList) {
+export default function DonorList({ includeTitle, title, donors }: DonorList) {
   const [open, setOpen] = useState(true);
 
   return (
@@ -13,14 +13,16 @@ export default function DonorList({ title, donors }: DonorList) {
         <Flex
           justifyContent="space-between"
           onClick={() => setOpen(!open)}
-          borderBottom="1px #AEAEAE solid"
+          borderBottom={includeTitle ? "1px solid #AEAEAE" : "none"}
           p=".5em"
-          marginBottom="1em"
+          marginBottom={includeTitle ? "1em" : "none"}
         >
-          <Heading size="md" textTransform="capitalize">
-            {title}
-          </Heading>
-          {open ? <TriangleUpIcon /> : <TriangleDownIcon />}
+          {includeTitle && (
+            <Heading size="md" textTransform="capitalize">
+              {title}
+            </Heading>
+          )}
+          {includeTitle && (open ? <TriangleUpIcon /> : <TriangleDownIcon />)}
         </Flex>
         <Stack pl="3em" gap="1em">
           {open ? (

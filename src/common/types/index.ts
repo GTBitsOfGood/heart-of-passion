@@ -34,6 +34,7 @@ export type Donor = z.infer<typeof donorSchema>;
 
 //DonorList
 export const donorListSchema = z.object({
+  includeTitle: z.boolean(),
   title: z.string(),
   donors: z.array(donorSchema),
 });
