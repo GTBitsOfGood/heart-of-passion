@@ -14,7 +14,7 @@ export default function DonorList({ includeTitle, title, donors }: DonorList) {
           justifyContent="space-between"
           onClick={() => setOpen(!open)}
           borderBottom={includeTitle ? "1px solid #AEAEAE" : "none"}
-          p=".5em"
+          p={includeTitle ? ".5em" : "none"}
           marginBottom={includeTitle ? "1em" : "none"}
         >
           {includeTitle && (

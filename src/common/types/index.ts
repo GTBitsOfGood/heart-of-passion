@@ -195,6 +195,7 @@ export type Fund = z.infer<typeof fundSchema>;
 
 // Fund List
 export const fundListSchema = z.object({
+  includeTitle: z.boolean(),
   title: z.string(),
   funds: z.array(fundSchema),
 });
