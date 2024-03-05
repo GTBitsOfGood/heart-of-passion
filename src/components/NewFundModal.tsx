@@ -30,18 +30,6 @@ type NewFundProps = {
   retreatId: string;
 };
 
-// Validate and parse date
-function isValidDate(dateString: string): boolean {
-  const datePattern = /^(0?[1-9]|1[0-2])\/(0?[1-9]|[12][0-9]|3[01])\/\d{4}$/;
-  return datePattern.test(dateString);
-}
-
-// Parse amount as a number (dollars with two decimal places)
-function parseAmount(amountString: string): number {
-  const amount = parseFloat(amountString.replace(/[$,]/g, ""));
-  return isNaN(amount) ? 0 : amount;
-}
-
 enum FundError {
   None, // No error
   Empty, // Empty user
@@ -62,7 +50,7 @@ export const NewFundModal = ({
   create,
   retreatId,
 }: NewFundProps) => {
-  // Form Data
+  // form data
   const [name, setName] = useState(fund ? fund.name : "");
   const [date, setDate] = useState(fund ? fund.date : "");
   const [amount, setAmount] = useState(fund ? fund.amount : 0);
@@ -86,19 +74,19 @@ export const NewFundModal = ({
   } = useDisclosure({ defaultIsOpen: false });
 
   const trpcUtils = trpc.useContext();
-  const updateFund = trpc.fundraiser.updateFundraiser.useMutation({
+  const updateFund = trpc.fund.updateFund.useMutation({
     onSuccess: () => {
-      trpcUtils.fundraiser.invalidate();
+      trpcUtils.fund.invalidate();
     },
   });
-  const createFund = trpc.fundraiser.createFundraiser.useMutation({
+  const createFund = trpc.fund.createFund.useMutation({
     onSuccess: () => {
-      trpcUtils.fundraiser.invalidate();
+      trpcUtils.fund.invalidate();
     },
   });
-  const deleteFund = trpc.fundraiser.deleteFundraiser.useMutation({
+  const deleteFund = trpc.fund.deleteFund.useMutation({
     onSuccess: () => {
-      trpcUtils.fundraiser.invalidate();
+      trpcUtils.fund.invalidate();
     },
   });
 
@@ -115,29 +103,14 @@ export const NewFundModal = ({
     if (create)
       createFund.mutate({
         retreatId: retreatId,
-        fundraiserDetails: {
-          name: name,
-          location: "TODO LOCATION",
-          date: date,
-          contactName: "TODO DATE",
-          email: "TODO@todo.com",
-          profit: 1, // TODOj
-          expenses: [],
-        },
+        fundDetails: { name: name, date: date, amount: amount, source: source },
       });
     else
       updateFund.mutate({
-        fundraiserId: fund?._id!,
-        fundraiser: {
-          name: name,
-          location: "TODO LOCATION",
-          date: date,
-          contactName: "TODO DATE",
-          email: "TODO@todo.com",
-          profit: 1, // TODOj
-          expenses: [],
-        },
+        fundId: fund?._id!,
+        updates: { name: name, date: date, amount: amount, source: source },
       });
+
     onCloseModal();
     onCloseModal();
     return true;

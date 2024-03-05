@@ -86,6 +86,12 @@ export const NewTimeForm = ({
   );
   const [endTimeError, setEndTimeError] = useState(false);
 
+  const newTime: DateObject = {
+    day: day,
+    from: startTime,
+    to: endTime,
+  };
+
   useEffect(() => {
     setDay(selectedTime?.day ?? 1);
     setStartTime(selectedTime?.from ?? "09:00 am");
@@ -100,11 +106,7 @@ export const NewTimeForm = ({
     onCloseError();
     onCloseSide();
     //settimes
-    const newTime: DateObject = {
-      day: day,
-      from: startTime,
-      to: endTime,
-    };
+
     setTimes((prevTimes) => {
       let updatedTimes = prevTimes;
       if (editing) {
@@ -129,16 +131,31 @@ export const NewTimeForm = ({
     setSelectedTime(undefined);
   };
 
+  const handleDelete = () => {
+    onCloseError();
+    onCloseSide();
+    setTimes((prevTimes) => {
+      let updatedTimes = prevTimes.filter((e) => e !== selectedTime);
+      return updatedTimes;
+    });
+    setSelectedTime(undefined);
+  };
+
   const validateFields = () => {
     if (toMinutes(endTime) <= toMinutes(startTime)) {
       setEndTimeError(true);
       return false;
     }
 
-    const duplicate = times?.some(
-      (t) => t.day == day && t.from === startTime && t.to === endTime,
+    const sameTime = (t1: DateObject, t2: DateObject) => {
+      return t1.day === t2.day && t1.from === t2.from && t1.to === t2.to;
+    };
+
+    const duplicate = times?.some((time) =>
+      sameTime(time, { day, from: startTime, to: endTime }),
     );
-    if (duplicate) {
+
+    if (duplicate && (!selectedTime || !sameTime(selectedTime, newTime))) {
       setEndTimeError(true);
       return false;
     }
@@ -208,6 +225,7 @@ export const NewTimeForm = ({
           variant="outline"
           borderRadius="6px"
           mr="13px"
+          onClick={handleDelete}
         >
           DELETE
         </Button>

@@ -24,9 +24,11 @@ export const fundRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       const { retreatId, fundDetails } = input;
-      console.log(fundDetails);
+      console.log("Created Fund", fundDetails);
       const fund = new FundModel({ retreatId, ...fundDetails });
       await fund.save();
+
+      return { success: true };
     }),
   //get
   getFunds: studentProcedure.input(z.string()).query(async (opts) => {
