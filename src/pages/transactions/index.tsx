@@ -87,7 +87,7 @@ import {
       }
     })();
     const groupsRendered = groups.map((gr: any) => (
-      <TransactionList key={gr.title} {...gr} />
+      <TransactionList includeTitle={false} key={gr.title} {...gr} />
     ));
   
     return (

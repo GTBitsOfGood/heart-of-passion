@@ -166,6 +166,7 @@ export const transactionSchema = z.object({
 export type Transaction = z.infer<typeof transactionSchema>;
 
 export const transactionListSchema = z.object({
+  includeTitle: z.boolean(),
   title: z.string(),
   transactions: z.array(transactionSchema),
 });
