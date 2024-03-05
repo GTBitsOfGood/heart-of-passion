@@ -105,7 +105,7 @@ const Sidebar = ({
 
   return (
     <>
-      <Box pos="fixed" w="400px" h="100%">
+      <Box pos="fixed" w="400px" h="100%" className="no-scroll-bar">
         <Box
           bg={"#F9F9F9"}
           borderRight="1px"
@@ -113,6 +113,7 @@ const Sidebar = ({
           marginRight="-20px"
           paddingRight="20px"
           h="100%"
+          className="no-scroll-bar"
           scrollBehavior={"smooth"}
           overflowY={"scroll"}
           p="20px"
