@@ -200,7 +200,7 @@ export default function DummyPage() {
             startDate: earlierDate.toISOString(),
             endDate: date.toISOString(),
           });
-          storeTransaction.mutate({chapterId: "65b29ab8d35b2f536e2bdc4a", transactionDetails: txHistory[1]});
+          storeTransaction.mutate({transactionDetails: txHistory[1]});
           // console.log(txHistory)
         }}>LOG TRANSACTIONS</Button>
       </Stack>
