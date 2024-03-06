@@ -12,6 +12,8 @@ import { Chapter, Expense } from "~/common/types";
 import { EventModel, IEvent } from "~/server/models/Event";
 import { RetreatModel, IRetreat } from "~/server/models/Retreat";
 import { TRPCError } from "@trpc/server";
+import { FundraiserModel, IFundraiser } from "~/server/models/Fundraiser";
+import { FundModel, IFund } from "~/server/models/Fund";
 
 export const chapterRouter = createTRPCRouter({
   createChapter: adminProcedure
@@ -99,6 +101,9 @@ async function processChapter(chapterModel: Chapter): Promise<Chapter> {
     .sort("-year")
     .exec())!;
 
+  let fundraisers_sum = 0;
+  let funds_sum = 0;
+
   let cost = 0;
   if (retreat) {
     const events = (await EventModel.find({ retreatId: retreat?._id }).exec())!;
@@ -108,13 +113,21 @@ async function processChapter(chapterModel: Chapter): Promise<Chapter> {
         cost += expense.cost * (expense.numUnits || 1);
       });
     });
+    const fundraisers = (await FundraiserModel.find({ retreatId: retreat?._id }).exec())!;
+    fundraisers?.forEach((fundraiser: IFundraiser) => {
+      fundraisers_sum += fundraiser.profit;
+    });
+    const funds = (await FundModel.find({ retreatId: retreat?._id }).exec())!;
+    funds?.forEach((fund: IFund) => {
+      funds_sum += fund.amount;
+    })
   }
 
   return {
     name: chapterModel.name,
     totalCost: cost,
-    fundExpected: 5100,
-    fundActual: 2600,
+    fundExpected: fundraisers_sum,
+    fundActual: funds_sum,
     id: chapterModel.id,
   };
 }
