@@ -81,7 +81,7 @@ export const transactionRouter = createTRPCRouter({
           message: tx_info.transaction_note ?? "",
           payerName: e.payer_info?.payer_name?.alternate_full_name ?? "",
           amount: parseFloat(tx_info.transaction_amount.value),
-          chapter: (tx_info.chapter) ? tx_info.chapter : "Unclassified",
+          chapter: "Unclassified",
         };
 
         return tx;
@@ -124,55 +124,24 @@ export const transactionRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       const { transactionId, updatedTransaction } = input;
-      const originalTransaction = await TransactionModel.findOne({ transactionId }).exec();
       await TransactionModel.findOneAndUpdate(
         { transactionId: transactionId },
         updatedTransaction,
       ).exec();
-      if (originalTransaction && originalTransaction.chapter !== "Unclassified") {
-        const originalChapter = await ChapterModel.findOne({ name: originalTransaction.chapter }).exec();
-        if (originalChapter) {
-          originalChapter.fundActual -= originalTransaction.amount;
-          await originalChapter.save();
-        }
-      }
-      if (updatedTransaction.chapter !== "Unclassified") {
-        const chapterToUpdate = await ChapterModel.findOne({ name: updatedTransaction.chapter }).exec();
-        if (chapterToUpdate) {
-          chapterToUpdate.fundActual += updatedTransaction.amount;
-          await chapterToUpdate.save();
-        }
-      }
     }),
     updateTransactionChapter: studentProcedure
     .input(
       z.object({
         transactionId: z.string(),
         chapter: z.string(),
-        amount: z.number(),
       }),
     )
     .mutation(async ({ input }) => {
-      const { transactionId, chapter, amount } = input;
-      const originalTransaction = await TransactionModel.findOne({ transactionId }).exec();
+      const { transactionId, chapter } = input;
       await TransactionModel.findOneAndUpdate(
         { transactionId: transactionId },
         {chapter: chapter},
       ).exec();
-      if (originalTransaction && originalTransaction.chapter !== "Unclassified") {
-        const originalChapter = await ChapterModel.findOne({ name: originalTransaction.chapter }).exec();
-        if (originalChapter) {
-          originalChapter.fundActual -= originalTransaction.amount;
-          await originalChapter.save();
-        }
-      }
-      if (chapter !== "Unclassified") {
-        const chapterToUpdate = await ChapterModel.findOne({ name: chapter }).exec();
-        if (chapterToUpdate) {
-          chapterToUpdate.fundActual += amount;
-          await chapterToUpdate.save();
-        }
-      }
     }),
     deleteTransaction: studentProcedure
     .input(
@@ -182,15 +151,7 @@ export const transactionRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       const { transaction } = input;
-      const transactionToDelete = await TransactionModel.findOne({ transactionId: transaction.transactionId }).exec();
       await TransactionModel.findOneAndDelete({transactionId : transaction.transactionId}).exec();
-      if (transaction.chapter !== "Unclassified") {
-        const chapterToUpdate = await ChapterModel.findOne({ name: transaction.chapter }).exec();
-        if (chapterToUpdate) {
-          chapterToUpdate.fundActual -= transaction.amount;
-          await chapterToUpdate.save();
-        }
-      }
     }),
     getTransaction: studentProcedure
     .input(z.string())

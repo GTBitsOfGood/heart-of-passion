@@ -46,7 +46,6 @@ import {
     updateTransactionChapter.mutate({
       transactionId: transactionId,
       chapter: chapter,
-      amount: amount,
     });
 
     const formattedDate = new Date(transactionDate).toLocaleDateString('en-US', {
