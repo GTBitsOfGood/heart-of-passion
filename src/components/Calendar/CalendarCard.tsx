@@ -22,6 +22,7 @@ export default function CalendarCard({
   width,
   right,
   startTime,
+  zoom
 }: {
   event: IEvent;
   date: DateObject;
@@ -30,10 +31,11 @@ export default function CalendarCard({
   retreatId: string;
   right?: boolean;
   startTime?: string;
+  zoom: number;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const height = computeHeight(date.from, date.to, screen.height);
-  const topY = computeHeight(startTime ?? "9:00 am", date.from, screen.height);
+  const height = computeHeight(date.from, date.to, screen.height, zoom);
+  const topY = computeHeight(startTime ?? "9:00 am", date.from, screen.height, zoom);
   const parentRef: any = useRef();
   const [variant, setVariant] = useState(3);
   useEffect(() => {
@@ -142,6 +144,7 @@ export default function CalendarCard({
         display={"flex"}
         border="1px solid #D9D9D9"
         marginBottom={"16px"}
+        cursor="pointer"
         onClick={onOpen}
         overflow={variant < -1 ? "visible" : "hidden"}
         ref={parentRef}
