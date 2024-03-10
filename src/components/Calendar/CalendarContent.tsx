@@ -26,12 +26,11 @@ type EventWithStamp = {
   to: string;
 };
 
-
 export default function CalendarContent({
   events,
   counter,
   retreatId,
-  zoom
+  zoom,
 }: {
   events: IEvent[];
   counter: number;

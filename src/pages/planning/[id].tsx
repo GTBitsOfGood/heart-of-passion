@@ -25,7 +25,7 @@ export enum PlanningSort {
 
 export default function Planning() {
   const router = useRouter();
-  const { id: retreatId}: { id?: string } = router.query;
+  const { id: retreatId }: { id?: string } = router.query;
 
   const {
     isOpen: isOpenFundraisingPlanningModal,
@@ -36,7 +36,7 @@ export default function Planning() {
   const fundraisers = trpc.fundraiser.getFundraisers.useQuery(retreatId!, {
     enabled: !!retreatId,
   }).data;
-  
+
   const chapter = trpc.chapter.getChapterByRetreatId.useQuery(retreatId!, {
     enabled: !!retreatId,
   })?.data;

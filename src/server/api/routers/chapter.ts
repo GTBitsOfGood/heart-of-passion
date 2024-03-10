@@ -113,14 +113,16 @@ async function processChapter(chapterModel: Chapter): Promise<Chapter> {
         cost += expense.cost * (expense.numUnits || 1);
       });
     });
-    const fundraisers = (await FundraiserModel.find({ retreatId: retreat?._id }).exec())!;
+    const fundraisers = (await FundraiserModel.find({
+      retreatId: retreat?._id,
+    }).exec())!;
     fundraisers?.forEach((fundraiser: IFundraiser) => {
       fundraisers_sum += fundraiser.profit;
     });
     const funds = (await FundModel.find({ retreatId: retreat?._id }).exec())!;
     funds?.forEach((fund: IFund) => {
       funds_sum += fund.amount;
-    })
+    });
   }
 
   return {

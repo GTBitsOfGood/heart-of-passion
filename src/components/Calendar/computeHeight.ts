@@ -2,7 +2,7 @@ export const computeHeight = (
   startTime: string,
   endTime: string,
   screenHeight: number,
-  zoom: number = 1.0
+  zoom: number = 1.0,
 ): number => {
   var start = 0;
   var end = 0;
