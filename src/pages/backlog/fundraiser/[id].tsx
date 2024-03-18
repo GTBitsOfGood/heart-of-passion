@@ -72,7 +72,7 @@ export default function Backlog() {
       <Box>
         {eventsByYear && (
           <Box display={"flex"}>
-            <Box>{chapter ? <Sidebar chapter={chapter} /> : <Spinner />}</Box>
+            <Box>{chapter ? <Sidebar chapter={chapter} pageClicked={7} /> : <Spinner />}</Box>
             <Box
               display={"flex"}
               flexDirection={"column"}

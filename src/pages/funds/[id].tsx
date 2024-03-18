@@ -130,6 +130,7 @@ export default function RaisedFunds() {
         chapter={chapter ? chapter : dummyChapter}
         year={retreat ? retreat.year : dummyYear}
         retreatId={retreatId}
+        pageClicked={8}
       />
       <Stack
         spacing={4}

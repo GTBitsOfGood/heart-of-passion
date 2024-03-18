@@ -156,7 +156,7 @@ export default function FundraiserExpenses() {
   return (
     <Box>
       {chapter ? (
-        <Sidebar chapter={chapter!} retreatId={retreatId} />
+        <Sidebar chapter={chapter!} retreatId={retreatId} pageClicked={5} />
       ) : (
         <Spinner />
       )}

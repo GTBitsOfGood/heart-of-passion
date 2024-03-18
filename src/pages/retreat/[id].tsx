@@ -92,6 +92,7 @@ export default function Calendar() {
             chapter={chapter}
             year={retreat.year}
             retreatId={retreat._id}
+            pageClicked={1}
           />
         )}
       </GridItem>

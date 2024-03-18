@@ -111,7 +111,7 @@ export default function Donors() {
   return (
     <Box>
       {chapter ? (
-        <Sidebar chapter={chapter!} retreatId={retreatId} />
+        <Sidebar chapter={chapter!} retreatId={retreatId} pageClicked={6} />
       ) : (
         <Spinner />
       )}
