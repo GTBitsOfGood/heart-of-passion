@@ -589,9 +589,7 @@ export const NewEventModal = ({
                     fontWeight="400"
                     lineHeight="25px"
                   >{`$${state.event.expenses.reduce(
-                    (acc, cv) =>
-                      acc + cv.cost * (cv.numUnits ? cv.numUnits : 1),
-                    0,
+                    (acc: any, cv: any) => acc + (cv.numUnits ? cv.cost * cv.numUnits : cv.cost),0
                   )}`}</Text>
                 </HStack>
                 {state.event.notes && (
