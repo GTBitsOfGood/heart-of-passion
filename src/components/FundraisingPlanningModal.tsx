@@ -92,14 +92,17 @@ export const FundraisingPlanningModal = ({
 }: FundraisingPlanningModalProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [selectedExpense, setSelectedExpense] = useState<Expense>();
+  const [nameError, setNameError] = useState<string>("");
+  const [emailError, setEmailError] = useState<string>("");
+  const [profitError, setProfitError] = useState<string>("");
 
   const onCloseModal = () => {
     onClose();
     setNameError("");
+    setEmailError("");
+    setProfitError("");
   };
   const sidebarOpen = state.expenseFormOpen;
-
-  const [nameError, setNameError] = useState<string>("");
 
   return (
     <Modal
@@ -203,7 +206,7 @@ export const FundraisingPlanningModal = ({
                 width="100%"
                 justifyContent="space-between"
               >
-                <FormControl
+                <FormControl isRequired
                   //Date
                   width="182px"
                   maxWidth="182px"
@@ -253,10 +256,7 @@ export const FundraisingPlanningModal = ({
                 </FormControl>
               </HStack>
 
-              <FormControl
-                //Email
-                marginTop="23px"
-              >
+              <FormControl isRequired isInvalid={emailError !== ""} mt="23px">
                 <FormLabel
                   mb="10px"
                   fontWeight="500"
@@ -270,13 +270,26 @@ export const FundraisingPlanningModal = ({
                   color="black"
                   border="1px solid #D9D9D9"
                   borderRadius="0px"
-                ></Input>
+                  value={state.fundraiser.email}
+                  onChange={(e) => {
+                    dispatch({
+                      type: "UPDATE_FUNDRAISER",
+                      field: "email",
+                      value: e.target.value,
+                    });
+                    // Email validation
+                    const emailPattern = /\S+@\S+\.\S+/;
+                    if (!emailPattern.test(e.target.value)) {
+                      setEmailError("Please enter a valid email address");
+                    } else {
+                      setEmailError("");
+                    }
+                  }}
+                />
+                <FormErrorMessage>{emailError}</FormErrorMessage>
               </FormControl>
 
-              <FormControl
-                //Expected Net Profit
-                marginTop="22px"
-              >
+              <FormControl isRequired marginTop="22px" isInvalid={profitError !== ""}>
                 <FormLabel
                   mb="10px"
                   fontWeight="500"
@@ -286,14 +299,7 @@ export const FundraisingPlanningModal = ({
                 >
                   Expected Net Profit
                 </FormLabel>
-                <InputGroup
-                  border="1px solid #D9D9D9"
-                  borderRadius="0px"
-                  color="black"
-                  fontSize="18px"
-                  fontWeight="400"
-                  lineHeight="25px"
-                >
+                <InputGroup border="1px solid #D9D9D9" borderRadius="0px" color="black" fontSize="18px" fontWeight="400" lineHeight="25px">
                   <Input
                     value="$"
                     _focusVisible={{ outline: "none" }}
@@ -311,11 +317,17 @@ export const FundraisingPlanningModal = ({
                     paddingInlineStart="none"
                     paddingInlineEnd="none"
                     _focusVisible={{ outline: "none" }}
-
-                    // value={`$${profit}`}
-                    // onChange={(e)=>{setProfit(parseInt(e.target.value.substring(1)))}}
-                  ></Input>
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      if (isNaN(value) || value <= 0) {
+                        setProfitError("Expected net profit must be a positive number");
+                      } else {
+                        setProfitError("");
+                      }
+                    }}
+                  />
                 </InputGroup>
+                <FormErrorMessage>{profitError}</FormErrorMessage>
               </FormControl>
 
               <HStack mt="26px" width="100%" justifyContent="space-between">
