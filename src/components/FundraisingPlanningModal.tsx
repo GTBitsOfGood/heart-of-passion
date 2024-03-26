@@ -3,6 +3,7 @@ import {
   Button,
   Divider,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   HStack,
   Input,
@@ -87,45 +88,18 @@ const initialState: State = {
 export const FundraisingPlanningModal = ({
   isOpen,
   onClose,
-  onOpenError,
-  onCloseError,
   fundraiser,
 }: FundraisingPlanningModalProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [selectedExpense, setSelectedExpense] = useState<Expense>();
-  const toast = useToast();
-
-  const handleFundraiserNameChange = (event: React.FormEvent<HTMLInputElement>) =>
-    dispatch({
-      type: "UPDATE_FUNDRAISER",
-      field: "name",
-      value: event.currentTarget.value,
-    });
-  
-  const validateFields = () => {
-    try {
-      fundraiserSchema.parse(state);
-      return true;
-    } catch (e) {
-      let errorDesc = "Unknown Error";
-      if (e instanceof z.ZodError) {
-        errorDesc = e.issues.map((issue) => issue.message).join("\n");
-      }
-      toast({
-        title: "Error",
-        description: errorDesc,
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    }
-  }
-
 
   const onCloseModal = () => {
     onClose();
+    setNameError("");
   };
   const sidebarOpen = state.expenseFormOpen;
+
+  const [nameError, setNameError] = useState<string>("");
 
   return (
     <Modal
@@ -166,29 +140,41 @@ export const FundraisingPlanningModal = ({
             boxShadow={"0px 4px 29px 0px #00000040"}
           >
             <VStack height="100%" spacing="0px">
-              <Input
-                //Enter Fundraiser Name
-                height="53px"
-                minHeight="53px"
-                color="black"
-                border="none"
-                fontSize="36px"
-                fontWeight="700"
-                lineHeight="53px"
-                fontFamily="heading"
-                placeholder="Enter Fundraiser Name"
-                _placeholder={{
-                  color: "#9F9F9F",
-                }}
-                outline="none"
-                _focusVisible={{
-                  outline: "none",
-                }}
-                // padding="none"
-                paddingInlineStart="none"
-                paddingInlineEnd="none"
-                // sx={{ outline: "none" }}
-              />
+            <FormControl isRequired isInvalid={nameError !== ""} mt="23px">
+                <Input
+                  //Enter Fundraiser Name
+                  height="53px"
+                  minHeight="53px"
+                  color="black"
+                  border="none"
+                  fontSize="36px"
+                  fontWeight="700"
+                  lineHeight="53px"
+                  fontFamily="heading"
+                  placeholder="Enter Fundraiser Name"
+                  _placeholder={{
+                    color: "#9F9F9F",
+                  }}
+                  outline="none"
+                  _focusVisible={{
+                    outline: "none",
+                  }}
+                  value={state.fundraiser.name}
+                  onChange={(e) => {
+                    dispatch({
+                      type: "UPDATE_FUNDRAISER",
+                      field: "name",
+                      value: e.target.value,
+                    });
+                    if (e.target.value.trim() === "") {
+                      setNameError("Fundraiser name cannot be empty");
+                    } else {
+                      setNameError("");
+                    }
+                  }}
+                />
+                <FormErrorMessage>{nameError}</FormErrorMessage>
+              </FormControl>
               <Divider borderColor="black" />
 
               <FormControl
