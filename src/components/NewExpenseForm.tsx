@@ -40,6 +40,7 @@ const initialState: State = {
   name: "Expense Name",
   type: "Entertainment",
   cost: -1000,
+  numUnits: 1,
 };
 
 // const [expense, setExpense] = useState(selectedExpense)
@@ -80,7 +81,7 @@ export const NewExpenseForm = ({
       value: event.currentTarget.value,
     });
   const handleCostChange = (event: React.FormEvent<HTMLInputElement>) => {
-    if (event.currentTarget.value !== "") {
+    if (event.currentTarget.value !== "" && parseFloat(event.currentTarget.value) >= 0) {
       dispatch({
         type: "UPDATE_EXPENSE",
         field: "cost",
@@ -90,38 +91,35 @@ export const NewExpenseForm = ({
       dispatch({
         type: "UPDATE_EXPENSE",
         field: "cost",
-        value: -1000,
+        value: 0,
       });
     }
   };
 
-  const handleUnitsChange = (event: React.FormEvent<HTMLInputElement>) =>
-    dispatch({
-      type: "UPDATE_EXPENSE",
-      field: "numUnits",
-      value: parseInt(event.currentTarget.value || "1"),
-    });
+  const handleUnitsChange = (event: React.FormEvent<HTMLInputElement>) => {
+    if (parseInt(event.currentTarget.value || "1") > 0) {
+      dispatch({
+        type: "UPDATE_EXPENSE",
+        field: "numUnits",
+        value: parseInt(event.currentTarget.value || "1"),
+      });
+    } 
+  }
   // const handleNotesChange = (e: ChangeEvent<HTMLTextAreaElement>) =>
   //   dispatch({ type: "UPDATE_EXPENSE", field: "notes", value: e.target.value });
 
   const validateFields = () => {
-    //todo
-    // if(state.name)
     try {
       expenseSchema.parse(state);
-      // console.log('parse ');
-      // console.log(state);
       return true;
     } catch (e) {
       let errorDesc = "Unknown Error";
       if (e instanceof z.ZodError) {
-        // console.log(state.event);
+        console.log(e)
         errorDesc = e.issues.map((issue) => issue.message).join("\n");
-        // errorDesc = `Please fill all fields marked by asterisk`;
-        // console.log(e.issues);
-        // console.log(state);
+        errorDesc = `Please fill all fields marked by asterisk`;
       }
-      // onOpenError();
+      onOpenError();
       toast({
         title: "Error",
         description: errorDesc,
@@ -169,10 +167,10 @@ export const NewExpenseForm = ({
 
   const handleApply = async () => {
     if (!validateFields()) {
-      // onOpenError();
+      onOpenError();
       return;
     }
-    // onCloseError();
+    onCloseError();
     if (onCloseSide) {
       onCloseSide();
     }
@@ -297,7 +295,7 @@ export const NewExpenseForm = ({
             onChange={(e) => {
               let numUnits;
               if (e == "unit") numUnits = state.numUnits ?? 1;
-              else numUnits = undefined;
+              else numUnits = 1;
 
               dispatch({
                 type: "UPDATE_EXPENSE",
