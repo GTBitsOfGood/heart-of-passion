@@ -122,6 +122,16 @@ export default function RetreatExpenses() {
           title: e,
           expenses: emap.get(e) || [],
         }));
+      } else if (filter === "state") {
+        const uniques = [...new Set(expenses?.map((u) => u.type))]; // array of unique vals
+        const emap: Map<string, ExpenseWithDateAndEvent[]> = new Map(
+          uniques.map((e) => [e, new Array()]),
+        ); // map of val to empty array
+        expenses?.forEach((e) => emap.get(e.state)?.push(e));
+        return uniques?.map((e) => ({
+          title: e,
+          expenses: emap.get(e) || [],
+        }));
       } else if (filter === "highest cost") {
         expenses.sort((a, b) => getTotalCost(b) - getTotalCost(a));
         return [{ title: "Highest to Lowest", expenses: expenses }];
@@ -233,7 +243,10 @@ export default function RetreatExpenses() {
                       ? "View by Category"
                       : filter == "lowest cost"
                       ? "View by Lowest Cost"
-                      : "View by Highest Cost"}
+                      : filter == "state"
+                      ? "Status"
+                      : "View by Highest Cost"
+                    }
                   </Text>
                   <TriangleDownIcon />
                 </Button>
@@ -279,6 +292,16 @@ export default function RetreatExpenses() {
                         fontSize="sm"
                       >
                         Highest Cost
+                      </Text>
+                    </Box>
+                    <Box onClick={() => handleFilterClick("state")}>
+                      <Text
+                        align="right"
+                        cursor="pointer"
+                        fontFamily={fonts.nunito}
+                        fontSize="sm"
+                      >
+                        Status
                       </Text>
                     </Box>
                   </Stack>
