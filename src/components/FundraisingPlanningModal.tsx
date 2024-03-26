@@ -16,15 +16,20 @@ import {
   Select,
   Text,
   VStack,
+  useToast,
 } from "@chakra-ui/react";
 import { useReducer, useState } from "react";
 import { DownArrowIcon } from "~/common/theme/icons";
-import { Expense, Fundraiser } from "~/common/types";
+import { Expense, Fundraiser, fundraiserSchema } from "~/common/types";
 import { NewExpenseForm } from "./NewExpenseForm";
+import { z } from "zod";
+import { fundraiserRouter } from "~/server/api/routers/fundraiser";
 
 type FundraisingPlanningModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  onOpenError: () => void;
+  onCloseError: () => void;
   fundraiser?: Fundraiser;
 };
 
@@ -37,7 +42,8 @@ type Action<T extends keyof Fundraiser = keyof Fundraiser> =
   | { type: "TOGGLE_EXPENSE_SIDEBAR" }
   | { type: "CLOSE_SIDEBAR" }
   | { type: "RESET_FORM"; event: Fundraiser | undefined }
-  | { type: "UPDATE_FUNDRAISER"; field: T; value: Fundraiser[T] };
+  | { type: "UPDATE_FUNDRAISER"; field: Exclude<T, "date">; value: Fundraiser[Exclude<T, "date">] }
+  | { type: "UPDATE_DATE"; value: string };
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
@@ -46,6 +52,11 @@ const reducer = (state: State, action: Action): State => {
         ...state,
         fundraiser: { ...state.fundraiser, [action.field]: action.value },
       };
+    case "UPDATE_DATE":
+        return {
+          ...state,
+          fundraiser: { ...state.fundraiser, date: action.value },
+        };
     case "RESET_FORM":
       if (action.event) return { ...initialState, fundraiser: action.event };
       return { ...initialState };
@@ -76,10 +87,40 @@ const initialState: State = {
 export const FundraisingPlanningModal = ({
   isOpen,
   onClose,
+  onOpenError,
+  onCloseError,
   fundraiser,
 }: FundraisingPlanningModalProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [selectedExpense, setSelectedExpense] = useState<Expense>();
+  const toast = useToast();
+
+  const handleFundraiserNameChange = (event: React.FormEvent<HTMLInputElement>) =>
+    dispatch({
+      type: "UPDATE_FUNDRAISER",
+      field: "name",
+      value: event.currentTarget.value,
+    });
+  
+  const validateFields = () => {
+    try {
+      fundraiserSchema.parse(state);
+      return true;
+    } catch (e) {
+      let errorDesc = "Unknown Error";
+      if (e instanceof z.ZodError) {
+        errorDesc = e.issues.map((issue) => issue.message).join("\n");
+      }
+      toast({
+        title: "Error",
+        description: errorDesc,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  }
+
 
   const onCloseModal = () => {
     onClose();
@@ -198,8 +239,7 @@ export const FundraisingPlanningModal = ({
                     value={state.fundraiser.date}
                     onChange={(e) => {
                       dispatch({
-                        type: "UPDATE_FUNDRAISER",
-                        field: "date",
+                        type: "UPDATE_DATE",
                         value: e.target.value,
                       });
                     }}
@@ -495,4 +535,4 @@ export const FundraisingPlanningModal = ({
       </ModalContent>
     </Modal>
   );
-};
+}
