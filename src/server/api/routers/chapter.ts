@@ -95,41 +95,45 @@ export const chapterRouter = createTRPCRouter({
 });
 
 async function processChapter(chapterModel: Chapter): Promise<Chapter> {
-  let retreat: IRetreat | null = (await RetreatModel.findOne({
+  let retreat: IRetreat | null = await RetreatModel.findOne({
     chapterId: chapterModel.id,
   })
     .sort("-year")
-    .exec())!;
+    .exec();
 
-  let fundraisers_sum = 0;
-  let funds_sum = 0;
-
+  let fundraisersSum = 0;
+  let fundsSum = 0;
   let cost = 0;
+
   if (retreat) {
-    const events = (await EventModel.find({ retreatId: retreat?._id }).exec())!;
-    events?.forEach((event: IEvent) => {
-      let expenses: Expense[] = event.expenses;
-      expenses?.forEach((expense) => {
-        cost += expense.cost * (expense.numUnits || 1);
-      });
-    });
-    const fundraisers = (await FundraiserModel.find({
+    const events = await EventModel.find({ retreatId: retreat?._id }).exec();
+    cost = events?.reduce((acc, event) => {
+      return (
+        acc +
+        event.expenses.reduce((acc, expense) => {
+          return acc + expense.cost * (expense.numUnits || 1);
+        }, 0)
+      );
+    }, 0);
+    const fundraisers = await FundraiserModel.find({
       retreatId: retreat?._id,
-    }).exec())!;
-    fundraisers?.forEach((fundraiser: IFundraiser) => {
-      fundraisers_sum += fundraiser.profit;
-    });
-    const funds = (await FundModel.find({ retreatId: retreat?._id }).exec())!;
-    funds?.forEach((fund: IFund) => {
-      funds_sum += fund.amount;
-    });
+    }).exec();
+
+    fundraisersSum = fundraisers?.reduce((acc, fundraiser) => {
+      return acc + fundraiser.profit;
+    }, 0);
+
+    const funds = await FundModel.find({ retreatId: retreat?._id }).exec();
+    fundsSum = funds?.reduce((acc, fund) => {
+      return acc + fund.amount;
+    }, 0);
   }
 
   return {
     name: chapterModel.name,
     totalCost: cost,
-    fundExpected: fundraisers_sum,
-    fundActual: funds_sum,
+    fundExpected: fundraisersSum,
+    fundActual: fundsSum,
     id: chapterModel.id,
   };
 }
