@@ -104,11 +104,18 @@ export const NewExpenseForm = ({
   };
 
   const handleUnitsChange = (event: React.FormEvent<HTMLInputElement>) => {
-    if (parseInt(event.currentTarget.value || "1") > 0) {
+    const numUnits = parseInt(event.currentTarget.value);
+    if (!isNaN(numUnits) && numUnits > 0) {
       dispatch({
         type: "UPDATE_EXPENSE",
         field: "numUnits",
-        value: parseInt(event.currentTarget.value || "1"),
+        value: numUnits,
+      });
+    } else {
+      dispatch({
+        type: "UPDATE_EXPENSE",
+        field: "numUnits",
+        value: 0,
       });
     }
   };
@@ -122,9 +129,7 @@ export const NewExpenseForm = ({
     } catch (e) {
       let errorDesc = "Unknown Error";
       if (e instanceof z.ZodError) {
-        console.log(e);
         errorDesc = e.issues.map((issue) => issue.message).join("\n");
-        errorDesc = `Please fill all fields marked by asterisk`;
       }
       onOpenError();
       toast({
@@ -299,10 +304,14 @@ export const NewExpenseForm = ({
             Cost Type
           </FormLabel>
           <RadioGroup
-            onChange={(e) => {
-              let numUnits;
-              if (e == "unit") numUnits = state.numUnits ?? 1;
-              else numUnits = 1;
+            onChange={(val) => {
+              let numUnits = state.numUnits;
+
+              if (val == "flat") {
+                numUnits = 1;
+              } else if (val == "unit" && numUnits == 1) {
+                numUnits++;
+              }
 
               dispatch({
                 type: "UPDATE_EXPENSE",
@@ -310,7 +319,7 @@ export const NewExpenseForm = ({
                 value: numUnits,
               });
             }}
-            value={state.numUnits ? "unit" : "flat"}
+            value={state.numUnits == 1 ? "flat" : "unit"}
           >
             <HStack spacing="24px">
               <Radio value="flat">Flat Cost</Radio>
@@ -326,11 +335,9 @@ export const NewExpenseForm = ({
             color="black"
             border="1px solid #D9D9D9"
             borderRadius="0px"
-            value={state.numUnits ?? 1}
-            isDisabled={state.numUnits === undefined}
+            value={state.numUnits === 0 ? "" : state.numUnits.toString()}
             width="100%"
             type="number"
-            required={state.numUnits !== undefined}
             onChange={handleUnitsChange}
             padding="10px"
           />
