@@ -40,6 +40,7 @@ const initialState: State = {
   name: "Expense Name",
   type: "Entertainment",
   cost: 0,
+  numUnits: 0,
 };
 
 function reducer(state: State, action: Action): State {

@@ -113,6 +113,12 @@ export default function Planning() {
                   <FundraisingPlanningModal
                     isOpen={isOpenFundraisingPlanningModal}
                     onClose={onCloseFundraisingPlanningModal}
+                    onOpenError={function (): void {
+                      throw new Error("Function not implemented.");
+                    }}
+                    onCloseError={function (): void {
+                      throw new Error("Function not implemented.");
+                    }}
                   />
                 </Box>
               </Box>
