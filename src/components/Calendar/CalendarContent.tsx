@@ -101,8 +101,8 @@ export default function CalendarContent({
       };
 
       const totalExpense = currEvent.expenses.reduce(
-        (acc: any, cv: any) => acc + cv.cost,
-        0,
+        (acc: any, cv: any) => acc + (cv.numUnits ? cv.cost * cv.numUnits : cv.cost),
+        0
       );
 
       const event: EventWithStamp = {
