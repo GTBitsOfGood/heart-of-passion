@@ -36,6 +36,7 @@ export const fundraiserRouter = createTRPCRouter({
         retreatId,
         ...fundraiserDetails,
       });
+
       await fundraiser.save();
     }),
   updateExpense: studentProcedure

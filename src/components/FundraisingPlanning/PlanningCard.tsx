@@ -1,5 +1,5 @@
 import { Box, Text } from "@chakra-ui/react";
-import { DateObject, Event, Fundraiser } from "~/common/types";
+import { Fundraiser } from "~/common/types";
 
 export default function PlanningCard({
   fundraiser,
@@ -19,7 +19,7 @@ export default function PlanningCard({
       </Text>
       <Box display={"flex"} justifyContent={"space-between"}>
         <Text fontFamily={"nunito"} fontWeight={500} fontSize={20}>
-          Date {fundraiser.date}
+          {new Date(fundraiser.date).toLocaleDateString("en-US")}
         </Text>
         <Text fontFamily={"nunito"} fontWeight={500} fontSize={20}>
           ${fundraiser.profit}

@@ -18,18 +18,23 @@ const FundraiserSchema = new Schema<IFundraiser>({
   },
   name: {
     type: String,
+    required: true,
   },
   date: {
-    type: String,
+    type: Date,
+    required: true,
   },
   contactName: {
     type: String,
+    required: true,
   },
   email: {
     type: String,
+    required: true,
   },
   profit: {
     type: Number,
+    required: true,
   },
   expenses: [ExpenseSchema],
 });

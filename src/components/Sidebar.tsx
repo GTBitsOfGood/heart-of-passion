@@ -251,7 +251,7 @@ const Sidebar = ({
           >
             Fundraising Planning
           </Button>
-          <Grid templateRows="repeat(3, 1fr)" templateColumns="repeat(15, 1fr)">
+          <Grid templateRows="repeat(2, 1fr)" templateColumns="repeat(15, 1fr)">
             <GridItem
               rowSpan={3}
               paddingLeft="15px"
@@ -264,22 +264,6 @@ const Sidebar = ({
                 w="10px"
                 borderLeftWidth="2px"
               />
-            </GridItem>
-            <GridItem colSpan={14}>
-              <Button
-                fontFamily="nunito"
-                borderRadius="none"
-                p="10px"
-                width="98%"
-                justifyContent="left"
-                backgroundColor={clicked == 5 ? "#54A9DD" : "#F9F9F9"}
-                onClick={() => {
-                  router.push(`/fundraising-expenses/${retreatId}/`);
-                  setClicked(5);
-                }}
-              >
-                Expenses
-              </Button>
             </GridItem>
             <GridItem colSpan={14}>
               <Button
@@ -325,19 +309,6 @@ const Sidebar = ({
             }}
           >
             Raised Funds
-          </Button>
-          <Button
-            fontFamily="nunito"
-            borderRadius="none"
-            p="10px"
-            width="98%"
-            justifyContent="left"
-            backgroundColor={clicked == 9 ? "#54A9DD" : "#F9F9F9"}
-            onClick={() => {
-              setClicked(9);
-            }}
-          >
-            Archive
           </Button>
           <Image
             src="/netlify.png"

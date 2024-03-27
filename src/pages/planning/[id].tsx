@@ -1,11 +1,4 @@
-import {
-  Box,
-  Spinner,
-  Text,
-  useDisclosure,
-  useToast,
-  Button,
-} from "@chakra-ui/react";
+import { Box, Spinner, Text, useDisclosure, Button } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { trpc } from "~/utils/api";
@@ -14,8 +7,6 @@ import Sidebar from "~/components/Sidebar";
 import Select from "react-select";
 import PlanningHandler from "~/components/FundraisingPlanning/PlanningHandler";
 import { FundraisingPlanningModal } from "~/components/FundraisingPlanningModal";
-import { Fundraiser } from "~/common/types";
-import { fundraiserRouter } from "~/server/api/routers/fundraiser";
 
 export enum PlanningSort {
   ViewByDate = "View by Date",
