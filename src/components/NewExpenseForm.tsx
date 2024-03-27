@@ -81,7 +81,10 @@ export const NewExpenseForm = ({
       value: event.currentTarget.value,
     });
   const handleCostChange = (event: React.FormEvent<HTMLInputElement>) => {
-    if (event.currentTarget.value !== "" && parseFloat(event.currentTarget.value) >= 0) {
+    if (
+      event.currentTarget.value !== "" &&
+      parseFloat(event.currentTarget.value) >= 0
+    ) {
       const regex = /^\d*\.?\d{0,2}$/;
       if (!regex.test(event.currentTarget.value)) {
         return;
@@ -107,8 +110,8 @@ export const NewExpenseForm = ({
         field: "numUnits",
         value: parseInt(event.currentTarget.value || "1"),
       });
-    } 
-  }
+    }
+  };
   // const handleNotesChange = (e: ChangeEvent<HTMLTextAreaElement>) =>
   //   dispatch({ type: "UPDATE_EXPENSE", field: "notes", value: e.target.value });
 
@@ -119,7 +122,7 @@ export const NewExpenseForm = ({
     } catch (e) {
       let errorDesc = "Unknown Error";
       if (e instanceof z.ZodError) {
-        console.log(e)
+        console.log(e);
         errorDesc = e.issues.map((issue) => issue.message).join("\n");
         errorDesc = `Please fill all fields marked by asterisk`;
       }

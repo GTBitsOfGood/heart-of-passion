@@ -43,7 +43,11 @@ type Action<T extends keyof Fundraiser = keyof Fundraiser> =
   | { type: "TOGGLE_EXPENSE_SIDEBAR" }
   | { type: "CLOSE_SIDEBAR" }
   | { type: "RESET_FORM"; event: Fundraiser | undefined }
-  | { type: "UPDATE_FUNDRAISER"; field: Exclude<T, "date">; value: Fundraiser[Exclude<T, "date">] }
+  | {
+      type: "UPDATE_FUNDRAISER";
+      field: Exclude<T, "date">;
+      value: Fundraiser[Exclude<T, "date">];
+    }
   | { type: "UPDATE_DATE"; value: string };
 
 const reducer = (state: State, action: Action): State => {
@@ -54,10 +58,10 @@ const reducer = (state: State, action: Action): State => {
         fundraiser: { ...state.fundraiser, [action.field]: action.value },
       };
     case "UPDATE_DATE":
-        return {
-          ...state,
-          fundraiser: { ...state.fundraiser, date: action.value },
-        };
+      return {
+        ...state,
+        fundraiser: { ...state.fundraiser, date: action.value },
+      };
     case "RESET_FORM":
       if (action.event) return { ...initialState, fundraiser: action.event };
       return { ...initialState };
@@ -143,7 +147,7 @@ export const FundraisingPlanningModal = ({
             boxShadow={"0px 4px 29px 0px #00000040"}
           >
             <VStack height="100%" spacing="0px">
-            <FormControl isRequired isInvalid={nameError !== ""} mt="23px">
+              <FormControl isRequired isInvalid={nameError !== ""} mt="23px">
                 <Input
                   //Enter Fundraiser Name
                   height="53px"
@@ -206,7 +210,8 @@ export const FundraisingPlanningModal = ({
                 width="100%"
                 justifyContent="space-between"
               >
-                <FormControl isRequired
+                <FormControl
+                  isRequired
                   //Date
                   width="182px"
                   maxWidth="182px"
@@ -289,7 +294,11 @@ export const FundraisingPlanningModal = ({
                 <FormErrorMessage>{emailError}</FormErrorMessage>
               </FormControl>
 
-              <FormControl isRequired marginTop="22px" isInvalid={profitError !== ""}>
+              <FormControl
+                isRequired
+                marginTop="22px"
+                isInvalid={profitError !== ""}
+              >
                 <FormLabel
                   mb="10px"
                   fontWeight="500"
@@ -299,7 +308,14 @@ export const FundraisingPlanningModal = ({
                 >
                   Expected Net Profit
                 </FormLabel>
-                <InputGroup border="1px solid #D9D9D9" borderRadius="0px" color="black" fontSize="18px" fontWeight="400" lineHeight="25px">
+                <InputGroup
+                  border="1px solid #D9D9D9"
+                  borderRadius="0px"
+                  color="black"
+                  fontSize="18px"
+                  fontWeight="400"
+                  lineHeight="25px"
+                >
                   <Input
                     value="$"
                     _focusVisible={{ outline: "none" }}
@@ -320,7 +336,9 @@ export const FundraisingPlanningModal = ({
                     onChange={(e) => {
                       const value = parseFloat(e.target.value);
                       if (isNaN(value) || value <= 0) {
-                        setProfitError("Expected net profit must be a positive number");
+                        setProfitError(
+                          "Expected net profit must be a positive number",
+                        );
                       } else {
                         setProfitError("");
                       }
@@ -533,4 +551,4 @@ export const FundraisingPlanningModal = ({
       </ModalContent>
     </Modal>
   );
-}
+};
