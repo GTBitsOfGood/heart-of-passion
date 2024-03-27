@@ -73,7 +73,7 @@ export const NewFundModal = ({
     onOpen: onOpenError,
   } = useDisclosure({ defaultIsOpen: false });
 
-  const trpcUtils = trpc.useContext();
+  const trpcUtils = trpc.useUtils();
   const updateFund = trpc.fund.updateFund.useMutation({
     onSuccess: () => {
       trpcUtils.fund.invalidate();

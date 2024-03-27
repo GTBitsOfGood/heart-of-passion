@@ -160,7 +160,7 @@ export const NewExpenseForm = ({
     return;
   };
 
-  const trpcUtils = trpc.useContext();
+  const trpcUtils = trpc.useUtils();
   const updateExpense = trpc.event.updateExpense.useMutation({
     onSuccess: () => {
       trpcUtils.event.invalidate();

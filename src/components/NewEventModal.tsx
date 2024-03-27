@@ -197,7 +197,7 @@ export const NewEventModal = ({
     }
   };
 
-  const trpcUtils = trpc.useContext();
+  const trpcUtils = trpc.useUtils();
   const updateEvent = trpc.event.updateEvent.useMutation({
     onSuccess: () => {
       trpcUtils.event.invalidate();

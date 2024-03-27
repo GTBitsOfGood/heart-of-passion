@@ -111,6 +111,7 @@ export default function Planning() {
                     ADD FUNDRAISER
                   </Button>
                   <FundraisingPlanningModal
+                    retreatId={retreatId!}
                     isOpen={isOpenFundraisingPlanningModal}
                     onClose={onCloseFundraisingPlanningModal}
                     onOpenError={function (): void {

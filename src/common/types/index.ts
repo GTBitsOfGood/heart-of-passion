@@ -138,17 +138,12 @@ export const eventSchema = z
 export type Event = z.infer<typeof eventSchema>;
 
 export const fundraiserSchema = z.object({
-  name: z.string().min(1, "Fundraiser name is empty"),
-  location: z.string().min(1, "Location name is empty"),
-  date: z.string().datetime(),
-  contactName: z.string().min(1, "Contact name is empty"),
+  name: z.string().min(1, "Fundraiser name cannot be  empty"),
+  location: z.string().min(1, "Location name cannot be empty"),
+  date: z.date(),
+  contactName: z.string().min(1, "Contact name cannot be empty"),
   email: z.string().email(),
-  profit: z
-    .number({
-      required_error: "Profit is required",
-      invalid_type_error: "Profit must be a number",
-    })
-    .nonnegative(),
+  profit: z.number().nonnegative(),
   expenses: z.array(expenseSchema),
 });
 
