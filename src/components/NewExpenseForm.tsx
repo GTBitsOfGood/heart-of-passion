@@ -82,6 +82,10 @@ export const NewExpenseForm = ({
     });
   const handleCostChange = (event: React.FormEvent<HTMLInputElement>) => {
     if (event.currentTarget.value !== "" && parseFloat(event.currentTarget.value) >= 0) {
+      const regex = /^\d*\.?\d{0,2}$/;
+      if (!regex.test(event.currentTarget.value)) {
+        return;
+      }
       dispatch({
         type: "UPDATE_EXPENSE",
         field: "cost",
