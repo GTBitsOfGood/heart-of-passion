@@ -29,7 +29,7 @@ export default function CalendarCard({
   expenseTotal: number;
   width: number;
   retreatId: string;
-  right?: boolean;
+  right?: number;
   startTime?: string;
   zoom: number;
 }) {
@@ -156,7 +156,7 @@ export default function CalendarCard({
         as={GridItem}
         area="stack"
         textOverflow="ellipsis"
-        left={right ? 103 : 0}
+        left={right}
         top={!!topY ? topY : 0}
       >
         <GridItem

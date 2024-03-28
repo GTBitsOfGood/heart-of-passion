@@ -235,6 +235,7 @@ export default function Donors() {
             <NewDonorModal
               isOpen={isOpenAddDonorModal}
               onClose={onCloseAddDonorModal}
+              retreatId={retreatId!}
               donorData={{
                 donorName: "",
                 studentName: "",

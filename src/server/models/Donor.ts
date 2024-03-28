@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { z } from "zod";
-import { donorSchema, SponsorLevel, Source, Status } from "~/common/types";
+import { donorSchema, SponsorLevel, Status } from "~/common/types";
 
 const { Schema } = mongoose;
 
@@ -9,7 +9,7 @@ export interface IDonor extends z.infer<typeof donorSchema> {
   donorName: string;
   studentName: string;
   donorEmail: string;
-  source: Source;
+  source: string;
   sponsorLevel: SponsorLevel;
   status: Status;
 }
@@ -27,7 +27,6 @@ export const statusOptions = [
   "Note Sent",
   "Send Email",
 ];
-export const sourceOptions = ["Event 1", "Event 2", "Event 3"];
 
 const DonorSchema = new Schema<IDonor>({
   donorName: {
@@ -45,8 +44,6 @@ const DonorSchema = new Schema<IDonor>({
   },
   source: {
     type: String,
-    enum: sourceOptions,
-    default: "Event 1",
     required: true,
   },
   sponsorLevel: {

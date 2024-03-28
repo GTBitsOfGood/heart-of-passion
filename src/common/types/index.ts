@@ -1,9 +1,5 @@
 import { z } from "zod";
-import {
-  sponsorLevelOptions,
-  sourceOptions,
-  statusOptions,
-} from "~/server/models/Donor";
+import { sponsorLevelOptions, statusOptions } from "~/server/models/Donor";
 
 // Role
 export const roleSchema = z.enum(["student", "mentor", "admin"]);
@@ -16,9 +12,6 @@ export const sponsorLevelSchema = z.enum(
 );
 export type SponsorLevel = z.infer<typeof sponsorLevelSchema>;
 
-export const sourceSchema = z.enum(sourceOptions as [string, ...string[]]);
-export type Source = z.infer<typeof sourceSchema>;
-
 export const statusDonorSchema = z.enum(statusOptions as [string, ...string[]]);
 export type Status = z.infer<typeof statusDonorSchema>;
 
@@ -26,7 +19,7 @@ export const donorSchema = z.object({
   studentName: z.string(),
   donorName: z.string(),
   donorEmail: z.string().email(),
-  source: sourceSchema,
+  source: z.string(),
   sponsorLevel: sponsorLevelSchema,
   status: statusDonorSchema,
 });
@@ -88,8 +81,8 @@ export const expenseSchema = z.object({
   event: z.string().optional(),
   eventId: z.string().optional(),
   type: expenseTypeSchema,
-  cost: z.number(),
-  numUnits: z.number().optional(),
+  cost: z.number().min(0, "Cost must be a positive amount"),
+  numUnits: z.number().min(1, "Minimum 1 unit is needed"),
 });
 export type Expense = z.infer<typeof expenseSchema>;
 
@@ -138,18 +131,18 @@ export const eventSchema = z
 export type Event = z.infer<typeof eventSchema>;
 
 export const fundraiserSchema = z.object({
-  name: z.string().min(1, "Fundraiser name is empty"),
-  location: z.string().min(1, "Location name is empty"),
-  date: z.string().datetime(),
-  contactName: z.string().min(1, "Contact name is empty"),
+  name: z.string().min(1, "Fundraiser name cannot be  empty"),
+  location: z.string().min(1, "Location name cannot be empty"),
+  date: z.date(),
+  contactName: z.string().min(1, "Contact name cannot be empty"),
   email: z.string().email(),
-  profit: z
-    .number({
-      required_error: "Profit is required",
-      invalid_type_error: "Profit must be a number",
-    })
-    .nonnegative(),
+  profit: z.number().nonnegative(),
   expenses: z.array(expenseSchema),
+});
+
+export const savedFundraiserSchema = fundraiserSchema.extend({
+  _id: z.string(),
+  retreatId: z.string(),
 });
 
 export type Fundraiser = z.infer<typeof fundraiserSchema>;

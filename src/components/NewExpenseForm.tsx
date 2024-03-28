@@ -40,6 +40,7 @@ const initialState: State = {
   name: "Expense Name",
   type: "Entertainment",
   cost: -1000,
+  numUnits: 1,
 };
 
 // const [expense, setExpense] = useState(selectedExpense)
@@ -80,7 +81,14 @@ export const NewExpenseForm = ({
       value: event.currentTarget.value,
     });
   const handleCostChange = (event: React.FormEvent<HTMLInputElement>) => {
-    if (event.currentTarget.value !== "") {
+    if (
+      event.currentTarget.value !== "" &&
+      parseFloat(event.currentTarget.value) >= 0
+    ) {
+      const regex = /^\d*\.?\d{0,2}$/;
+      if (!regex.test(event.currentTarget.value)) {
+        return;
+      }
       dispatch({
         type: "UPDATE_EXPENSE",
         field: "cost",
@@ -90,38 +98,40 @@ export const NewExpenseForm = ({
       dispatch({
         type: "UPDATE_EXPENSE",
         field: "cost",
-        value: -1000,
+        value: 0,
       });
     }
   };
 
-  const handleUnitsChange = (event: React.FormEvent<HTMLInputElement>) =>
-    dispatch({
-      type: "UPDATE_EXPENSE",
-      field: "numUnits",
-      value: parseInt(event.currentTarget.value || "1"),
-    });
+  const handleUnitsChange = (event: React.FormEvent<HTMLInputElement>) => {
+    const numUnits = parseInt(event.currentTarget.value);
+    if (!isNaN(numUnits) && numUnits > 0) {
+      dispatch({
+        type: "UPDATE_EXPENSE",
+        field: "numUnits",
+        value: numUnits,
+      });
+    } else {
+      dispatch({
+        type: "UPDATE_EXPENSE",
+        field: "numUnits",
+        value: 0,
+      });
+    }
+  };
   // const handleNotesChange = (e: ChangeEvent<HTMLTextAreaElement>) =>
   //   dispatch({ type: "UPDATE_EXPENSE", field: "notes", value: e.target.value });
 
   const validateFields = () => {
-    //todo
-    // if(state.name)
     try {
       expenseSchema.parse(state);
-      // console.log('parse ');
-      // console.log(state);
       return true;
     } catch (e) {
       let errorDesc = "Unknown Error";
       if (e instanceof z.ZodError) {
-        // console.log(state.event);
         errorDesc = e.issues.map((issue) => issue.message).join("\n");
-        // errorDesc = `Please fill all fields marked by asterisk`;
-        // console.log(e.issues);
-        // console.log(state);
       }
-      // onOpenError();
+      onOpenError();
       toast({
         title: "Error",
         description: errorDesc,
@@ -150,7 +160,7 @@ export const NewExpenseForm = ({
     return;
   };
 
-  const trpcUtils = trpc.useContext();
+  const trpcUtils = trpc.useUtils();
   const updateExpense = trpc.event.updateExpense.useMutation({
     onSuccess: () => {
       trpcUtils.event.invalidate();
@@ -169,10 +179,10 @@ export const NewExpenseForm = ({
 
   const handleApply = async () => {
     if (!validateFields()) {
-      // onOpenError();
+      onOpenError();
       return;
     }
-    // onCloseError();
+    onCloseError();
     if (onCloseSide) {
       onCloseSide();
     }
@@ -294,10 +304,14 @@ export const NewExpenseForm = ({
             Cost Type
           </FormLabel>
           <RadioGroup
-            onChange={(e) => {
-              let numUnits;
-              if (e == "unit") numUnits = state.numUnits ?? 1;
-              else numUnits = undefined;
+            onChange={(val) => {
+              let numUnits = state.numUnits;
+
+              if (val == "flat") {
+                numUnits = 1;
+              } else if (val == "unit" && numUnits == 1) {
+                numUnits++;
+              }
 
               dispatch({
                 type: "UPDATE_EXPENSE",
@@ -305,7 +319,7 @@ export const NewExpenseForm = ({
                 value: numUnits,
               });
             }}
-            value={state.numUnits ? "unit" : "flat"}
+            value={state.numUnits == 1 ? "flat" : "unit"}
           >
             <HStack spacing="24px">
               <Radio value="flat">Flat Cost</Radio>
@@ -321,11 +335,9 @@ export const NewExpenseForm = ({
             color="black"
             border="1px solid #D9D9D9"
             borderRadius="0px"
-            value={state.numUnits ?? 1}
-            isDisabled={state.numUnits === undefined}
+            value={state.numUnits === 0 ? "" : state.numUnits.toString()}
             width="100%"
             type="number"
-            required={state.numUnits !== undefined}
             onChange={handleUnitsChange}
             padding="10px"
           />

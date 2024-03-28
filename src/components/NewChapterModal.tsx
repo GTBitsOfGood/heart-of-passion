@@ -40,7 +40,7 @@ export const NewChapterModal = ({
     onOpen: onOpenError,
   } = useDisclosure({ defaultIsOpen: false });
 
-  const trpcUtils = trpc.useContext();
+  const trpcUtils = trpc.useUtils();
   const createChapter = trpc.chapter.createChapter.useMutation({
     onSuccess: () => {
       trpcUtils.chapter.invalidate();

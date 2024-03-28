@@ -35,14 +35,6 @@ enum FundError {
   Empty, // Empty user
 }
 
-const eventOptions = [
-  "Select Source",
-  "Donation",
-  "Event 1",
-  "Event 2",
-  "Event 3",
-];
-
 export const NewFundModal = ({
   isOpen,
   onClose,
@@ -73,7 +65,7 @@ export const NewFundModal = ({
     onOpen: onOpenError,
   } = useDisclosure({ defaultIsOpen: false });
 
-  const trpcUtils = trpc.useContext();
+  const trpcUtils = trpc.useUtils();
   const updateFund = trpc.fund.updateFund.useMutation({
     onSuccess: () => {
       trpcUtils.fund.invalidate();
@@ -92,6 +84,12 @@ export const NewFundModal = ({
       trpcUtils.chapter.invalidate();
     },
   });
+
+  const sourceOptions = ["Other"].concat(
+    trpc.event.getEvents
+      .useQuery(retreatId, { enabled: !!retreatId })
+      .data?.map((e) => e.name) ?? [],
+  );
 
   const onCloseModal = () => {
     onClose();
@@ -201,7 +199,7 @@ export const NewFundModal = ({
                   Source*
                 </FormLabel>
                 <RadioDropdown
-                  options={eventOptions}
+                  options={sourceOptions}
                   selectedOption={source}
                   setSelectedOption={handleSourceChange}
                 />

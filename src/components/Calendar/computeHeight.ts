@@ -40,5 +40,5 @@ export const computeHeight = (
     }
     end += parseInt(endMins || "0");
   }
-  return Math.round(zoom * ((end - start) / 60) * (screenHeight / 24)); //
+  return zoom * ((end - start) / 60) * (screenHeight / 24); //
 };

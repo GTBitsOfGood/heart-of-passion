@@ -4,7 +4,15 @@ import { useState } from "react";
 import DonorEntry from "./DonorEntry";
 import { Donor, DonorList } from "src/common/types";
 
-export default function DonorList({ title, donors }: DonorList) {
+interface DonorListProps extends DonorList {
+  retreatId: string;
+}
+
+export default function DonorList({
+  title,
+  donors,
+  retreatId,
+}: DonorListProps) {
   const [open, setOpen] = useState(true);
 
   return (
@@ -26,6 +34,7 @@ export default function DonorList({ title, donors }: DonorList) {
           {open ? (
             donors?.map((donor: Donor) => (
               <DonorEntry
+                retreatId={retreatId}
                 key={
                   donor.donorEmail +
                   donor.donorName +
