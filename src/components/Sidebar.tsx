@@ -230,7 +230,8 @@ const Sidebar = ({
                 justifyContent="left"
                 backgroundColor={pageClicked == 3 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
-                  router.push(`/backlog/${chapterId}/`);
+                  // router.push(`/backlog/${chapterId}/`);
+                  router.push(`/backlog/${retreatId}/`);
                   setClicked(3);
                 }}
               >
@@ -311,7 +312,8 @@ const Sidebar = ({
                 justifyContent="left"
                 backgroundColor={pageClicked == 7 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
-                  router.push(`/backlog/fundraiser/${chapterId}/`);
+                  // router.push(`/backlog/fundraiser/${chapterId}/`);
+                  router.push(`/backlog/fundraiser/${retreatId}/`);
                   setClicked(7);
                 }}
               >
