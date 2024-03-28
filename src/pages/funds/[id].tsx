@@ -65,16 +65,12 @@ export default function RaisedFunds() {
   };
   let dummyYear = 2023;
 
-  const [retreat, setRetreat] = useState<IRetreat>();
-  const [chapter, setChapter] = useState<IChapter>();
-  const retreatData = trpc.retreat.getRetreatById.useQuery(retreatId).data!;
-  const chapterData = trpc.chapter.getChapterById.useQuery(
-    retreatData?.chapterId,
-    {
-      // The query will run only if the chapterId is available
-      enabled: !!retreatData?.chapterId,
-    },
-  );
+  const chapter = trpc.chapter.getChapterByRetreatId.useQuery(retreatId!, {
+    enabled: !!retreatId,
+  })?.data;
+  const retreat = trpc.retreat.getRetreatById.useQuery(retreatId!, {
+    enabled: !!retreatId,
+  })?.data;
 
   const funds = trpc.fund.getFunds.useQuery(retreatId).data!;
 

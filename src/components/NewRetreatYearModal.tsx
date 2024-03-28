@@ -44,7 +44,7 @@ export const NewRetreatYearModal = ({
   const handleYearChange = (event: React.FormEvent<HTMLInputElement>) =>
     setYear(event.currentTarget.value);
 
-  const trpcUtils = trpc.useContext();
+  const trpcUtils = trpc.useUtils();
 
   const { data: chapterId } =
     trpc.chapter.getChapterIdByName.useQuery(chapterName);

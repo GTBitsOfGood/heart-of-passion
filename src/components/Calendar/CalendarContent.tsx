@@ -24,14 +24,14 @@ type EventWithStamp = {
   event: IEvent;
   from: string;
   to: string;
+  day: number;
 };
-
 
 export default function CalendarContent({
   events,
   counter,
   retreatId,
-  zoom
+  zoom,
 }: {
   events: IEvent[];
   counter: number;
@@ -69,10 +69,11 @@ export default function CalendarContent({
     const { dates } = event;
     for (const date of dates) {
       const { from, to, day } = date;
-      eventsByDay[day - 1]!.push({ event, from, to });
+      eventsByDay[day - 1]!.push({ event, from, to, day });
       console.log(from);
     }
   }
+  console.log(eventsByDay);
   for (const dayEvents of eventsByDay) {
     dayEvents.sort(DayComparator);
   }
@@ -87,7 +88,12 @@ export default function CalendarContent({
         counter--;
         return <></>;
       }
-      const { event: currEvent, from: currFrom, to: currTo } = einfo;
+      const {
+        event: currEvent,
+        from: currFrom,
+        to: currTo,
+        day: currDay,
+      } = einfo;
       const dateObject: DateObject = {
         day,
         from: currFrom,
@@ -95,7 +101,8 @@ export default function CalendarContent({
       };
 
       const totalExpense = currEvent.expenses.reduce(
-        (acc: any, cv: any) => acc + cv.cost,
+        (acc: any, cv: any) =>
+          acc + (cv.numUnits ? cv.cost * cv.numUnits : cv.cost),
         0,
       );
 
@@ -103,6 +110,7 @@ export default function CalendarContent({
         event: currEvent,
         from: currFrom,
         to: currTo,
+        day: currDay,
       };
       if (index < arr.length - 1) {
         const nextEventsArray = [];
@@ -110,22 +118,21 @@ export default function CalendarContent({
           event: afterEvent,
           from: nextFrom,
           to: nextTo,
+          day: nextDay,
         } = eventsByDay[day - 1]![index + 1]!;
         // Check if the next event's "from" time is between the current event's from and to
         // appends every additional case where next event's time is between original "from" and "to"
         let prevTop: number | null = null;
         while (
           index < arr.length - 1 &&
-          StrToMinutes(nextFrom) &&
           StrToMinutes(nextFrom) >= StrToMinutes(currFrom) &&
           StrToMinutes(nextFrom) < StrToMinutes(currTo)
         ) {
           const nextDateObject: DateObject = {
-            day: 1,
+            day: nextDay,
             from: nextFrom,
             to: nextTo,
           };
-
           const nextTotalExpense = currEvent.expenses.reduce(
             (acc: any, cv: any) => acc + cv.cost,
             0,
@@ -133,7 +140,6 @@ export default function CalendarContent({
 
           const nextEventObject: Event = {
             ...afterEvent,
-            dates: [nextDateObject],
           };
 
           var topY = computeHeight(nextFrom, currFrom, screen.height, zoom);
@@ -166,6 +172,11 @@ export default function CalendarContent({
                 expenseTotal={totalExpense}
                 date={dateObject}
                 event={event.event}
+                startTime={
+                  StrToMinutes("9:00 am") >= StrToMinutes(arr[0]!.from)
+                    ? arr[0]!.from
+                    : "9:00 am"
+                }
                 width={207}
                 zoom={zoom}
               />
@@ -175,21 +186,34 @@ export default function CalendarContent({
                   expenseTotal={totalExpense}
                   date={dateObject}
                   event={event.event}
-                  width={103}
+                  startTime={
+                    StrToMinutes("9:00 am") >= StrToMinutes(arr[0]!.from)
+                      ? arr[0]!.from
+                      : "9:00 am"
+                  }
+                  width={207 / (nextEventsArray.length + 1)}
                   retreatId={retreatId}
                   zoom={zoom}
                 />
+                {console.log(nextEventsArray)}
                 <Box>
                   {nextEventsArray.map((nextEvent: any, index) => {
                     return (
                       <CalendarCard
-                        right={true}
+                        right={
+                          0 + (index + 1) * (207 / (nextEventsArray.length + 1))
+                        }
                         retreatId={retreatId}
                         key={index}
+                        startTime={
+                          StrToMinutes("9:00 am") >= StrToMinutes(arr[0]!.from)
+                            ? arr[0]!.from
+                            : "9:00 am"
+                        }
                         expenseTotal={nextEvent.nextTotalExpense}
                         date={nextEvent.nextDateObject}
                         event={nextEvent.nextEventObject}
-                        width={103}
+                        width={207 / (nextEventsArray.length + 1)}
                         zoom={zoom}
                       />
                     );
@@ -206,6 +230,11 @@ export default function CalendarContent({
           key={index}
           expenseTotal={totalExpense}
           date={dateObject}
+          startTime={
+            StrToMinutes("9:00 am") >= StrToMinutes(arr[0]!.from)
+              ? arr[0]!.from
+              : "9:00 am"
+          }
           event={event.event}
           width={207}
           zoom={zoom}

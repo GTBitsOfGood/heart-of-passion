@@ -64,7 +64,7 @@ export const NewUserModal = ({
   } = useDisclosure({ defaultIsOpen: false });
 
   // TRPC Queries and Mutations
-  const trpcUtils = trpc.useContext();
+  const trpcUtils = trpc.useUtils();
   const chapters = trpc.chapter.getChapters.useQuery();
   const createUser = trpc.user.createUser.useMutation({
     onSuccess: () => {

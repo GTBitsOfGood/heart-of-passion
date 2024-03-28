@@ -22,20 +22,25 @@ export default function CalendarCard({
   width,
   right,
   startTime,
-  zoom
+  zoom,
 }: {
   event: IEvent;
   date: DateObject;
   expenseTotal: number;
   width: number;
   retreatId: string;
-  right?: boolean;
+  right?: number;
   startTime?: string;
   zoom: number;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const height = computeHeight(date.from, date.to, screen.height, zoom);
-  const topY = computeHeight(startTime ?? "9:00 am", date.from, screen.height, zoom);
+  const topY = computeHeight(
+    startTime ?? "9:00 am",
+    date.from,
+    screen.height,
+    zoom,
+  );
   const parentRef: any = useRef();
   const [variant, setVariant] = useState(3);
   useEffect(() => {
@@ -151,7 +156,7 @@ export default function CalendarCard({
         as={GridItem}
         area="stack"
         textOverflow="ellipsis"
-        left={right ? 103 : 0}
+        left={right}
         top={!!topY ? topY : 0}
       >
         <GridItem

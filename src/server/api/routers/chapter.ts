@@ -12,6 +12,8 @@ import { Chapter, Expense } from "~/common/types";
 import { EventModel, IEvent } from "~/server/models/Event";
 import { RetreatModel, IRetreat } from "~/server/models/Retreat";
 import { TRPCError } from "@trpc/server";
+import { FundraiserModel, IFundraiser } from "~/server/models/Fundraiser";
+import { FundModel, IFund } from "~/server/models/Fund";
 
 export const chapterRouter = createTRPCRouter({
   createChapter: adminProcedure
@@ -93,28 +95,45 @@ export const chapterRouter = createTRPCRouter({
 });
 
 async function processChapter(chapterModel: Chapter): Promise<Chapter> {
-  let retreat: IRetreat | null = (await RetreatModel.findOne({
+  let retreat: IRetreat | null = await RetreatModel.findOne({
     chapterId: chapterModel.id,
   })
     .sort("-year")
-    .exec())!;
+    .exec();
 
+  let fundraisersSum = 0;
+  let fundsSum = 0;
   let cost = 0;
+
   if (retreat) {
-    const events = (await EventModel.find({ retreatId: retreat?._id }).exec())!;
-    events?.forEach((event: IEvent) => {
-      let expenses: Expense[] = event.expenses;
-      expenses?.forEach((expense) => {
-        cost += expense.cost * (expense.numUnits || 1);
-      });
-    });
+    const events = await EventModel.find({ retreatId: retreat?._id }).exec();
+    cost = events?.reduce((acc, event) => {
+      return (
+        acc +
+        event.expenses.reduce((acc, expense) => {
+          return acc + expense.cost * (expense.numUnits || 1);
+        }, 0)
+      );
+    }, 0);
+    const fundraisers = await FundraiserModel.find({
+      retreatId: retreat?._id,
+    }).exec();
+
+    fundraisersSum = fundraisers?.reduce((acc, fundraiser) => {
+      return acc + fundraiser.profit;
+    }, 0);
+
+    const funds = await FundModel.find({ retreatId: retreat?._id }).exec();
+    fundsSum = funds?.reduce((acc, fund) => {
+      return acc + fund.amount;
+    }, 0);
   }
 
   return {
     name: chapterModel.name,
     totalCost: cost,
-    fundExpected: 5100,
-    fundActual: 2600,
+    fundExpected: fundraisersSum,
+    fundActual: fundsSum,
     id: chapterModel.id,
   };
 }

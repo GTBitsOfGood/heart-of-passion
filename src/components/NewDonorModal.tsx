@@ -93,7 +93,7 @@ export const NewDonorModal = ({
   } = useDisclosure({ defaultIsOpen: false });
 
   // TRPC Queries and Mutations
-  const trpcUtils = trpc.useContext();
+  const trpcUtils = trpc.useUtils();
   const createDonor = trpc.donor.createDonor.useMutation({
     onSuccess: () => {
       trpcUtils.donor.invalidate();

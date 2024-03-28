@@ -9,7 +9,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import ChapterCard from "~/components/chapters/ChapterCard";
-import { IoMdSettings } from "react-icons/io";
+import { IoMdPeople } from "react-icons/io";
 import "@fontsource/oswald/600.css";
 import { NewChapterModal } from "~/components/NewChapterModal";
 import { useRef } from "react";
@@ -64,7 +64,7 @@ export default function Home() {
             height="50px"
             width="50px"
             icon={
-              <IoMdSettings
+              <IoMdPeople
                 size="50px"
                 onClick={() => {
                   router.push("/users");

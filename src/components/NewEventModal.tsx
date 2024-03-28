@@ -128,6 +128,9 @@ export const NewEventModal = ({
   }, [eventToEdit]);
 
   const save = useCallbackRef(() => {
+    if (!state.event.name) {
+      return;
+    }
     if (!validate()) {
       return;
     }
@@ -194,7 +197,7 @@ export const NewEventModal = ({
     }
   };
 
-  const trpcUtils = trpc.useContext();
+  const trpcUtils = trpc.useUtils();
   const updateEvent = trpc.event.updateEvent.useMutation({
     onSuccess: () => {
       trpcUtils.event.invalidate();
@@ -586,8 +589,8 @@ export const NewEventModal = ({
                     fontWeight="400"
                     lineHeight="25px"
                   >{`$${state.event.expenses.reduce(
-                    (acc, cv) =>
-                      acc + cv.cost * (cv.numUnits ? cv.numUnits : 1),
+                    (acc: any, cv: any) =>
+                      acc + (cv.numUnits ? cv.cost * cv.numUnits : cv.cost),
                     0,
                   )}`}</Text>
                 </HStack>
