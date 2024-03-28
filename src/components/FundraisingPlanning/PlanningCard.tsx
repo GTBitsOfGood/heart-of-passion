@@ -3,11 +3,20 @@ import { Fundraiser } from "~/common/types";
 
 export default function PlanningCard({
   fundraiser,
+  onClick,
 }: {
   fundraiser: Fundraiser;
+  onClick: () => void;
 }) {
   return (
-    <Box border={"2px solid #D9D9D9"} paddingX={4} paddingY={6} width={286}>
+    <Box
+      border={"2px solid #D9D9D9"}
+      paddingX={4}
+      paddingY={6}
+      width={286}
+      onClick={onClick}
+      cursor="pointer"
+    >
       <Text
         fontFamily={"nunito"}
         fontWeight={700}

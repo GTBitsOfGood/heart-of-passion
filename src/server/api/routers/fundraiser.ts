@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { expenseSchema, fundraiserSchema } from "~/common/types";
+import {
+  expenseSchema,
+  fundraiserSchema,
+  savedFundraiserSchema,
+} from "~/common/types";
 
 import {
   createTRPCRouter,
@@ -9,7 +13,7 @@ import {
 } from "~/server/api/trpc";
 
 import { ExpenseModel } from "~/server/models/Event";
-import { FundraiserModel } from "~/server/models/Fundraiser";
+import { FundraiserModel, IFundraiser } from "~/server/models/Fundraiser";
 
 export const fundraiserRouter = createTRPCRouter({
   updateFundraiser: studentProcedure
@@ -97,16 +101,51 @@ export const fundraiserRouter = createTRPCRouter({
       await FundraiserModel.findByIdAndDelete(input).exec();
     }),
 
-  getFundraiser: studentProcedure.input(z.string()).query(async (opts) => {
-    const event = await FundraiserModel.findOne({ _id: opts.input }).exec();
-    return event;
-  }),
-  getFundraisers: studentProcedure.input(z.string()).query(async (opts) => {
-    const events = await FundraiserModel.find({ retreatId: opts.input }).exec();
-    return events;
-  }),
+  getFundraiser: studentProcedure
+    .input(z.string())
+    .output(savedFundraiserSchema)
+    .query(async (opts) => {
+      const event = await FundraiserModel.findOne({ _id: opts.input }).exec();
+      if (!event) {
+        throw new Error("Fundraiser not found");
+      }
+
+      return processEvent(event);
+    }),
+
+  getFundraisers: studentProcedure
+    .input(z.string())
+    .output(z.array(savedFundraiserSchema))
+    .query(async (opts) => {
+      const events = await FundraiserModel.find({
+        retreatId: opts.input,
+      }).exec();
+
+      const parsedEvents = events.map(processEvent);
+      try {
+        if (events) savedFundraiserSchema.parse(parsedEvents[0]);
+      } catch (e) {
+        console.log(parsedEvents[0]);
+      }
+
+      return parsedEvents;
+    }),
   getExpenses: studentProcedure.input(z.string()).query(async (opts) => {
     const expenses = await ExpenseModel.find({ retreatId: opts.input }).exec();
     return expenses;
   }),
 });
+
+function processEvent(fundraiser: IFundraiser) {
+  return {
+    name: fundraiser.name,
+    location: fundraiser.location,
+    date: fundraiser.date,
+    contactName: fundraiser.contactName,
+    email: fundraiser.email,
+    profit: fundraiser.profit,
+    expenses: fundraiser.expenses,
+    _id: fundraiser._id.toString(),
+    retreatId: fundraiser.retreatId.toString(),
+  };
+}

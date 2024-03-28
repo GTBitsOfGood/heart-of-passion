@@ -147,6 +147,11 @@ export const fundraiserSchema = z.object({
   expenses: z.array(expenseSchema),
 });
 
+export const savedFundraiserSchema = fundraiserSchema.extend({
+  _id: z.string(),
+  retreatId: z.string(),
+});
+
 export type Fundraiser = z.infer<typeof fundraiserSchema>;
 
 export const eventsByYearSchema = z.record(z.number(), z.array(eventSchema));

@@ -105,12 +105,6 @@ export default function Planning() {
                     retreatId={retreatId!}
                     isOpen={isOpenFundraisingPlanningModal}
                     onClose={onCloseFundraisingPlanningModal}
-                    onOpenError={function (): void {
-                      throw new Error("Function not implemented.");
-                    }}
-                    onCloseError={function (): void {
-                      throw new Error("Function not implemented.");
-                    }}
                   />
                 </Box>
               </Box>

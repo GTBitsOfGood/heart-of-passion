@@ -19,25 +19,29 @@ import { useEffect, useReducer, useState } from "react";
 import { Expense, Fundraiser, fundraiserSchema } from "~/common/types";
 import { NewExpenseForm } from "./NewExpenseForm";
 import { trpc } from "~/utils/api";
+import { IFundraiser } from "~/server/models/Fundraiser";
 
 type FundraisingPlanningModalProps = {
   isOpen: boolean;
   retreatId: string;
   onClose: () => void;
-  onOpenError: () => void;
-  onCloseError: () => void;
-  fundraiser?: Fundraiser;
+  fundraiser?: IFundraiser;
 };
 
 type State = {
   fundraiser: Fundraiser;
+  fundraiserId: string | undefined;
   expenseFormOpen: boolean;
 };
 type Action<T extends keyof Fundraiser = keyof Fundraiser> =
   | { type: "OPEN_EXPENSE_SIDEBAR" }
   | { type: "TOGGLE_EXPENSE_SIDEBAR" }
   | { type: "CLOSE_SIDEBAR" }
-  | { type: "RESET_FORM"; event: Fundraiser | undefined }
+  | {
+      type: "RESET_FORM";
+      fundraiser: Fundraiser | undefined;
+      fundraiserId?: string;
+    }
   | {
       type: "UPDATE_FUNDRAISER";
       field: T;
@@ -52,7 +56,12 @@ const reducer = (state: State, action: Action): State => {
         fundraiser: { ...state.fundraiser, [action.field]: action.value },
       };
     case "RESET_FORM":
-      if (action.event) return { ...initialState, fundraiser: action.event };
+      if (action.fundraiser && action.fundraiserId)
+        return {
+          ...initialState,
+          fundraiser: action.fundraiser,
+          fundraiserId: action.fundraiserId,
+        };
       return { ...initialState };
     case "OPEN_EXPENSE_SIDEBAR":
       return { ...state, expenseFormOpen: true };
@@ -75,6 +84,7 @@ const initialState: State = {
     profit: 0,
     expenses: [],
   },
+  fundraiserId: undefined,
   expenseFormOpen: false,
 };
 
@@ -91,7 +101,7 @@ export const FundraisingPlanningModal = ({
 
   const onCloseModal = () => {
     onClose();
-    dispatch({ type: "RESET_FORM", event: undefined });
+    dispatch({ type: "RESET_FORM", fundraiser, fundraiserId: fundraiser?._id });
   };
   const sidebarOpen = state.expenseFormOpen;
 
@@ -113,7 +123,11 @@ export const FundraisingPlanningModal = ({
 
   useEffect(() => {
     if (fundraiser) {
-      dispatch({ type: "RESET_FORM", event: fundraiser });
+      dispatch({
+        type: "RESET_FORM",
+        fundraiser,
+        fundraiserId: fundraiser._id,
+      });
     }
   }, [fundraiser]);
 
@@ -125,13 +139,38 @@ export const FundraisingPlanningModal = ({
     },
   });
 
+  const updateFundraiser = trpc.fundraiser.updateFundraiser.useMutation({
+    onSuccess: () => {
+      trpcUtils.fundraiser.invalidate();
+    },
+  });
+
+  const deleteFundraiser = trpc.fundraiser.deleteFundraiser.useMutation({
+    onSuccess: () => {
+      trpcUtils.fundraiser.invalidate();
+    },
+  });
+
+  const handleDelete = async () => {
+    if (fundraiser) await deleteFundraiser.mutate(fundraiser._id);
+
+    onCloseModal();
+  };
+
   const handleSubmit = async () => {
     if (!validateFields()) return;
 
-    await createFundraiser.mutate({
-      retreatId,
-      fundraiserDetails: state.fundraiser,
-    });
+    if (fundraiser) {
+      await updateFundraiser.mutate({
+        fundraiserId: fundraiser._id,
+        fundraiser: state.fundraiser,
+      });
+    } else {
+      await createFundraiser.mutate({
+        retreatId,
+        fundraiserDetails: state.fundraiser,
+      });
+    }
 
     onCloseModal();
   };
@@ -514,19 +553,21 @@ export const FundraisingPlanningModal = ({
                 </Text>
               </HStack>
               <HStack alignSelf="end" mt="24px">
-                <Button
-                  fontFamily="heading"
-                  fontSize="20px"
-                  fontWeight="400"
-                  colorScheme="red"
-                  color="hop_red.500"
-                  variant="outline"
-                  // onClick={deleteEventHandler}
-                  borderRadius="6px"
-                  mr="13px"
-                >
-                  DELETE
-                </Button>
+                {fundraiser && (
+                  <Button
+                    fontFamily="heading"
+                    fontSize="20px"
+                    fontWeight="400"
+                    colorScheme="red"
+                    color="hop_red.500"
+                    variant="outline"
+                    onClick={handleDelete}
+                    borderRadius="6px"
+                    mr="13px"
+                  >
+                    DELETE
+                  </Button>
+                )}
                 <Button
                   colorScheme="twitter"
                   bg="hop_blue.500"
@@ -536,7 +577,7 @@ export const FundraisingPlanningModal = ({
                   fontWeight="400"
                   onClick={handleSubmit}
                 >
-                  APPLY
+                  {fundraiser ? "UPDATE" : "CREATE"}
                 </Button>
               </HStack>
             </VStack>
