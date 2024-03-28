@@ -21,8 +21,6 @@ import { RadioDropdown } from "./RadioDropdown";
 import {
   Donor,
   donorSchema,
-  Source,
-  sourceSchema,
   SponsorLevel,
   statusDonorSchema,
   sponsorLevelSchema,
@@ -35,6 +33,7 @@ type NewDonorProps = {
   onClose: () => void;
   donorData: Donor;
   create: boolean;
+  retreatId: string;
 };
 
 enum EmailError {
@@ -62,6 +61,7 @@ export const NewDonorModal = ({
   isOpen,
   onClose,
   donorData,
+  retreatId,
   create,
 }: NewDonorProps) => {
   // Form Data
@@ -69,14 +69,13 @@ export const NewDonorModal = ({
   const [studentName, setStudentName] = useState(donorData.studentName);
   const [donorEmail, setDonorEmail] = useState(donorData.donorEmail);
   const [status, setStatus] = useState(donorData.status);
-  const [source, setSource] = useState<Source>(donorData.source);
+  const [source, setSource] = useState(donorData.source);
   const [sponsorLevel, setSponsorLevel] = useState<SponsorLevel>(
     donorData.sponsorLevel,
   );
 
   // Options
   const SponsorLevelOptions = Object.values(sponsorLevelSchema.enum);
-  const SourceOptions = Object.values(sourceSchema.enum);
   const StatusOptions = Object.values(statusDonorSchema.enum);
 
   // Errors
@@ -212,15 +211,21 @@ export const NewDonorModal = ({
   const handleStatusChange = (status: string) => {
     setStatus(statusDonorSchema.parse(status));
   };
-  const handleSourceChange = (source: string) => {
-    setSource(sourceSchema.parse(source));
-  };
   const handleDonorNameChange = (event: React.FormEvent<HTMLInputElement>) =>
     setDonorName(event.currentTarget.value);
   const handleStudentNameChange = (event: React.FormEvent<HTMLInputElement>) =>
     setStudentName(event.currentTarget.value);
   const handleDonorEmailChange = (event: React.FormEvent<HTMLInputElement>) =>
     setDonorEmail(event.currentTarget.value);
+
+  const handleSourceChange = (newSource: string) => setSource(newSource);
+
+  const sourceOptions = ["Other"].concat(
+    trpc.event.getEvents
+      .useQuery(retreatId, { enabled: !!retreatId })
+      .data?.map((e) => e.name) ?? [],
+  );
+
   return (
     <Modal isOpen={isOpen} onClose={onCloseModal} isCentered>
       <ModalOverlay />
@@ -328,7 +333,7 @@ export const NewDonorModal = ({
                   Source
                 </FormLabel>
                 <RadioDropdown
-                  options={SourceOptions}
+                  options={sourceOptions}
                   selectedOption={source}
                   setSelectedOption={handleSourceChange}
                 />

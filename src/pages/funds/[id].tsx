@@ -53,17 +53,7 @@ export default function RaisedFunds() {
   }
 
   const router = useRouter();
-  const { id } = router.query;
-  const retreatId = id as string;
-
-  let dummyChapter = {
-    id: "1",
-    name: "Atlanta",
-    totalCost: 5100,
-    fundExpected: 5180,
-    fundActual: 2600,
-  };
-  let dummyYear = 2023;
+  const retreatId = router.query.id as string | undefined;
 
   const chapter = trpc.chapter.getChapterByRetreatId.useQuery(retreatId!, {
     enabled: !!retreatId,
@@ -72,28 +62,33 @@ export default function RaisedFunds() {
     enabled: !!retreatId,
   })?.data;
 
-  const funds = trpc.fund.getFunds.useQuery(retreatId).data!;
+  const funds = trpc.fund.getFunds.useQuery(retreatId!, {
+    enabled: !!retreatId,
+  }).data!;
 
   const totalAmount = funds?.reduce((total, fund) => total + fund.amount, 0);
 
   const groups = (function () {
     if (funds && funds.length > 0) {
       if (filter === "source") {
-        const uniques = [...new Set(funds?.map((u: any) => u["source"]))]; // array of unique vals
-        const emap = new Map(uniques.map((e: any) => [e, new Array()])); // map of val to empty array
-        funds?.forEach(
-          (e: any) =>
-            emap.get(e["source"])?.push({
-              name: e["name"],
-              date: e["date"],
-              amount: e["amount"],
-              source: e["source"],
+        const uniqueSources = [...new Set(funds.map((u) => u.source))]; // array of unique vals
+        const emap: Map<string, Fund[]> = new Map(
+          uniqueSources.map((e) => [e, new Array()]),
+        ); // map of val to empty array
+        funds.forEach(
+          (e) =>
+            emap.get(e.source)?.push({
+              name: e.name,
+              date: e.date,
+              amount: e.amount,
+              source: e.source,
             }),
         );
-        return uniques
-          ?.map((e: string) => ({
+
+        return uniqueSources
+          .map((e: string) => ({
             title: e,
-            funds: emap.get(e),
+            funds: emap.get(e)!,
           }))
           .sort((a, b) => a.title.localeCompare(b.title));
       } else if (filter === "highest amount") {
@@ -120,17 +115,13 @@ export default function RaisedFunds() {
     }
   })();
 
-  const groupsRendered = groups.map((gr: any) => (
-    <FundList handleSelectFund={handleSelectFund} key={gr.title} {...gr} />
-  ));
+  if (!chapter || !retreat) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Box>
-      <Sidebar
-        chapter={chapter ? chapter : dummyChapter}
-        year={retreat ? retreat.year : dummyYear}
-        retreatId={retreatId}
-      />
+      <Sidebar chapter={chapter!} year={retreat!.year} retreatId={retreatId!} />
       <Stack
         spacing={4}
         alignItems={"right"}
@@ -237,11 +228,17 @@ export default function RaisedFunds() {
               onClose={handleClose}
               create={selectedFund === null}
               fund={selectedFund}
-              retreatId={retreatId}
+              retreatId={retreatId!}
             />
           </Box>
         </Flex>
-        {groupsRendered}
+        {groups.map((gr) => (
+          <FundList
+            handleSelectFund={handleSelectFund}
+            key={gr.title}
+            {...gr}
+          />
+        ))}
         <Flex borderBottom="1px #AEAEAE solid"></Flex>
         <Flex paddingBottom="30px" justifyContent="end" alignItems="flex-end">
           <Text paddingBottom="0.5em" paddingRight="0.5em">

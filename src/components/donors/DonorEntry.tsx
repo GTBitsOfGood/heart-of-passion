@@ -15,6 +15,10 @@ import fonts from "~/common/theme/fonts";
 import { NewDonorModal } from "../NewDonorModal";
 import { useRef } from "react";
 
+interface DonorsProps extends Donor {
+  retreatId: string;
+}
+
 export default function Donors({
   donorName,
   studentName,
@@ -22,7 +26,8 @@ export default function Donors({
   status,
   source,
   sponsorLevel,
-}: Donor) {
+  retreatId,
+}: DonorsProps) {
   const {
     isOpen: isOpenAddDonorModal,
     onOpen: onOpenAddDonorModal,
@@ -96,6 +101,7 @@ export default function Donors({
           status: status,
         }}
         create={false}
+        retreatId={retreatId}
       />
     </>
   );
