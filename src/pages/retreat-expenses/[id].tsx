@@ -65,6 +65,10 @@ export default function RetreatExpenses() {
   const eventData = trpc.event.getEvents.useQuery(retreatId!).data;
   const expenseData = trpc.event.getExpenses.useQuery(retreatId!).data;
 
+  const retreat = trpc.retreat.getRetreatById.useQuery(retreatId!, {
+    enabled: !!retreatId,
+  })?.data;
+
   const chapter = trpc.chapter.getChapterByRetreatId.useQuery(retreatId!).data;
 
   // const expenses: ExpenseWithDateAndEvent[] =
@@ -194,7 +198,7 @@ export default function RetreatExpenses() {
   return (
     <Box>
       {chapter ? (
-        <Sidebar chapter={chapter!} retreatId={retreatId} pageClicked={2}/>
+        <Sidebar chapter={chapter!} year={retreat?.year} retreatId={retreatId} pageClicked={2}/>
       ) : (
         <Spinner />
       )}

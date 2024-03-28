@@ -29,7 +29,10 @@ import Link from "next/link";
 export default function Donors() {
   const router = useRouter();
   const { id: retreatId }: { id?: string } = router.query;
-  const chapter = trpc.chapter.getChapterByRetreatId.useQuery(retreatId!).data;
+  const chapter = trpc.chapter.getChapterByRetreatId.useQuery(retreatId!).data;  
+  const retreat = trpc.retreat.getRetreatById.useQuery(retreatId!, {
+    enabled: !!retreatId,
+  })?.data;
 
   const [filter, setFilter] = useState("donorName"); // value decides grouping behavior
 
@@ -111,7 +114,7 @@ export default function Donors() {
   return (
     <Box>
       {chapter ? (
-        <Sidebar chapter={chapter!} retreatId={retreatId} pageClicked={6} />
+        <Sidebar chapter={chapter!} year={retreat?.year} retreatId={retreatId} pageClicked={6} />
       ) : (
         <Spinner />
       )}

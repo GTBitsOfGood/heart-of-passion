@@ -22,7 +22,10 @@ export default function Backlog() {
   const chapter = trpc.chapter.getChapterByRetreatId.useQuery(retreatId!, {
     enabled: !!retreatId,
   })?.data;
-  const chapterId = chapter?.id;
+  const chapterId = chapter?.id;  
+  const retreat = trpc.retreat.getRetreatById.useQuery(retreatId!, {
+    enabled: !!retreatId,
+  })?.data;
   // const chapter = trpc.chapter.getChapterById.useQuery(chapterId!, {
   //   enabled: !!chapterId,
   // })?.data;
@@ -76,7 +79,7 @@ export default function Backlog() {
       <Box>
         {eventsByYear && (
           <Box display={"flex"}>
-            <Box>{chapter ? <Sidebar chapter={chapter} retreatId={retreatId} pageClicked={7} /> : <Spinner />}</Box>
+            <Box>{chapter ? <Sidebar chapter={chapter} year={retreat?.year} retreatId={retreatId} pageClicked={7} /> : <Spinner />}</Box>
             <Box
               display={"flex"}
               flexDirection={"column"}

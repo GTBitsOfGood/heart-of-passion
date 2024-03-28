@@ -63,7 +63,10 @@ export default function FundraiserExpenses() {
   const { id: retreatId, id: fundraiserId }: { id?: string } = router.query;
   const eventData = trpc.fundraiser.getFundraisers.useQuery(fundraiserId!).data;
 
-  const chapter = trpc.chapter.getChapterByRetreatId.useQuery(retreatId!).data;
+  const chapter = trpc.chapter.getChapterByRetreatId.useQuery(retreatId!).data;  
+  const retreat = trpc.retreat.getRetreatById.useQuery(retreatId!, {
+    enabled: !!retreatId,
+  })?.data;
   const expenses: ExpenseWithDateAndEvent[] = [];
 
   if (eventData) {
@@ -156,7 +159,7 @@ export default function FundraiserExpenses() {
   return (
     <Box>
       {chapter ? (
-        <Sidebar chapter={chapter!} retreatId={retreatId} pageClicked={5} />
+        <Sidebar chapter={chapter!} year={retreat?.year} retreatId={retreatId} pageClicked={5} />
       ) : (
         <Spinner />
       )}
