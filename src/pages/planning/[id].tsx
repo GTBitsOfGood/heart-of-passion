@@ -49,7 +49,18 @@ export default function Planning() {
       <Box>
         {fundraisers && (
           <Box display={"flex"}>
-            <Box>{chapter ? <Sidebar chapter={chapter} year={retreat?.year} retreatId={retreatId} pageClicked={4}/> : <Spinner />}</Box>
+            <Box>
+              {chapter ? (
+                <Sidebar
+                  chapter={chapter}
+                  year={retreat?.year}
+                  retreatId={retreatId}
+                  pageClicked={4}
+                />
+              ) : (
+                <Spinner />
+              )}
+            </Box>
             <Box
               display={"flex"}
               flexDirection={"column"}

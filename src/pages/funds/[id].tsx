@@ -121,8 +121,12 @@ export default function RaisedFunds() {
 
   return (
     <Box>
-
-      <Sidebar chapter={chapter!} year={retreat!.year} retreatId={retreatId!} pageClicked={8} />
+      <Sidebar
+        chapter={chapter!}
+        year={retreat!.year}
+        retreatId={retreatId!}
+        pageClicked={8}
+      />
       <Stack
         spacing={4}
         alignItems={"right"}

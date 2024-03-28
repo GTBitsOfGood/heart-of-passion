@@ -198,7 +198,12 @@ export default function RetreatExpenses() {
   return (
     <Box>
       {chapter ? (
-        <Sidebar chapter={chapter!} year={retreat?.year} retreatId={retreatId} pageClicked={2}/>
+        <Sidebar
+          chapter={chapter!}
+          year={retreat?.year}
+          retreatId={retreatId}
+          pageClicked={2}
+        />
       ) : (
         <Spinner />
       )}

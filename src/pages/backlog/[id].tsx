@@ -89,7 +89,18 @@ export default function Backlog() {
       <Box>
         {eventsByYear && (
           <Box display={"flex"}>
-            <Box>{chapter ? <Sidebar chapter={chapter} year={retreat?.year} retreatId={retreatId} pageClicked={3} /> : <Spinner />}</Box>
+            <Box>
+              {chapter ? (
+                <Sidebar
+                  chapter={chapter}
+                  year={retreat?.year}
+                  retreatId={retreatId}
+                  pageClicked={3}
+                />
+              ) : (
+                <Spinner />
+              )}
+            </Box>
             <Box
               display={"flex"}
               flexDirection={"column"}

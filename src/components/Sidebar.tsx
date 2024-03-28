@@ -27,7 +27,7 @@ const Sidebar = ({
   chapter,
   year: yearProp,
   retreatId: retreatIdProp,
-  pageClicked, 
+  pageClicked,
 }: SidebarProps) => {
   const id = useId();
   const {
