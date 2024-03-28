@@ -7,11 +7,10 @@ type FundEntryProps = {
   fund: Fund;
 };
 export default function Fund({ handleSelectFund, fund }: FundEntryProps) {
-
-  const formattedDate = new Date(fund.date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: '2-digit',
+  const formattedDate = new Date(fund.date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
   });
 
   return (

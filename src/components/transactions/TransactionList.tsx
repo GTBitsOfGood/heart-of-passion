@@ -5,7 +5,11 @@ import TransactionEntry from "./TransactionEntry";
 import { Transaction, TransactionList } from "src/common/types";
 import fonts from "~/common/theme/fonts";
 
-export default function TransactionList({ includeTitle, title, transactions }: TransactionList) {
+export default function TransactionList({
+  includeTitle,
+  title,
+  transactions,
+}: TransactionList) {
   const [open, setOpen] = useState(true);
 
   return (
@@ -13,29 +17,19 @@ export default function TransactionList({ includeTitle, title, transactions }: T
       <Stack w="95%" py="0.5em" px="1em">
         <Grid templateColumns="repeat(9, 1fr)" gap={4} pl="3em">
           <GridItem colSpan={1}>
-            <Box fontFamily={fonts.nunito}>
-              Name
-            </Box>
+            <Box fontFamily={fonts.nunito}>Name</Box>
           </GridItem>
           <GridItem colSpan={1}>
-            <Box fontFamily={fonts.nunito}>
-                Amount
-            </Box>
+            <Box fontFamily={fonts.nunito}>Amount</Box>
           </GridItem>
           <GridItem colSpan={2}>
-            <Box fontFamily={fonts.nunito}>
-              Date
-            </Box>
+            <Box fontFamily={fonts.nunito}>Date</Box>
           </GridItem>
           <GridItem colSpan={2}>
-            <Box fontFamily={fonts.nunito}>
-              Chapter
-            </Box>
+            <Box fontFamily={fonts.nunito}>Chapter</Box>
           </GridItem>
           <GridItem colSpan={3}>
-            <Box fontFamily={fonts.nunito}>
-              Notes
-            </Box>
+            <Box fontFamily={fonts.nunito}>Notes</Box>
           </GridItem>
         </Grid>
         <Flex
@@ -55,9 +49,7 @@ export default function TransactionList({ includeTitle, title, transactions }: T
           {open ? (
             transactions?.map((transaction: Transaction) => (
               <TransactionEntry
-                key={
-                  transaction.transactionId
-                }
+                key={transaction.transactionId}
                 {...transaction}
               />
             ))

@@ -115,7 +115,7 @@ export const transactionRouter = createTRPCRouter({
         { upsert: true },
       );
     }),
-    updateTransaction: studentProcedure
+  updateTransaction: studentProcedure
     .input(
       z.object({
         transactionId: z.string(),
@@ -129,7 +129,7 @@ export const transactionRouter = createTRPCRouter({
         updatedTransaction,
       ).exec();
     }),
-    updateTransactionChapter: studentProcedure
+  updateTransactionChapter: studentProcedure
     .input(
       z.object({
         transactionId: z.string(),
@@ -140,20 +140,22 @@ export const transactionRouter = createTRPCRouter({
       const { transactionId, chapter } = input;
       await TransactionModel.findOneAndUpdate(
         { transactionId: transactionId },
-        {chapter: chapter},
+        { chapter: chapter },
       ).exec();
     }),
-    deleteTransaction: studentProcedure
+  deleteTransaction: studentProcedure
     .input(
       z.object({
-        transaction : transactionSchema,
+        transaction: transactionSchema,
       }),
     )
     .mutation(async ({ input }) => {
       const { transaction } = input;
-      await TransactionModel.findOneAndDelete({transactionId : transaction.transactionId}).exec();
+      await TransactionModel.findOneAndDelete({
+        transactionId: transaction.transactionId,
+      }).exec();
     }),
-    getTransaction: studentProcedure
+  getTransaction: studentProcedure
     .input(z.string())
     .query(async ({ input }): Promise<Transaction> => {
       const transaction = await TransactionModel.findById(input).exec();
