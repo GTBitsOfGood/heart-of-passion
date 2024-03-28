@@ -77,7 +77,7 @@ export const NewRetreatYearModal = ({
       setYearError(2);
       return;
     }
-    if (parseInt(year) < 0) {
+    if (parseInt(year) <= 0) {
       setYearError(3);
       return;
     }
@@ -145,7 +145,7 @@ export const NewRetreatYearModal = ({
                 <FormErrorMessage mt={0}>
                   {yearError === 1 && `Year is required`}
                   {yearError === 2 && `Year already exists`}
-                  {yearError === 3 && 'Negative year not allowed'}
+                  {yearError === 3 && 'Year must be positive'}
                 </FormErrorMessage>
               </Box>
             </FormControl>
