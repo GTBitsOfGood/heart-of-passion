@@ -195,7 +195,6 @@ export default function CalendarContent({
                   retreatId={retreatId}
                   zoom={zoom}
                 />
-                {console.log(nextEventsArray)}
                 <Box>
                   {nextEventsArray.map((nextEvent: any, index) => {
                     return (

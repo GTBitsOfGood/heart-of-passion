@@ -16,7 +16,7 @@ import {
   VStack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
 import { Fund } from "~/common/types";
 import { FloatingAlert } from "./FloatingAlert";
@@ -85,10 +85,13 @@ export const NewFundModal = ({
     },
   });
 
-  const sourceOptions = ["Other"].concat(
-    trpc.event.getEvents
-      .useQuery(retreatId, { enabled: !!retreatId })
-      .data?.map((e) => e.name) ?? [],
+  const fundraiserData = trpc.fundraiser.getFundraisers.useQuery(retreatId, {
+    enabled: !!retreatId,
+  }).data;
+
+  const sourceOptions = useMemo(
+    () => ["Other"].concat(fundraiserData?.map((f) => f.name) ?? []),
+    [fundraiserData],
   );
 
   const onCloseModal = () => {

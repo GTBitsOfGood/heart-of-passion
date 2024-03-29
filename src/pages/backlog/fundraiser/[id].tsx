@@ -18,10 +18,17 @@ export enum BacklogSort {
 export default function Backlog() {
   const toast = useToast();
   const router = useRouter();
-  const { id: chapterId }: { id?: string } = router.query;
-  const chapter = trpc.chapter.getChapterById.useQuery(chapterId!, {
-    enabled: !!chapterId,
+  const { id: retreatId }: { id?: string } = router.query;
+  const chapter = trpc.chapter.getChapterByRetreatId.useQuery(retreatId!, {
+    enabled: !!retreatId,
   })?.data;
+  const chapterId = chapter?.id;
+  const retreat = trpc.retreat.getRetreatById.useQuery(retreatId!, {
+    enabled: !!retreatId,
+  })?.data;
+  // const chapter = trpc.chapter.getChapterById.useQuery(chapterId!, {
+  //   enabled: !!chapterId,
+  // })?.data;
   const eventsByYear: EventsByYear = {
     2024: [
       {
@@ -72,7 +79,18 @@ export default function Backlog() {
       <Box>
         {eventsByYear && (
           <Box display={"flex"}>
-            <Box>{chapter ? <Sidebar chapter={chapter} /> : <Spinner />}</Box>
+            <Box>
+              {chapter ? (
+                <Sidebar
+                  chapter={chapter}
+                  year={retreat?.year}
+                  retreatId={retreatId}
+                  pageClicked={7}
+                />
+              ) : (
+                <Spinner />
+              )}
+            </Box>
             <Box
               display={"flex"}
               flexDirection={"column"}

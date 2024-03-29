@@ -78,6 +78,7 @@ const generateData = async (chapterId: Types.ObjectId) => {
   var fundraiser1 = await FundraiserModel.create({
     retreatId: retreat._id,
     name: "School Fundraising Activity",
+    location: "Georgia Tech",
     date: "2024-03-05",
     contactName: "J",
     email: "J@gmail.com",
@@ -101,6 +102,7 @@ const generateData = async (chapterId: Types.ObjectId) => {
   var fundraiser2 = await FundraiserModel.create({
     retreatId: retreat._id,
     name: "Museum Fundraising Activity",
+    location: "High Museum",
     date: "2023-12-01",
     contactName: "Q",
     email: "Q@gmail.com",
