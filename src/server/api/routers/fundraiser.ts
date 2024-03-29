@@ -122,11 +122,6 @@ export const fundraiserRouter = createTRPCRouter({
       }).exec();
 
       const parsedEvents = events.map(processEvent);
-      try {
-        if (events) savedFundraiserSchema.parse(parsedEvents[0]);
-      } catch (e) {
-        console.log(parsedEvents[0]);
-      }
 
       return parsedEvents;
     }),
