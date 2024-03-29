@@ -10,18 +10,29 @@ import {
 import { DonorModel } from "~/server/models/Donor";
 import { Donor } from "~/common/types";
 import { donorSchema } from "~/common/types";
+import mongoose from "mongoose";
+import { TRPCError } from "@trpc/server";
 export const donorRouter = createTRPCRouter({
   createDonor: studentProcedure
     .input(donorSchema)
     .mutation(async ({ input }) => {
       const donor = new DonorModel(input);
-      await donor.save();
+
+      await donor.save().catch((error) => {
+        //duplicate key
+        if(error.code===11000) {
+          throw new TRPCError({
+            code: 'CONFLICT',
+            message: 'Email already exists',
+          })
+        }
+      });
     }),
 
   deleteDonor: studentProcedure
     .input(z.string())
     .mutation(async ({ input }) => {
-      await DonorModel.findByIdAndDelete(input).exec();
+      await DonorModel.findOneAndDelete({ donorEmail: input }).exec();
     }),
 
   updateDonor: studentProcedure
