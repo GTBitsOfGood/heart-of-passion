@@ -39,6 +39,7 @@ import { IEvent } from "~/server/models/Event";
 import { z } from "zod";
 import { trpc } from "~/utils/api";
 import { error } from "console";
+import { NewNotesForm } from "./NewNotesForm";
 
 type NewEventProps = {
   isOpen: boolean;
@@ -55,6 +56,7 @@ type Action<T extends keyof Event = keyof Event> =
   | { type: "OPEN_TIME_SIDEBAR" }
   | { type: "OPEN_EXPENSE_SIDEBAR" }
   | { type: "CLOSE_SIDEBAR" }
+  | { type: "TOGGLE_NOTES_SIDEBAR" }
   | { type: "RESET_FORM"; event: Event | undefined }
   | { type: "UPDATE_EVENT"; field: T; value: Event[T] };
 
@@ -62,6 +64,7 @@ type State = {
   event: Event;
   timeFormOpen: boolean;
   expenseFormOpen: boolean;
+  notesFormOpen: boolean;
 };
 
 const reducer = (state: State, action: Action): State => {
@@ -75,11 +78,33 @@ const reducer = (state: State, action: Action): State => {
       if (action.event) return { ...initialState, event: action.event };
       return { ...initialState };
     case "OPEN_TIME_SIDEBAR":
-      return { ...state, timeFormOpen: true, expenseFormOpen: false };
+      return {
+        ...state,
+        timeFormOpen: true,
+        expenseFormOpen: false,
+        notesFormOpen: false,
+      };
     case "OPEN_EXPENSE_SIDEBAR":
-      return { ...state, timeFormOpen: false, expenseFormOpen: true };
+      return {
+        ...state,
+        timeFormOpen: false,
+        expenseFormOpen: true,
+        notesFormOpen: false,
+      };
     case "CLOSE_SIDEBAR":
-      return { ...state, timeFormOpen: false, expenseFormOpen: false };
+      return {
+        ...state,
+        timeFormOpen: false,
+        expenseFormOpen: false,
+        notesFormOpen: false,
+      };
+    case "TOGGLE_NOTES_SIDEBAR":
+      return {
+        ...state,
+        notesFormOpen: !state.notesFormOpen,
+        expenseFormOpen: false,
+        timeFormOpen: false,
+      };
     default:
       return state;
   }
@@ -92,10 +117,12 @@ let initialState: State = {
     location: "",
     dates: [{ day: 1, from: "09:00 am", to: "10:00 am" }],
     expenses: [],
+    notes: "",
   },
 
   timeFormOpen: false,
   expenseFormOpen: false,
+  notesFormOpen: false,
 };
 
 export const NewEventModal = ({
@@ -157,7 +184,7 @@ export const NewEventModal = ({
   //   // save();
   // }, [state.event, debouncedSave]); // Run this effect whenever the event data changes
 
-  const sidebarOpen = state.timeFormOpen || state.expenseFormOpen;
+  const sidebarOpen = state.timeFormOpen || state.expenseFormOpen || state.notesFormOpen;
 
   const onCloseModal = () => {
     // debouncedSave.cancel();
@@ -594,7 +621,7 @@ export const NewEventModal = ({
                     0,
                   )}`}</Text>
                 </HStack>
-                {state.event.notes && (
+                {/* {state.event.notes && (
                   <FormControl marginTop="29px">
                     <FormLabel
                       fontWeight="500"
@@ -619,11 +646,86 @@ export const NewEventModal = ({
                       }
                     />
                   </FormControl>
-                )}
+                )} */}
               </VStack>
-              {!sidebarOpen && isFundraiser ? (
-                <>
-                  <HStack width="100%" justifyContent="end" mb="34px">
+              <HStack width="100%" mb="34px" alignContent="center">
+                <HStack flex={1}>
+                  <Button
+                    colorScheme="twitter"
+                    bg="hop_blue.500"
+                    borderRadius="6px"
+                    fontFamily="heading"
+                    fontSize="20px"
+                    fontWeight="400"
+                    onClick={(e) => {
+                      dispatch({ type: "TOGGLE_NOTES_SIDEBAR" });
+                      setSelectedExpense(undefined);
+                    }}
+                  >
+                    NOTES
+                  </Button>
+                </HStack>
+
+                {!sidebarOpen && isFundraiser ? (
+                  <>
+                    <HStack flex={2} justifyContent="end">
+                      <Button
+                        colorScheme="twitter"
+                        bg="hop_blue.500"
+                        onClick={submit}
+                        borderRadius="6px"
+                        fontFamily="heading"
+                        fontSize="20px"
+                        fontWeight="400"
+                      >
+                        ADD TO FUNDRAISING PLANNING
+                      </Button>
+                    </HStack>
+                  </>
+                ) : isCopy ? (
+                  <>
+                    <HStack flex={2} justifyContent="end">
+                      <Button
+                        fontFamily="heading"
+                        fontSize="20px"
+                        fontWeight="400"
+                        colorScheme="red"
+                        color="hop_red.500"
+                        variant="outline"
+                        onClick={onClose}
+                        borderRadius="6px"
+                        mr="13px"
+                      >
+                        Close
+                      </Button>
+                      <Button
+                        colorScheme="twitter"
+                        bg="hop_blue.500"
+                        borderRadius="6px"
+                        fontFamily="heading"
+                        fontSize="20px"
+                        fontWeight="400"
+                        onClick={copyToCurrentRetreat}
+                      >
+                        Copy
+                      </Button>
+                    </HStack>
+                  </>
+                ) : (
+                  <HStack flex={2} justifyContent="end">
+                    <Button
+                      fontFamily="heading"
+                      fontSize="20px"
+                      fontWeight="400"
+                      colorScheme="red"
+                      color="hop_red.500"
+                      variant="outline"
+                      onClick={deleteEventHandler}
+                      borderRadius="6px"
+                      mr="13px"
+                    >
+                      DELETE
+                    </Button>
                     <Button
                       colorScheme="twitter"
                       bg="hop_blue.500"
@@ -633,67 +735,11 @@ export const NewEventModal = ({
                       fontSize="20px"
                       fontWeight="400"
                     >
-                      ADD TO FUNDRAISING PLANNING
+                      APPLY
                     </Button>
                   </HStack>
-                </>
-              ) : isCopy ? (
-                <>
-                  <HStack width="100%" justifyContent="end" mb="34px">
-                    <Button
-                      fontFamily="heading"
-                      fontSize="20px"
-                      fontWeight="400"
-                      colorScheme="red"
-                      color="hop_red.500"
-                      variant="outline"
-                      onClick={onClose}
-                      borderRadius="6px"
-                      mr="13px"
-                    >
-                      Close
-                    </Button>
-                    <Button
-                      colorScheme="twitter"
-                      bg="hop_blue.500"
-                      borderRadius="6px"
-                      fontFamily="heading"
-                      fontSize="20px"
-                      fontWeight="400"
-                      onClick={copyToCurrentRetreat}
-                    >
-                      Copy
-                    </Button>
-                  </HStack>
-                </>
-              ) : (
-                <HStack width="100%" justifyContent="end" mb="34px">
-                  <Button
-                    fontFamily="heading"
-                    fontSize="20px"
-                    fontWeight="400"
-                    colorScheme="red"
-                    color="hop_red.500"
-                    variant="outline"
-                    onClick={deleteEventHandler}
-                    borderRadius="6px"
-                    mr="13px"
-                  >
-                    DELETE
-                  </Button>
-                  <Button
-                    colorScheme="twitter"
-                    bg="hop_blue.500"
-                    onClick={submit}
-                    borderRadius="6px"
-                    fontFamily="heading"
-                    fontSize="20px"
-                    fontWeight="400"
-                  >
-                    APPLY
-                  </Button>
-                </HStack>
-              )}
+                )}
+              </HStack>
             </VStack>
           </ModalBody>
           {sidebarOpen && (
@@ -745,6 +791,18 @@ export const NewEventModal = ({
                   setSelectedExpense={(e: Expense | undefined) =>
                     setSelectedExpense(e)
                   }
+                />
+              )}
+              {state.notesFormOpen && (
+                <NewNotesForm
+                  notes={state.event.notes ?? ""}
+                  setNotes={(notes) => {
+                    dispatch({
+                      type: "UPDATE_EVENT",
+                      field: "notes",
+                      value: notes,
+                    });
+                  }}
                 />
               )}
             </ModalBody>

@@ -10,9 +10,10 @@ import {
   Select,
   Radio,
   useToast,
+  Textarea,
 } from "@chakra-ui/react";
 import { Expense, expenseSchema, expenseTypeSchema } from "~/common/types";
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import { trpc } from "~/utils/api";
 
 import { useReducer } from "react";
@@ -41,6 +42,7 @@ const initialState: State = {
   type: "Entertainment",
   cost: -1000,
   numUnits: 1,
+  notes: "",
 };
 
 // const [expense, setExpense] = useState(selectedExpense)
@@ -119,8 +121,10 @@ export const NewExpenseForm = ({
       });
     }
   };
-  // const handleNotesChange = (e: ChangeEvent<HTMLTextAreaElement>) =>
-  //   dispatch({ type: "UPDATE_EXPENSE", field: "notes", value: e.target.value });
+  const handleNotesChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    dispatch({ type: "UPDATE_EXPENSE", field: "notes", value: e.target.value });
+    // console.log(state.notes);
+  }
 
   const validateFields = () => {
     try {
@@ -188,8 +192,10 @@ export const NewExpenseForm = ({
     }
     if (create) {
       if (retreatId) {
+        console.log(state);
         await createExpense.mutate({ expenseDetails: state, retreatId });
       } else {
+        console.log('hiiii')
         await createExpense.mutate({ expenseDetails: state });
       }
     } else {
@@ -342,7 +348,7 @@ export const NewExpenseForm = ({
             padding="10px"
           />
         </FormControl>
-        {/* <FormControl mt="18px">
+        <FormControl mt="18px">
           <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
             Notes
           </FormLabel>
@@ -355,9 +361,9 @@ export const NewExpenseForm = ({
             onChange={handleNotesChange}
             padding="10px"
             resize="none"
-            height="100px"
+            height="150px"
           />
-        </FormControl> */}
+        </FormControl>
         {/* <Button
           width="100%"
           height="50px"
@@ -386,7 +392,7 @@ export const NewExpenseForm = ({
             borderRadius="6px"
             mr="13px"
           >
-            {"Delete"}
+            {"DELETE"}
           </Button>
         )}
         <Button
@@ -398,7 +404,7 @@ export const NewExpenseForm = ({
           fontWeight="400"
           onClick={handleApply}
         >
-          {editing ? "Update" : "Add"}
+          {editing ? "UPDATE" : "ADD"}
         </Button>
       </HStack>
     </VStack>
