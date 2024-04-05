@@ -60,6 +60,6 @@ function processDonor(obj: any): Donor {
     source: obj.source,
     sponsorLevel: obj.sponsorLevel,
     status: obj.status,
-    notes: obj.notes,
+    notes: obj.notes ?? "",
   };
 }

@@ -200,6 +200,7 @@ export const NewDonorModal = ({
       status,
       source,
       sponsorLevel,
+      notes,
     };
     setSourceError(
       source === "Select Source" ? SourceError.Empty : SourceError.None,

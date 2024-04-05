@@ -12,6 +12,7 @@ export interface IDonor extends z.infer<typeof donorSchema> {
   source: string;
   sponsorLevel: SponsorLevel;
   status: Status;
+  notes: string;
 }
 
 export const sponsorLevelOptions = [
