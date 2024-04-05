@@ -56,6 +56,9 @@ const DonorSchema = new Schema<IDonor>({
     enum: statusOptions,
     required: true,
   },
+  notes: {
+    type: String,
+  },
 });
 
 export const DonorModel =

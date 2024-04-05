@@ -30,12 +30,11 @@ export const NewNotesForm = ({
   setNotes,
   ...rest
 }: NewNotesFormProps) => {
-
   const handleNotesChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setNotes(e.target.value);
-  }
-    // dispatch({ type: "UPDATE_EXPENSE", field: "notes", value: e.target.value });
-
+  };
+  // dispatch({ type: "UPDATE_EXPENSE", field: "notes", value: e.target.value });
+  
   return (
     <VStack height="100%" justifyContent="space-between">
       <VStack alignItems="start" spacing="0px" w="100%">
@@ -54,7 +53,7 @@ export const NewNotesForm = ({
             borderColor={!valid ? "#C63636" : "#D9D9D9"}
           />
         </FormControl> */}
-        
+
         <FormControl mt="18px">
           <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
             Notes
@@ -71,9 +70,7 @@ export const NewNotesForm = ({
             height="150px"
           />
         </FormControl>
-        
       </VStack>
-    
     </VStack>
   );
 };

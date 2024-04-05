@@ -233,7 +233,9 @@ export const NewExpenseForm = ({
   };
 
   useEffect(() => {
+    
     dispatch({ type: "RESET", expense: selectedExpense });
+    console.log(state.notes);
   }, [selectedExpense]);
 
   const valid = true; // TODO
@@ -357,7 +359,7 @@ export const NewExpenseForm = ({
             border="1px solid #D9D9D9"
             borderRadius="0px"
             width="100%"
-            value={state.notes}
+            value={state.notes ?? ""}
             onChange={handleNotesChange}
             padding="10px"
             resize="none"

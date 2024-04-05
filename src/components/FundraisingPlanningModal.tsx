@@ -487,6 +487,7 @@ export const FundraisingPlanningModal = ({
                           return;
                         }
                         setSelectedExpense(e);
+                        // console.log(e.notes);
                         dispatch({ type: "OPEN_EXPENSE_SIDEBAR" });
                       }}
                     >
