@@ -129,7 +129,7 @@ export const NewExpenseForm = ({
     } catch (e) {
       let errorDesc = "Unknown Error";
       if (e instanceof z.ZodError) {
-        errorDesc = e.issues.map((issue) => issue.message).join("\n");
+        errorDesc = e.issues.map((issue) => (issue.message)).join("\n");
       }
       onOpenError();
       toast({
