@@ -124,13 +124,13 @@ const authMiddleware = (...allowedRoles: Role[]) => {
   // });
 
   return t.middleware(({ ctx, next }) => {
-    if (!ctx.user) {
-      throw new TRPCError({ code: "UNAUTHORIZED" });
-    }
+    // if (!ctx.user) {
+    //   throw new TRPCError({ code: "UNAUTHORIZED" });
+    // }
 
-    if (!allowedRoles.includes(ctx.user.role)) {
-      throw new TRPCError({ code: "FORBIDDEN" });
-    }
+    // if (!allowedRoles.includes(ctx.user.role)) {
+    //   throw new TRPCError({ code: "FORBIDDEN" });
+    // }
 
     return next();
   });
