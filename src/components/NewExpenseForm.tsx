@@ -123,7 +123,6 @@ export const NewExpenseForm = ({
   };
   const handleNotesChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     dispatch({ type: "UPDATE_EXPENSE", field: "notes", value: e.target.value });
-    // console.log(state.notes);
   };
 
   const validateFields = () => {
@@ -234,8 +233,7 @@ export const NewExpenseForm = ({
 
   useEffect(() => {
     dispatch({ type: "RESET", expense: selectedExpense });
-    console.log(state.notes);
-  }, [selectedExpense, state.notes]);
+  }, [selectedExpense]);
 
   const valid = true; // TODO
   let expenseTypeOptions = Object.values(expenseTypeSchema.enum);

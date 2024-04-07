@@ -40,11 +40,17 @@ export default function Donors({
 
   return (
     <>
-      <HStack minHeight="50px" height="50px" width="100%" justifyContent="right" alignContent="center">
-        <Grid
+      <HStack
+        minHeight="50px"
+        height="50px"
+        width="100%"
+        justifyContent="right"
         alignContent="center"
-        height="100%"
-        flex={1}
+      >
+        <Grid
+          alignContent="center"
+          height="100%"
+          flex={1}
           onClick={onOpenAddDonorModal}
           templateColumns="repeat(9, 1fr)"
           gap={4}
@@ -94,11 +100,8 @@ export default function Donors({
           height="40px"
           fontSize="20px"
           marginBottom="0px"
-          onClick={()=>{
-            router.push(`mailto:${donorEmail}`);
-          }}
         >
-          EMAIL
+          <a href={`mailto:${donorEmail}`}>EMAIL</a>
         </Button>
       </HStack>
 

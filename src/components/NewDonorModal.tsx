@@ -101,9 +101,6 @@ export const NewDonorModal = ({
     onSuccess: () => {
       trpcUtils.donor.invalidate();
     },
-    onError: (error) => {
-      
-    },
   });
 
   const updateDonor = trpc.donor.updateDonor.useMutation({

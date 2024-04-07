@@ -10,9 +10,7 @@ import {
 import { DonorModel } from "~/server/models/Donor";
 import { Donor } from "~/common/types";
 import { donorSchema } from "~/common/types";
-import mongoose from "mongoose";
 import { TRPCError } from "@trpc/server";
-import { update } from "lodash";
 export const donorRouter = createTRPCRouter({
   createDonor: studentProcedure
     .input(donorSchema)
@@ -20,12 +18,11 @@ export const donorRouter = createTRPCRouter({
       const donor = new DonorModel(input);
 
       await donor.save().catch((error) => {
-        //duplicate key
-        if(error.code===11000) {
+        if (error.code === 11000) {
           throw new TRPCError({
-            code: 'CONFLICT',
-            message: 'Email already exists',
-          })
+            code: "CONFLICT",
+            message: "Email already exists",
+          });
         }
       });
     }),
