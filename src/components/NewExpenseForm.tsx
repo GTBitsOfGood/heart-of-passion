@@ -99,20 +99,47 @@ export const NewExpenseForm = ({
       });
     }
   };
+  
+  const trpcUtils = trpc.useContext();
+  const updateExpense = trpc.event.updateExpense.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+    },
+  });
+  const updateExpenseByEvent = trpc.event.updateExpenseByEvent.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+    },
+  });
+  const createExpense = trpc.event.createExpense.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+    },
+  });
+  const deleteExpenseByEvent = trpc.event.deleteExpenseByEvent.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+    }
+  })
+  const deleteExpense = trpc.event.deleteExpense.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+    }
+  })
 
   const handleUnitsChange = (event: React.FormEvent<HTMLInputElement>) => {
-    if (parseInt(event.currentTarget.value || "1") > 0) {
+    if (parseInt(event.currentTarget.value) > 0) {
       dispatch({
         type: "UPDATE_EXPENSE",
         field: "numUnits",
-        value: parseInt(event.currentTarget.value || "1"),
+        value: parseInt(event.currentTarget.value),
       });
     } 
   }
   // const handleNotesChange = (e: ChangeEvent<HTMLTextAreaElement>) =>
   //   dispatch({ type: "UPDATE_EXPENSE", field: "notes", value: e.target.value });
 
-  const [costType, setCostType] = useState("flat")
+  const [costType, setCostType] = useState(create || selectedExpense.numUnits === 1 ? "flat" : "unit")
 
   const validateFields = () => {
     try {
@@ -121,9 +148,7 @@ export const NewExpenseForm = ({
     } catch (e) {
       let errorDesc = "Unknown Error";
       if (e instanceof z.ZodError) {
-        console.log(e)
-        console.log("Bruh error ", e.issues)
-        errorDesc = e.issues.map((issue) => issue.message).join("\n")
+        errorDesc = e.issues.map((issue) => issue.message).join("; ")
         errorDesc += `; please fill all fields marked by asterisk`;
       }
       onOpenError();
@@ -142,35 +167,31 @@ export const NewExpenseForm = ({
     if (onCloseSide) {
       onCloseSide();
     }
-    // console.log('a');
-    const updatedExpenses = (expenses ?? []).filter(
-      (e) => e !== selectedExpense,
-    );
-    setExpenses && setExpenses(updatedExpenses);
-
+    console.log('a');
+    if (!create) {
+      console.log('b');
+      const updatedExpenses = (expenses ?? []).filter(
+        (e) => e !== selectedExpense,
+      );
+      if (setExpenses) {
+        console.log('c');
+        setExpenses(updatedExpenses);
+      } else if (selectedExpense._id) {
+        console.log('d');
+        if (thisEvent) {
+          deleteExpenseByEvent.mutate({ eventId: thisEvent, expenseId: selectedExpense._id })
+        } else {
+          deleteExpense.mutate(selectedExpense._id)
+        }
+      }
+    }
     if (setSelectedExpense) {
       setSelectedExpense(undefined);
     }
     dispatch({ type: "RESET" });
     return;
   };
-
-  const trpcUtils = trpc.useContext();
-  const updateExpense = trpc.event.updateExpense.useMutation({
-    onSuccess: () => {
-      trpcUtils.event.invalidate();
-    },
-  });
-  const updateExpenseByEvent = trpc.event.updateExpenseByEvent.useMutation({
-    onSuccess: () => {
-      trpcUtils.event.invalidate();
-    },
-  });
-  const createExpense = trpc.event.createExpense.useMutation({
-    onSuccess: () => {
-      trpcUtils.event.invalidate();
-    },
-  });
+  
 
   const handleApply = async () => {
     if (!validateFields()) {
@@ -330,14 +351,13 @@ export const NewExpenseForm = ({
             color="black"
             border="1px solid #D9D9D9"
             borderRadius="0px"
-            value={state.numUnits ?? 1}
-            isDisabled={state.numUnits === undefined}
+            value={state.numUnits}
             width="100%"
             type="number"
-            required={state.numUnits !== undefined}
+            required={costType !== "flat"}
             onChange={handleUnitsChange}
             padding="10px"
-            disabled={costType === "flat"}
+            isDisabled={costType === "flat"}
           />
         </FormControl>
         {/* <FormControl mt="18px">
