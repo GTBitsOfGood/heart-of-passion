@@ -215,7 +215,6 @@ export const NewDonorModal = ({
       studentName === "" ? StudentError.Empty : StudentError.None,
     );
     setEmailError(donorEmail === "" ? EmailError.Empty : EmailError.None);
-    // console.log(donor);
     return donorSchema.safeParse(donor).success;
   };
 

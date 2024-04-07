@@ -150,7 +150,6 @@ export const NewExpenseForm = ({
     if (onCloseSide) {
       onCloseSide();
     }
-    // console.log('a');
     const updatedExpenses = (expenses ?? []).filter(
       (e) => e !== selectedExpense,
     );
@@ -191,10 +190,8 @@ export const NewExpenseForm = ({
     }
     if (create) {
       if (retreatId) {
-        console.log(state);
         await createExpense.mutate({ expenseDetails: state, retreatId });
       } else {
-        console.log("hiiii");
         await createExpense.mutate({ expenseDetails: state });
       }
     } else {

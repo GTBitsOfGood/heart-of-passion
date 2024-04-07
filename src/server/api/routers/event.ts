@@ -77,9 +77,7 @@ export const eventRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       const { retreatId, expenseDetails } = input;
-      // console.log(expenseDetails.notes);
       if (retreatId) {
-        // console.log(expenseDetails);
         const expense = new ExpenseModel({ retreatId, ...expenseDetails });
         await expense.save();
       } else {

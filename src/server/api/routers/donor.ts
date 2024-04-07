@@ -42,7 +42,6 @@ export const donorRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       const { donorEmail, updatedDonor } = input;
-      console.log(updatedDonor);
       await DonorModel.findOneAndUpdate(
         { donorEmail: donorEmail },
         updatedDonor,
