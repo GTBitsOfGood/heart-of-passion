@@ -38,7 +38,7 @@ type Action<T extends keyof Expense = keyof Expense> =
 type State = Expense;
 
 const initialState: State = {
-  name: "Expense Name",
+  name: "",
   type: "Entertainment",
   cost: -1000,
   numUnits: 1,
@@ -243,6 +243,7 @@ export const NewExpenseForm = ({
             Name of Expense
           </FormLabel>
           <Input
+          placeholder="Expense Name"
             color="black"
             border="1px solid #D9D9D9"
             borderRadius="0px"
@@ -321,7 +322,7 @@ export const NewExpenseForm = ({
                 value: numUnits,
               });
             }}
-            value={state.numUnits == 1 ? "flat" : "unit"}
+            value={(state.numUnits === 1 || state.numUnits === 0) ? "flat" : "unit"}
           >
             <HStack spacing="24px">
               <Radio value="flat">Flat Cost</Radio>
@@ -337,7 +338,8 @@ export const NewExpenseForm = ({
             color="black"
             border="1px solid #D9D9D9"
             borderRadius="0px"
-            value={state.numUnits === 0 ? "" : state.numUnits.toString()}
+            placeholder="Enter Units"
+            value={(state.numUnits === 1 || state.numUnits === 0) ? "" : state.numUnits}
             width="100%"
             type="number"
             onChange={handleUnitsChange}

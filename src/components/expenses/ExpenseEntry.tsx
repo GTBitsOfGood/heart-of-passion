@@ -1,5 +1,5 @@
 import { Box, Grid, GridItem, useDisclosure } from "@chakra-ui/react";
-import { Expense } from "~/common/types";
+import type { Expense } from "~/common/types";
 import fonts from "~/common/theme/fonts";
 import { NewExpenseModal } from "../NewExpenseModal";
 
@@ -65,7 +65,7 @@ export default function Expense({
         </GridItem>
         <GridItem colSpan={1}>
           <Box fontFamily={fonts.nunito}>
-            {numUnits ? `x${numUnits}` : null}
+            {numUnits ? `x${numUnits}` : 'x1'}
           </Box>
         </GridItem>
         <GridItem colSpan={1} display="flex" justifyContent="end">
