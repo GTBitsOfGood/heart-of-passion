@@ -28,6 +28,7 @@ import {
 } from "~/common/types";
 import { trpc } from "~/utils/api";
 import { FloatingAlert } from "./FloatingAlert";
+import { TRPCError } from "@trpc/server";
 
 type NewDonorProps = {
   isOpen: boolean;
@@ -41,6 +42,7 @@ enum EmailError {
   None, // No error
   Empty, // Empty email
   Invalid, // Invalid email
+  Exists, // Email already exists
 }
 
 enum DonorError {
@@ -99,6 +101,9 @@ export const NewDonorModal = ({
     onSuccess: () => {
       trpcUtils.donor.invalidate();
     },
+    onError: (error) => {
+      
+    },
   });
 
   const updateDonor = trpc.donor.updateDonor.useMutation({
@@ -156,11 +161,8 @@ export const NewDonorModal = ({
   };
 
   // Create the donor in the backend and update the frontend with dummy data temporarily on success
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validateFields()) {
-      if (emailError !== EmailError.Empty) {
-        setEmailError(EmailError.Invalid);
-      }
       onOpenError();
       return false;
     }
@@ -174,7 +176,13 @@ export const NewDonorModal = ({
       notes,
     };
     if (create) {
-      createDonor.mutate(donor);
+      try {
+        await createDonor.mutateAsync(donor);
+      } catch (e) {
+        setEmailError(EmailError.Exists);
+        onOpenError();
+        return;
+      }
     } else {
       updateDonor.mutate({
         donorEmail: donorData.donorEmail,
@@ -210,6 +218,7 @@ export const NewDonorModal = ({
       studentName === "" ? StudentError.Empty : StudentError.None,
     );
     setEmailError(donorEmail === "" ? EmailError.Empty : EmailError.None);
+    // console.log(donor);
     return donorSchema.safeParse(donor).success;
   };
 
@@ -306,7 +315,8 @@ export const NewDonorModal = ({
                 <Box minHeight="20px" mt={2}>
                   <FormErrorMessage mt={0}>
                     {emailError === EmailError.Empty && "Email is required"}
-                    {emailError === 2 && "Invalid email"}
+                    {emailError === EmailError.Invalid && "Invalid email"}
+                    {emailError === EmailError.Exists && "Email already exists"}
                   </FormErrorMessage>
                 </Box>
               </FormControl>
@@ -376,6 +386,7 @@ export const NewDonorModal = ({
                   fontSize="16px"
                   fontWeight="600"
                   mb="4px"
+                  minWidth="150px"
                 >
                   Status
                 </FormLabel>
