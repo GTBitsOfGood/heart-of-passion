@@ -29,34 +29,41 @@ export default function Backlog() {
   // const chapter = trpc.chapter.getChapterById.useQuery(chapterId!, {
   //   enabled: !!chapterId,
   // })?.data;
-  const eventsByYear: EventsByYear = {
-    2024: [
-      {
-        name: "Yoga and Meditation Retreat",
-        dates: [
-          {
-            from: "9am",
-            day: 1,
-            to: "10am",
-          },
-        ],
-        expenses: [
-          {
-            name: "TestExpense",
-            type: "Entertainment",
-            cost: 1000,
-            numUnits: 1,
-            event: "Test",
-            eventId: "Test",
-            _id: "Test",
-          },
-        ],
-        location: "Mountain Retreat Center",
-        status: "planning",
-        energyLevel: "low",
-      },
-    ],
-  };
+  // const eventsByYear: EventsByYear = {
+  //   2024: [
+  //     {
+  //       name: "Yoga and Meditation Retreat",
+  //       dates: [
+  //         {
+  //           from: "9am",
+  //           day: 1,
+  //           to: "10am",
+  //         },
+  //       ],
+  //       expenses: [
+  //         {
+  //           name: "TestExpense",
+  //           type: "Entertainment",
+  //           cost: 1000,
+  //           numUnits: 1,
+  //           event: "Test",
+  //           eventId: "Test",
+  //           _id: "Test",
+  //         },
+  //       ],
+  //       location: "Mountain Retreat Center",
+  //       status: "planning",
+  //       energyLevel: "low",
+  //     },
+  //   ],
+  // };
+  const eventsByYear = trpc.retreat.getAllFundraisersForChapter.useQuery(
+    chapterId!,
+    {
+      enabled: !!chapterId,
+    },
+  )?.data;
+
   const sortOptions = Object.values(BacklogSort).map((sortMethod) => ({
     value: sortMethod,
     label: sortMethod,
