@@ -11,11 +11,12 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import { DateObject, Event } from "~/common/types";
+import { DateObject, Event, Fundraiser } from "~/common/types";
 import { NewEventModal } from "../NewEventModal";
+import { FundraisingPlanningModal } from "../FundraisingPlanningModal";
 
 type BacklogCopyModalProps = {
-  event: Event | undefined;
+  event: Fundraiser | undefined;
   copyToCurrentRetreat?: () => void;
   isOpen: boolean;
   onOpen: () => void;
@@ -31,14 +32,13 @@ export default function BacklogCopyModal({
 }: BacklogCopyModalProps) {
   return (
     <>
-      <NewEventModal
+      <FundraisingPlanningModal
         isOpen={isOpen}
         onClose={onClose}
         isCopy={true}
         copyToCurrentRetreat={copyToCurrentRetreat}
         retreatId="test"
-        copyEvent={event}
-        isFundraiser={true}
+        copyFundraiser={event}
       />
     </>
   );

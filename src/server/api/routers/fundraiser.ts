@@ -14,6 +14,7 @@ import {
 
 import { ExpenseModel } from "~/server/models/Event";
 import { FundraiserModel, IFundraiser } from "~/server/models/Fundraiser";
+import { RetreatModel } from "~/server/models/Retreat";
 
 export const fundraiserRouter = createTRPCRouter({
   updateFundraiser: studentProcedure
@@ -42,6 +43,29 @@ export const fundraiserRouter = createTRPCRouter({
       });
 
       await fundraiser.save();
+    }),
+  createFundraiserInLatestRetreat: mentorProcedure
+    .input(
+      z.object({
+        chapterId: z.string(),
+        eventDetails: fundraiserSchema,
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const { chapterId, eventDetails } = input;
+
+      const retreat = await RetreatModel.findOne({
+        chapterId,
+      }).sort({ year: -1 });
+
+      if (!retreat) {
+        throw new Error("No retreat found");
+      }
+
+      const retreatId = retreat._id;
+
+      const event = new FundraiserModel({ retreatId, ...eventDetails });
+      await event.save();
     }),
   updateExpenseByFundraiser: studentProcedure
     .input(

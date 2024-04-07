@@ -120,6 +120,7 @@ export default function Planning() {
                     retreatId={retreatId!}
                     isOpen={isOpenFundraisingPlanningModal}
                     onClose={onCloseFundraisingPlanningModal}
+                    isCopy={false}
                   />
                 </Box>
               </Box>
