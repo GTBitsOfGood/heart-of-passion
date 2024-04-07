@@ -12,6 +12,7 @@ import { EventModel, IEvent } from "~/server/models/Event";
 import { Event, eventsByYearSchema } from "~/common/types";
 import { Fundraiser, fundraisersByYearSchema} from "~/common/types";
 import { FundraiserModel } from "~/server/models/Fundraiser";
+import { FundModel } from "~/server/models/Fund";
 
 export const retreatRouter = createTRPCRouter({
   createRetreat: mentorProcedure
@@ -142,4 +143,11 @@ export const retreatRouter = createTRPCRouter({
 
       return fundraisersByYear;
     }),
+
+  deleteRetreat: mentorProcedure.input(z.string()).mutation(async ({ input }) => {
+      await EventModel.deleteMany({ retreatId: input}).exec();
+      await FundModel.deleteMany({ retreatId: input}).exec();
+      await FundraiserModel.deleteMany({ retreatId: input}).exec();
+      await RetreatModel.findByIdAndDelete(input).exec();
+  }),
 });
