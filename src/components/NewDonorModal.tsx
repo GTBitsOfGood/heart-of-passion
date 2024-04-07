@@ -13,10 +13,11 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Textarea,
   VStack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
 import {
   Donor,
@@ -27,6 +28,7 @@ import {
 } from "~/common/types";
 import { trpc } from "~/utils/api";
 import { FloatingAlert } from "./FloatingAlert";
+import { TRPCError } from "@trpc/server";
 
 type NewDonorProps = {
   isOpen: boolean;
@@ -40,6 +42,7 @@ enum EmailError {
   None, // No error
   Empty, // Empty email
   Invalid, // Invalid email
+  Exists, // Email already exists
 }
 
 enum DonorError {
@@ -73,6 +76,7 @@ export const NewDonorModal = ({
   const [sponsorLevel, setSponsorLevel] = useState<SponsorLevel>(
     donorData.sponsorLevel,
   );
+  const [notes, setNotes] = useState(donorData.notes ?? "");
 
   // Options
   const SponsorLevelOptions = Object.values(sponsorLevelSchema.enum);
@@ -121,6 +125,7 @@ export const NewDonorModal = ({
         setDonorName("");
         setStudentName("");
         setDonorEmail("");
+        setNotes("");
       } else {
         // Set existing values when editing
         setDonorName(donorData.donorName);
@@ -129,6 +134,7 @@ export const NewDonorModal = ({
         setStatus(donorData.status);
         setSource(donorData.source);
         setSponsorLevel(donorData.sponsorLevel);
+        setNotes(donorData.notes ?? "");
       }
     }
   }, [isOpen, create, donorData]);
@@ -141,20 +147,19 @@ export const NewDonorModal = ({
       setDonorName("");
       setStudentName("");
       setDonorEmail("");
+      setNotes("");
     }
     setNameError(DonorError.None);
     setStudentError(StudentError.None);
     setSourceError(SourceError.None);
     setEmailError(EmailError.None);
+    onCloseError();
     onClose();
   };
 
   // Create the donor in the backend and update the frontend with dummy data temporarily on success
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validateFields()) {
-      if (emailError !== EmailError.Empty) {
-        setEmailError(EmailError.Invalid);
-      }
       onOpenError();
       return false;
     }
@@ -165,9 +170,16 @@ export const NewDonorModal = ({
       source,
       sponsorLevel,
       status,
+      notes,
     };
     if (create) {
-      createDonor.mutate(donor);
+      try {
+        await createDonor.mutateAsync(donor);
+      } catch (e) {
+        setEmailError(EmailError.Exists);
+        onOpenError();
+        return;
+      }
     } else {
       updateDonor.mutate({
         donorEmail: donorData.donorEmail,
@@ -193,6 +205,7 @@ export const NewDonorModal = ({
       status,
       source,
       sponsorLevel,
+      notes,
     };
     setSourceError(
       source === "Select Source" ? SourceError.Empty : SourceError.None,
@@ -220,6 +233,9 @@ export const NewDonorModal = ({
 
   const handleSourceChange = (newSource: string) => setSource(newSource);
 
+  const handleNotesChange = (event: ChangeEvent<HTMLTextAreaElement>) =>
+    setNotes(event.currentTarget.value);
+
   const sourceOptions = ["Other"].concat(
     trpc.event.getEvents
       .useQuery(retreatId, { enabled: !!retreatId })
@@ -231,7 +247,7 @@ export const NewDonorModal = ({
       <ModalOverlay />
       <ModalContent
         width="600px"
-        height="400px"
+        height="550px"
         maxWidth="600px"
         borderRadius="none"
         boxShadow={"0px 4px 29px 0px #00000040"}
@@ -295,7 +311,8 @@ export const NewDonorModal = ({
                 <Box minHeight="20px" mt={2}>
                   <FormErrorMessage mt={0}>
                     {emailError === EmailError.Empty && "Email is required"}
-                    {emailError === 2 && "Invalid email"}
+                    {emailError === EmailError.Invalid && "Invalid email"}
+                    {emailError === EmailError.Exists && "Email already exists"}
                   </FormErrorMessage>
                 </Box>
               </FormControl>
@@ -365,6 +382,7 @@ export const NewDonorModal = ({
                   fontSize="16px"
                   fontWeight="600"
                   mb="4px"
+                  minWidth="150px"
                 >
                   Status
                 </FormLabel>
@@ -376,6 +394,22 @@ export const NewDonorModal = ({
                 <FormErrorMessage minHeight="20px" />
               </FormControl>
             </HStack>
+            <FormControl mt="18px">
+              <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
+                Notes
+              </FormLabel>
+              <Textarea
+                color="black"
+                border="1px solid #D9D9D9"
+                borderRadius="0px"
+                width="100%"
+                value={notes}
+                onChange={handleNotesChange}
+                padding="10px"
+                resize="none"
+                height="50px"
+              />
+            </FormControl>
           </VStack>
         </ModalBody>
 

@@ -70,10 +70,8 @@ export default function CalendarContent({
     for (const date of dates) {
       const { from, to, day } = date;
       eventsByDay[day - 1]!.push({ event, from, to, day });
-      console.log(from);
     }
   }
-  console.log(eventsByDay);
   for (const dayEvents of eventsByDay) {
     dayEvents.sort(DayComparator);
   }

@@ -16,12 +16,18 @@ export const statusDonorSchema = z.enum(statusOptions as [string, ...string[]]);
 export type Status = z.infer<typeof statusDonorSchema>;
 
 export const donorSchema = z.object({
-  studentName: z.string(),
-  donorName: z.string(),
+  studentName: z.string().min(1, "Student name is required"),
+  donorName: z.string().min(1, "Donor name is required"),
   donorEmail: z.string().email(),
-  source: z.string(),
+  source: z
+    .string()
+    .min(1, "Source is required")
+    .refine((v) => v !== "Select Source", {
+      message: "Source is required",
+    }),
   sponsorLevel: sponsorLevelSchema,
   status: statusDonorSchema,
+  notes: z.string().optional(),
 });
 export type Donor = z.infer<typeof donorSchema>;
 
@@ -83,6 +89,7 @@ export const expenseSchema = z.object({
   type: expenseTypeSchema,
   cost: z.number().min(0, "Cost must be a positive amount"),
   numUnits: z.number().min(1, "Minimum 1 unit is needed"),
+  notes: z.string().optional(),
 });
 export type Expense = z.infer<typeof expenseSchema>;
 
@@ -138,6 +145,7 @@ export const fundraiserSchema = z.object({
   email: z.string().email(),
   profit: z.number().nonnegative(),
   expenses: z.array(expenseSchema),
+  notes: z.string().optional(),
 });
 
 export const savedFundraiserSchema = fundraiserSchema.extend({
