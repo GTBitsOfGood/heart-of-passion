@@ -40,6 +40,10 @@ const FundraiserSchema = new Schema<IFundraiser>({
     type: Number,
     required: true,
   },
+  notes: {
+    type: String,
+    required: false,
+  },
   expenses: [ExpenseSchema],
 });
 

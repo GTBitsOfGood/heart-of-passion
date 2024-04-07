@@ -55,7 +55,7 @@ export const fundraiserRouter = createTRPCRouter({
       const { expenseId, expense, fundraiserId } = input;
       const fundraiser = await FundraiserModel.findById(fundraiserId).exec();
       if (!fundraiser) {
-        throw new Error("Event not found: " + fundraiser);
+        throw new Error("Fundraiser not found with ID: " + fundraiserId);
       }
       const expenseIndex = fundraiser.expenses.findIndex(
         (exp) => exp._id?.toString() === expenseId,
@@ -108,6 +108,7 @@ function processExpense(expense: any) {
     type: expense.type,
     cost: expense.cost,
     numUnits: expense.numUnits,
+    notes: expense.notes,
   };
 }
 
@@ -119,7 +120,8 @@ function processEvent(fundraiser: IFundraiser) {
     contactName: fundraiser.contactName,
     email: fundraiser.email,
     profit: fundraiser.profit,
-    
+    notes: fundraiser.notes,
+
     expenses: fundraiser.expenses.map(processExpense),
     _id: fundraiser._id.toString(),
     retreatId: fundraiser.retreatId.toString(),
