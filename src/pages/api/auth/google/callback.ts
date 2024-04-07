@@ -32,7 +32,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     storedState !== state ||
     typeof code !== "string"
   ) {
-    console.log("HERE 0");
     res.status(400).end();
     return;
   }

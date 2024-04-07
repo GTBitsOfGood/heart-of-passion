@@ -10,9 +10,10 @@ import {
   Select,
   Radio,
   useToast,
+  Textarea,
 } from "@chakra-ui/react";
 import { Expense, expenseSchema, expenseTypeSchema } from "~/common/types";
-import { useState, useEffect } from "react";
+import { useEffect, ChangeEvent, useState } from "react";
 import { trpc } from "~/utils/api";
 
 import { useReducer } from "react";
@@ -37,10 +38,11 @@ type Action<T extends keyof Expense = keyof Expense> =
 type State = Expense;
 
 const initialState: State = {
-  name: "Expense Name",
+  name: "",
   type: "Entertainment",
-  cost: -1000,
+  cost: -1,
   numUnits: 1,
+  notes: "",
 };
 
 // const [expense, setExpense] = useState(selectedExpense)
@@ -81,7 +83,10 @@ export const NewExpenseForm = ({
       value: event.currentTarget.value,
     });
   const handleCostChange = (event: React.FormEvent<HTMLInputElement>) => {
-    if (event.currentTarget.value !== "" && parseFloat(event.currentTarget.value) >= 0) {
+    if (
+      event.currentTarget.value !== "" &&
+      parseFloat(event.currentTarget.value) >= 0
+    ) {
       const regex = /^\d*\.?\d{0,2}$/;
       if (!regex.test(event.currentTarget.value)) {
         return;
@@ -136,8 +141,9 @@ export const NewExpenseForm = ({
       });
     } 
   }
-  // const handleNotesChange = (e: ChangeEvent<HTMLTextAreaElement>) =>
-  //   dispatch({ type: "UPDATE_EXPENSE", field: "notes", value: e.target.value });
+  const handleNotesChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    dispatch({ type: "UPDATE_EXPENSE", field: "notes", value: e.target.value });
+  };
 
   const [costType, setCostType] = useState(create || selectedExpense.numUnits === 1 ? "flat" : "unit")
 
@@ -257,6 +263,7 @@ export const NewExpenseForm = ({
             Name of Expense
           </FormLabel>
           <Input
+            placeholder="Expense Name"
             color="black"
             border="1px solid #D9D9D9"
             borderRadius="0px"
@@ -309,7 +316,7 @@ export const NewExpenseForm = ({
             width="100%"
             type="number"
             placeholder="Enter Cost"
-            value={state.cost === -1000 ? "" : state.cost.toString()}
+            value={state.cost === -1 ? "" : state.cost}
             onChange={handleCostChange}
             padding="10px"
             borderColor={!valid ? "#C63636" : "#D9D9D9"}
@@ -355,12 +362,13 @@ export const NewExpenseForm = ({
             width="100%"
             type="number"
             required={costType !== "flat"}
+            placeholder="Enter Units"
             onChange={handleUnitsChange}
             padding="10px"
             isDisabled={costType === "flat"}
           />
         </FormControl>
-        {/* <FormControl mt="18px">
+        <FormControl mt="18px">
           <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
             Notes
           </FormLabel>
@@ -369,13 +377,13 @@ export const NewExpenseForm = ({
             border="1px solid #D9D9D9"
             borderRadius="0px"
             width="100%"
-            value={state.notes}
+            value={state.notes ?? ""}
             onChange={handleNotesChange}
             padding="10px"
             resize="none"
-            height="100px"
+            height="150px"
           />
-        </FormControl> */}
+        </FormControl>
         {/* <Button
           width="100%"
           height="50px"
@@ -404,7 +412,7 @@ export const NewExpenseForm = ({
             borderRadius="6px"
             mr="13px"
           >
-            {"Delete"}
+            {"DELETE"}
           </Button>
         )}
         <Button
@@ -416,7 +424,7 @@ export const NewExpenseForm = ({
           fontWeight="400"
           onClick={handleApply}
         >
-          {editing ? "Update" : "Add"}
+          {editing ? "UPDATE" : "ADD"}
         </Button>
       </HStack>
     </VStack>

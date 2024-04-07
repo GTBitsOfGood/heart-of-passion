@@ -16,7 +16,7 @@ import {
   VStack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
 import { Fund } from "~/common/types";
 import { FloatingAlert } from "./FloatingAlert";
@@ -34,14 +34,6 @@ enum FundError {
   None, // No error
   Empty, // Empty user
 }
-
-const eventOptions = [
-  "Select Source",
-  "Donation",
-  "Event 1",
-  "Event 2",
-  "Event 3",
-];
 
 export const NewFundModal = ({
   isOpen,
@@ -73,7 +65,7 @@ export const NewFundModal = ({
     onOpen: onOpenError,
   } = useDisclosure({ defaultIsOpen: false });
 
-  const trpcUtils = trpc.useContext();
+  const trpcUtils = trpc.useUtils();
   const updateFund = trpc.fund.updateFund.useMutation({
     onSuccess: () => {
       trpcUtils.fund.invalidate();
@@ -92,6 +84,15 @@ export const NewFundModal = ({
       trpcUtils.chapter.invalidate();
     },
   });
+
+  const fundraiserData = trpc.fundraiser.getFundraisers.useQuery(retreatId, {
+    enabled: !!retreatId,
+  }).data;
+
+  const sourceOptions = useMemo(
+    () => ["Other"].concat(fundraiserData?.map((f) => f.name) ?? []),
+    [fundraiserData],
+  );
 
   const onCloseModal = () => {
     onClose();
@@ -201,7 +202,7 @@ export const NewFundModal = ({
                   Source*
                 </FormLabel>
                 <RadioDropdown
-                  options={eventOptions}
+                  options={sourceOptions}
                   selectedOption={source}
                   setSelectedOption={handleSourceChange}
                 />

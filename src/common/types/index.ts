@@ -1,9 +1,5 @@
 import { z } from "zod";
-import {
-  sponsorLevelOptions,
-  sourceOptions,
-  statusOptions,
-} from "~/server/models/Donor";
+import { sponsorLevelOptions, statusOptions } from "~/server/models/Donor";
 
 // Role
 export const roleSchema = z.enum(["student", "mentor", "admin"]);
@@ -16,19 +12,22 @@ export const sponsorLevelSchema = z.enum(
 );
 export type SponsorLevel = z.infer<typeof sponsorLevelSchema>;
 
-export const sourceSchema = z.enum(sourceOptions as [string, ...string[]]);
-export type Source = z.infer<typeof sourceSchema>;
-
 export const statusDonorSchema = z.enum(statusOptions as [string, ...string[]]);
 export type Status = z.infer<typeof statusDonorSchema>;
 
 export const donorSchema = z.object({
-  studentName: z.string(),
-  donorName: z.string(),
+  studentName: z.string().min(1, "Student name is required"),
+  donorName: z.string().min(1, "Donor name is required"),
   donorEmail: z.string().email(),
-  source: sourceSchema,
+  source: z
+    .string()
+    .min(1, "Source is required")
+    .refine((v) => v !== "Select Source", {
+      message: "Source is required",
+    }),
   sponsorLevel: sponsorLevelSchema,
   status: statusDonorSchema,
+  notes: z.string().optional(),
 });
 export type Donor = z.infer<typeof donorSchema>;
 
@@ -83,13 +82,14 @@ export type DateObject = z.infer<typeof dateObjectSchema>;
 
 // Expense
 export const expenseSchema = z.object({
-  name: z.string().min(1, "Expense name is empty"),
+  name: z.string().min(1, "Expense name must be at least 1 character long"),
   _id: z.string().optional(),
   event: z.string().optional(),
   eventId: z.string().optional(),
   type: expenseTypeSchema,
   cost: z.number().min(0, "Cost cannot be empty or negative"),
   numUnits: z.number().min(1, "Minimum 1 unit is needed"),
+  notes: z.string().optional(),
 });
 export type Expense = z.infer<typeof expenseSchema>;
 
@@ -138,18 +138,19 @@ export const eventSchema = z
 export type Event = z.infer<typeof eventSchema>;
 
 export const fundraiserSchema = z.object({
-  name: z.string().min(1, "Fundraiser name is empty"),
-  location: z.string().min(1, "Location name is empty"),
-  date: z.string().datetime(),
-  contactName: z.string().min(1, "Contact name is empty"),
+  name: z.string().min(1, "Fundraiser name cannot be  empty"),
+  location: z.string().min(1, "Location name cannot be empty"),
+  date: z.date(),
+  contactName: z.string().min(1, "Contact name cannot be empty"),
   email: z.string().email(),
-  profit: z
-    .number({
-      required_error: "Profit is required",
-      invalid_type_error: "Profit must be a number",
-    })
-    .nonnegative(),
+  profit: z.number().nonnegative(),
   expenses: z.array(expenseSchema),
+  notes: z.string().optional(),
+});
+
+export const savedFundraiserSchema = fundraiserSchema.extend({
+  _id: z.string(),
+  retreatId: z.string(),
 });
 
 export type Fundraiser = z.infer<typeof fundraiserSchema>;

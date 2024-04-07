@@ -1,18 +1,19 @@
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Text, useDisclosure } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import "@fontsource/oswald/700.css";
-import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 
 import PlanningCard from "~/components/FundraisingPlanning/PlanningCard";
-import { Event, EventsByYear, Fundraiser } from "~/common/types";
+import { Fundraiser } from "~/common/types";
 import { PlanningSort } from "~/pages/planning/[id]";
+import { FundraisingPlanningModal } from "../FundraisingPlanningModal";
+import { IFundraiser } from "~/server/models/Fundraiser";
 
 export default function PlanningHandler({
   sortMethod,
   fundraisers,
 }: {
   sortMethod: PlanningSort;
-  fundraisers: Fundraiser[];
+  fundraisers: IFundraiser[];
 }) {
   // Combine all events into a single array
   //const allFundraisers = Object.values(eventsByYear).flat();
@@ -31,7 +32,7 @@ function PlanningYearContainer({
   fundraisers,
   sortMethod,
 }: {
-  fundraisers: Fundraiser[];
+  fundraisers: IFundraiser[];
   sortMethod: PlanningSort;
 }) {
   const [open, setOpen] = useState(true);
@@ -59,14 +60,37 @@ function PlanningYearContainer({
     }
   }, [fundraisers, sortMethod]);
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const [editingFundraiser, setEditingFundraiser] = useState<
+    IFundraiser | undefined
+  >(undefined);
+
+  const editFundraiser = (fundraiser: IFundraiser) => {
+    setEditingFundraiser(fundraiser);
+    onOpen();
+  };
+
   return (
     <Box display={"flex"} gap={10} flexWrap={"wrap"} marginTop={7}>
       {open &&
         sortedEvents.map((f) => {
           return (
-            <PlanningCard key={f.name + f.date + f.location} fundraiser={f} />
+            <PlanningCard
+              key={f.name + f.date + f.location}
+              fundraiser={f}
+              onClick={() => {
+                editFundraiser(f);
+              }}
+            />
           );
         })}
+      <FundraisingPlanningModal
+        isOpen={isOpen}
+        retreatId={""}
+        fundraiser={editingFundraiser}
+        onClose={onClose}
+      />
     </Box>
   );
 }

@@ -39,12 +39,13 @@ export const NewRetreatYearModal = ({
   // 0 - none
   // 1 - blank year
   // 2 - year already exists
+  // 3 - negative year
   const [yearError, setYearError] = useState(0);
 
   const handleYearChange = (event: React.FormEvent<HTMLInputElement>) =>
     setYear(event.currentTarget.value);
 
-  const trpcUtils = trpc.useContext();
+  const trpcUtils = trpc.useUtils();
 
   const { data: chapterId } =
     trpc.chapter.getChapterIdByName.useQuery(chapterName);
@@ -58,8 +59,6 @@ export const NewRetreatYearModal = ({
 
   const createRetreat = trpc.retreat.createRetreat.useMutation({
     onSuccess: (data) => {
-      //console.log("year"+year)
-      //router.push(`/retreats/${data.id}`);
       trpcUtils.retreat.invalidate();
     },
   });
@@ -74,6 +73,10 @@ export const NewRetreatYearModal = ({
 
     if (exists) {
       setYearError(2);
+      return;
+    }
+    if (parseInt(year) <= 0) {
+      setYearError(3);
       return;
     }
     setYearError(0);
@@ -140,6 +143,7 @@ export const NewRetreatYearModal = ({
                 <FormErrorMessage mt={0}>
                   {yearError === 1 && `Year is required`}
                   {yearError === 2 && `Year already exists`}
+                  {yearError === 3 && "Year must be positive"}
                 </FormErrorMessage>
               </Box>
             </FormControl>

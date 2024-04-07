@@ -1,50 +1,55 @@
 import {
-  Box,
   Button,
   Divider,
   FormControl,
-  FormErrorMessage,
   FormLabel,
   HStack,
   Input,
   InputGroup,
-  InputRightElement,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalOverlay,
-  Select,
   Text,
+  Textarea,
   VStack,
   useToast,
 } from "@chakra-ui/react";
-import { useReducer, useState } from "react";
-import { DownArrowIcon } from "~/common/theme/icons";
+import { useEffect, useReducer, useState } from "react";
 import { Expense, Fundraiser, fundraiserSchema } from "~/common/types";
 import { NewExpenseForm } from "./NewExpenseForm";
-import { z } from "zod";
-import { fundraiserRouter } from "~/server/api/routers/fundraiser";
+import { trpc } from "~/utils/api";
+import { IFundraiser } from "~/server/models/Fundraiser";
 
 type FundraisingPlanningModalProps = {
   isOpen: boolean;
+  retreatId: string;
   onClose: () => void;
-  onOpenError: () => void;
-  onCloseError: () => void;
-  fundraiser?: Fundraiser;
+  fundraiser?: IFundraiser;
 };
 
 type State = {
   fundraiser: Fundraiser;
+  fundraiserId: string | undefined;
   expenseFormOpen: boolean;
+  notesFormOpen: boolean;
 };
 type Action<T extends keyof Fundraiser = keyof Fundraiser> =
   | { type: "OPEN_EXPENSE_SIDEBAR" }
   | { type: "TOGGLE_EXPENSE_SIDEBAR" }
+  | { type: "TOGGLE_NOTES_SIDEBAR" }
   | { type: "CLOSE_SIDEBAR" }
-  | { type: "RESET_FORM"; event: Fundraiser | undefined }
-  | { type: "UPDATE_FUNDRAISER"; field: Exclude<T, "date">; value: Fundraiser[Exclude<T, "date">] }
-  | { type: "UPDATE_DATE"; value: string };
+  | {
+      type: "RESET_FORM";
+      fundraiser: Fundraiser | undefined;
+      fundraiserId?: string;
+    }
+  | {
+      type: "UPDATE_FUNDRAISER";
+      field: T;
+      value: Fundraiser[T];
+    };
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
@@ -53,20 +58,30 @@ const reducer = (state: State, action: Action): State => {
         ...state,
         fundraiser: { ...state.fundraiser, [action.field]: action.value },
       };
-    case "UPDATE_DATE":
-        return {
-          ...state,
-          fundraiser: { ...state.fundraiser, date: action.value },
-        };
     case "RESET_FORM":
-      if (action.event) return { ...initialState, fundraiser: action.event };
+      if (action.fundraiser && action.fundraiserId)
+        return {
+          ...initialState,
+          fundraiser: action.fundraiser,
+          fundraiserId: action.fundraiserId,
+        };
       return { ...initialState };
     case "OPEN_EXPENSE_SIDEBAR":
-      return { ...state, expenseFormOpen: true };
+      return { ...state, expenseFormOpen: true, notesFormOpen: false };
     case "CLOSE_SIDEBAR":
-      return { ...state, expenseFormOpen: false };
+      return { ...state, expenseFormOpen: false, notesFormOpen: false };
     case "TOGGLE_EXPENSE_SIDEBAR":
-      return { ...state, expenseFormOpen: !state.expenseFormOpen };
+      return {
+        ...state,
+        expenseFormOpen: !state.expenseFormOpen,
+        notesFormOpen: false,
+      };
+    case "TOGGLE_NOTES_SIDEBAR":
+      return {
+        ...state,
+        notesFormOpen: !state.notesFormOpen,
+        expenseFormOpen: false,
+      };
     default:
       return state;
   }
@@ -74,35 +89,106 @@ const reducer = (state: State, action: Action): State => {
 
 const initialState: State = {
   fundraiser: {
-    name: "Laser Tag",
+    name: "",
     location: "",
-    date: new Date().toISOString(),
+    date: new Date(),
     contactName: "",
     email: "",
     profit: 0,
     expenses: [],
+    notes: "",
   },
+  fundraiserId: undefined,
   expenseFormOpen: false,
+  notesFormOpen: false,
 };
 
 export const FundraisingPlanningModal = ({
   isOpen,
+  retreatId,
   onClose,
   fundraiser,
 }: FundraisingPlanningModalProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [selectedExpense, setSelectedExpense] = useState<Expense>();
-  const [nameError, setNameError] = useState<string>("");
-  const [emailError, setEmailError] = useState<string>("");
-  const [profitError, setProfitError] = useState<string>("");
+
+  const toast = useToast();
 
   const onCloseModal = () => {
     onClose();
-    setNameError("");
-    setEmailError("");
-    setProfitError("");
+    dispatch({ type: "RESET_FORM", fundraiser, fundraiserId: fundraiser?._id });
   };
-  const sidebarOpen = state.expenseFormOpen;
+  const sidebarOpen = state.expenseFormOpen || state.notesFormOpen;
+
+  const validateFields = () => {
+    let parsed = fundraiserSchema.safeParse(state.fundraiser);
+
+    if (parsed.success) return true;
+
+    let description = parsed.error.errors.map((e) => e.message).join("\n");
+
+    toast({
+      title: "Error",
+      description,
+      status: "error",
+      isClosable: true,
+    });
+    return false;
+  };
+
+  useEffect(() => {
+    if (fundraiser) {
+      dispatch({
+        type: "RESET_FORM",
+        fundraiser,
+        fundraiserId: fundraiser._id,
+      });
+    }
+  }, [fundraiser]);
+
+  const trpcUtils = trpc.useUtils();
+
+  const createFundraiser = trpc.fundraiser.createFundraiser.useMutation({
+    onSuccess: () => {
+      trpcUtils.fundraiser.invalidate();
+    },
+  });
+
+  const updateFundraiser = trpc.fundraiser.updateFundraiser.useMutation({
+    onSuccess: () => {
+      trpcUtils.fundraiser.invalidate();
+    },
+  });
+
+  const deleteFundraiser = trpc.fundraiser.deleteFundraiser.useMutation({
+    onSuccess: () => {
+      trpcUtils.fundraiser.invalidate();
+    },
+  });
+
+  const handleDelete = async () => {
+    if (fundraiser) await deleteFundraiser.mutate(fundraiser._id);
+
+    onCloseModal();
+  };
+
+  const handleSubmit = async () => {
+    if (!validateFields()) return;
+
+    if (fundraiser) {
+      await updateFundraiser.mutate({
+        fundraiserId: fundraiser._id,
+        fundraiser: state.fundraiser,
+      });
+    } else {
+      await createFundraiser.mutate({
+        retreatId,
+        fundraiserDetails: state.fundraiser,
+      });
+    }
+
+    onCloseModal();
+  };
 
   return (
     <Modal
@@ -116,7 +202,7 @@ export const FundraisingPlanningModal = ({
       <ModalContent
         width={sidebarOpen ? "831px" : "494px"}
         maxWidth={sidebarOpen ? "831px" : "494px"}
-        height="879px"
+        height="979px"
         borderRadius="none"
         boxShadow={"0px 4px 29px 0px #00000040"}
         position="relative"
@@ -143,7 +229,7 @@ export const FundraisingPlanningModal = ({
             boxShadow={"0px 4px 29px 0px #00000040"}
           >
             <VStack height="100%" spacing="0px">
-            <FormControl isRequired isInvalid={nameError !== ""} mt="23px">
+              <FormControl isRequired mt="23px">
                 <Input
                   //Enter Fundraiser Name
                   height="53px"
@@ -169,15 +255,11 @@ export const FundraisingPlanningModal = ({
                       field: "name",
                       value: e.target.value,
                     });
-                    if (e.target.value.trim() === "") {
-                      setNameError("Fundraiser name cannot be empty");
-                    } else {
-                      setNameError("");
-                    }
                   }}
+                  pl="0px"
                 />
-                <FormErrorMessage>{nameError}</FormErrorMessage>
               </FormControl>
+
               <Divider borderColor="black" />
 
               <FormControl
@@ -197,6 +279,14 @@ export const FundraisingPlanningModal = ({
                   color="black"
                   border="1px solid #D9D9D9"
                   borderRadius="0px"
+                  value={state.fundraiser.location}
+                  onChange={(e) => {
+                    dispatch({
+                      type: "UPDATE_FUNDRAISER",
+                      field: "location",
+                      value: e.target.value,
+                    });
+                  }}
                 ></Input>
               </FormControl>
 
@@ -206,7 +296,8 @@ export const FundraisingPlanningModal = ({
                 width="100%"
                 justifyContent="space-between"
               >
-                <FormControl isRequired
+                <FormControl
+                  isRequired
                   //Date
                   width="182px"
                   maxWidth="182px"
@@ -224,18 +315,19 @@ export const FundraisingPlanningModal = ({
                     type="date"
                     border="1px solid #D9D9D9"
                     borderRadius="0px"
-                    // defaultValue={date}
-                    value={state.fundraiser.date}
+                    value={state.fundraiser.date.toISOString().split("T")[0]}
                     onChange={(e) => {
                       dispatch({
-                        type: "UPDATE_DATE",
-                        value: e.target.value,
+                        type: "UPDATE_FUNDRAISER",
+                        field: "date",
+                        value: new Date(e.target.value),
                       });
                     }}
                   />
                 </FormControl>
                 <FormControl
                   //Name of Contact
+                  isRequired
                   width="182px"
                   maxWidth="182px"
                 >
@@ -252,11 +344,19 @@ export const FundraisingPlanningModal = ({
                     color="black"
                     border="1px solid #D9D9D9"
                     borderRadius="0px"
+                    value={state.fundraiser.contactName}
+                    onChange={(e) => {
+                      dispatch({
+                        type: "UPDATE_FUNDRAISER",
+                        field: "contactName",
+                        value: e.target.value,
+                      });
+                    }}
                   ></Input>
                 </FormControl>
               </HStack>
 
-              <FormControl isRequired isInvalid={emailError !== ""} mt="23px">
+              <FormControl isRequired mt="23px">
                 <FormLabel
                   mb="10px"
                   fontWeight="500"
@@ -277,19 +377,11 @@ export const FundraisingPlanningModal = ({
                       field: "email",
                       value: e.target.value,
                     });
-                    // Email validation
-                    const emailPattern = /\S+@\S+\.\S+/;
-                    if (!emailPattern.test(e.target.value)) {
-                      setEmailError("Please enter a valid email address");
-                    } else {
-                      setEmailError("");
-                    }
                   }}
                 />
-                <FormErrorMessage>{emailError}</FormErrorMessage>
               </FormControl>
 
-              <FormControl isRequired marginTop="22px" isInvalid={profitError !== ""}>
+              <FormControl isRequired marginTop="22px">
                 <FormLabel
                   mb="10px"
                   fontWeight="500"
@@ -299,7 +391,14 @@ export const FundraisingPlanningModal = ({
                 >
                   Expected Net Profit
                 </FormLabel>
-                <InputGroup border="1px solid #D9D9D9" borderRadius="0px" color="black" fontSize="18px" fontWeight="400" lineHeight="25px">
+                <InputGroup
+                  border="1px solid #D9D9D9"
+                  borderRadius="0px"
+                  color="black"
+                  fontSize="18px"
+                  fontWeight="400"
+                  lineHeight="25px"
+                >
                   <Input
                     value="$"
                     _focusVisible={{ outline: "none" }}
@@ -317,17 +416,16 @@ export const FundraisingPlanningModal = ({
                     paddingInlineStart="none"
                     paddingInlineEnd="none"
                     _focusVisible={{ outline: "none" }}
+                    value={state.fundraiser.profit}
                     onChange={(e) => {
-                      const value = parseFloat(e.target.value);
-                      if (isNaN(value) || value <= 0) {
-                        setProfitError("Expected net profit must be a positive number");
-                      } else {
-                        setProfitError("");
-                      }
+                      dispatch({
+                        type: "UPDATE_FUNDRAISER",
+                        field: "profit",
+                        value: parseInt(e.target.value),
+                      });
                     }}
                   />
                 </InputGroup>
-                <FormErrorMessage>{profitError}</FormErrorMessage>
               </FormControl>
 
               <HStack mt="26px" width="100%" justifyContent="space-between">
@@ -419,6 +517,28 @@ export const FundraisingPlanningModal = ({
                   );
                 })}
               </VStack>
+              <FormControl mt="18px">
+                <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
+                  Notes
+                </FormLabel>
+                <Textarea
+                  color="black"
+                  border="1px solid #D9D9D9"
+                  borderRadius="0px"
+                  width="100%"
+                  value={state.fundraiser.notes ?? ""}
+                  onChange={(e) =>
+                    dispatch({
+                      type: "UPDATE_FUNDRAISER",
+                      field: "notes",
+                      value: e.target.value,
+                    })
+                  }
+                  padding="10px"
+                  resize="none"
+                  height="100px"
+                />
+              </FormControl>
               <Divider mt="10px" borderColor="black" />
               <HStack
                 mt="7px"
@@ -471,30 +591,52 @@ export const FundraisingPlanningModal = ({
                   }`}
                 </Text>
               </HStack>
-              <HStack alignSelf="end" mt="24px">
-                <Button
-                  fontFamily="heading"
-                  fontSize="20px"
-                  fontWeight="400"
-                  colorScheme="red"
-                  color="hop_red.500"
-                  variant="outline"
-                  // onClick={deleteEventHandler}
-                  borderRadius="6px"
-                  mr="13px"
-                >
-                  DELETE
-                </Button>
-                <Button
-                  colorScheme="twitter"
-                  bg="hop_blue.500"
-                  borderRadius="6px"
-                  fontFamily="heading"
-                  fontSize="20px"
-                  fontWeight="400"
-                >
-                  APPLY
-                </Button>
+              <HStack width="100%" mt="24px">
+                <HStack flex={1}>
+                  <Button
+                    colorScheme="twitter"
+                    bg="hop_blue.500"
+                    borderRadius="6px"
+                    fontFamily="heading"
+                    fontSize="20px"
+                    fontWeight="400"
+                    onClick={(e) => {
+                      dispatch({ type: "TOGGLE_NOTES_SIDEBAR" });
+                      setSelectedExpense(undefined);
+                    }}
+                  >
+                    NOTES
+                  </Button>
+                </HStack>
+
+                <HStack alignSelf="end" justifyContent="end" flex={2}>
+                  {fundraiser && (
+                    <Button
+                      fontFamily="heading"
+                      fontSize="20px"
+                      fontWeight="400"
+                      colorScheme="red"
+                      color="hop_red.500"
+                      variant="outline"
+                      onClick={handleDelete}
+                      borderRadius="6px"
+                      mr="13px"
+                    >
+                      DELETE
+                    </Button>
+                  )}
+                  <Button
+                    colorScheme="twitter"
+                    bg="hop_blue.500"
+                    borderRadius="6px"
+                    fontFamily="heading"
+                    fontSize="20px"
+                    fontWeight="400"
+                    onClick={handleSubmit}
+                  >
+                    {fundraiser ? "UPDATE" : "CREATE"}
+                  </Button>
+                </HStack>
               </HStack>
             </VStack>
           </ModalBody>
@@ -510,27 +652,29 @@ export const FundraisingPlanningModal = ({
               paddingRight="57px"
               paddingTop="73px"
             >
-              <NewExpenseForm
-                expenses={state.fundraiser.expenses}
-                setExpenses={(expenses) => {
-                  dispatch({
-                    type: "UPDATE_FUNDRAISER",
-                    field: "expenses",
-                    value: expenses,
-                  });
-                }}
-                onOpenError={() => {}}
-                onCloseError={() => {}}
-                onCloseSide={() => dispatch({ type: "CLOSE_SIDEBAR" })}
-                selectedExpense={selectedExpense}
-                setSelectedExpense={(e: Expense | undefined) =>
-                  setSelectedExpense(e)
-                }
-              />
+              {state.expenseFormOpen && (
+                <NewExpenseForm
+                  expenses={state.fundraiser.expenses}
+                  setExpenses={(expenses) => {
+                    dispatch({
+                      type: "UPDATE_FUNDRAISER",
+                      field: "expenses",
+                      value: expenses,
+                    });
+                  }}
+                  onOpenError={() => {}}
+                  onCloseError={() => {}}
+                  onCloseSide={() => dispatch({ type: "CLOSE_SIDEBAR" })}
+                  selectedExpense={selectedExpense}
+                  setSelectedExpense={(e: Expense | undefined) =>
+                    setSelectedExpense(e)
+                  }
+                />
+              )}
             </ModalBody>
           )}
         </HStack>
       </ModalContent>
     </Modal>
   );
-}
+};

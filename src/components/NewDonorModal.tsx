@@ -13,34 +13,36 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Textarea,
   VStack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
 import {
   Donor,
   donorSchema,
-  Source,
-  sourceSchema,
   SponsorLevel,
   statusDonorSchema,
   sponsorLevelSchema,
 } from "~/common/types";
 import { trpc } from "~/utils/api";
 import { FloatingAlert } from "./FloatingAlert";
+import { TRPCError } from "@trpc/server";
 
 type NewDonorProps = {
   isOpen: boolean;
   onClose: () => void;
   donorData: Donor;
   create: boolean;
+  retreatId: string;
 };
 
 enum EmailError {
   None, // No error
   Empty, // Empty email
   Invalid, // Invalid email
+  Exists, // Email already exists
 }
 
 enum DonorError {
@@ -62,6 +64,7 @@ export const NewDonorModal = ({
   isOpen,
   onClose,
   donorData,
+  retreatId,
   create,
 }: NewDonorProps) => {
   // Form Data
@@ -69,14 +72,14 @@ export const NewDonorModal = ({
   const [studentName, setStudentName] = useState(donorData.studentName);
   const [donorEmail, setDonorEmail] = useState(donorData.donorEmail);
   const [status, setStatus] = useState(donorData.status);
-  const [source, setSource] = useState<Source>(donorData.source);
+  const [source, setSource] = useState(donorData.source);
   const [sponsorLevel, setSponsorLevel] = useState<SponsorLevel>(
     donorData.sponsorLevel,
   );
+  const [notes, setNotes] = useState(donorData.notes ?? "");
 
   // Options
   const SponsorLevelOptions = Object.values(sponsorLevelSchema.enum);
-  const SourceOptions = Object.values(sourceSchema.enum);
   const StatusOptions = Object.values(statusDonorSchema.enum);
 
   // Errors
@@ -93,7 +96,7 @@ export const NewDonorModal = ({
   } = useDisclosure({ defaultIsOpen: false });
 
   // TRPC Queries and Mutations
-  const trpcUtils = trpc.useContext();
+  const trpcUtils = trpc.useUtils();
   const createDonor = trpc.donor.createDonor.useMutation({
     onSuccess: () => {
       trpcUtils.donor.invalidate();
@@ -122,6 +125,7 @@ export const NewDonorModal = ({
         setDonorName("");
         setStudentName("");
         setDonorEmail("");
+        setNotes("");
       } else {
         // Set existing values when editing
         setDonorName(donorData.donorName);
@@ -130,6 +134,7 @@ export const NewDonorModal = ({
         setStatus(donorData.status);
         setSource(donorData.source);
         setSponsorLevel(donorData.sponsorLevel);
+        setNotes(donorData.notes ?? "");
       }
     }
   }, [isOpen, create, donorData]);
@@ -142,20 +147,19 @@ export const NewDonorModal = ({
       setDonorName("");
       setStudentName("");
       setDonorEmail("");
+      setNotes("");
     }
     setNameError(DonorError.None);
     setStudentError(StudentError.None);
     setSourceError(SourceError.None);
     setEmailError(EmailError.None);
+    onCloseError();
     onClose();
   };
 
   // Create the donor in the backend and update the frontend with dummy data temporarily on success
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validateFields()) {
-      if (emailError !== EmailError.Empty) {
-        setEmailError(EmailError.Invalid);
-      }
       onOpenError();
       return false;
     }
@@ -166,9 +170,16 @@ export const NewDonorModal = ({
       source,
       sponsorLevel,
       status,
+      notes,
     };
     if (create) {
-      createDonor.mutate(donor);
+      try {
+        await createDonor.mutateAsync(donor);
+      } catch (e) {
+        setEmailError(EmailError.Exists);
+        onOpenError();
+        return;
+      }
     } else {
       updateDonor.mutate({
         donorEmail: donorData.donorEmail,
@@ -194,6 +205,7 @@ export const NewDonorModal = ({
       status,
       source,
       sponsorLevel,
+      notes,
     };
     setSourceError(
       source === "Select Source" ? SourceError.Empty : SourceError.None,
@@ -212,21 +224,30 @@ export const NewDonorModal = ({
   const handleStatusChange = (status: string) => {
     setStatus(statusDonorSchema.parse(status));
   };
-  const handleSourceChange = (source: string) => {
-    setSource(sourceSchema.parse(source));
-  };
   const handleDonorNameChange = (event: React.FormEvent<HTMLInputElement>) =>
     setDonorName(event.currentTarget.value);
   const handleStudentNameChange = (event: React.FormEvent<HTMLInputElement>) =>
     setStudentName(event.currentTarget.value);
   const handleDonorEmailChange = (event: React.FormEvent<HTMLInputElement>) =>
     setDonorEmail(event.currentTarget.value);
+
+  const handleSourceChange = (newSource: string) => setSource(newSource);
+
+  const handleNotesChange = (event: ChangeEvent<HTMLTextAreaElement>) =>
+    setNotes(event.currentTarget.value);
+
+  const sourceOptions = ["Other"].concat(
+    trpc.event.getEvents
+      .useQuery(retreatId, { enabled: !!retreatId })
+      .data?.map((e) => e.name) ?? [],
+  );
+
   return (
     <Modal isOpen={isOpen} onClose={onCloseModal} isCentered>
       <ModalOverlay />
       <ModalContent
         width="600px"
-        height="400px"
+        height="550px"
         maxWidth="600px"
         borderRadius="none"
         boxShadow={"0px 4px 29px 0px #00000040"}
@@ -290,7 +311,8 @@ export const NewDonorModal = ({
                 <Box minHeight="20px" mt={2}>
                   <FormErrorMessage mt={0}>
                     {emailError === EmailError.Empty && "Email is required"}
-                    {emailError === 2 && "Invalid email"}
+                    {emailError === EmailError.Invalid && "Invalid email"}
+                    {emailError === EmailError.Exists && "Email already exists"}
                   </FormErrorMessage>
                 </Box>
               </FormControl>
@@ -328,7 +350,7 @@ export const NewDonorModal = ({
                   Source
                 </FormLabel>
                 <RadioDropdown
-                  options={SourceOptions}
+                  options={sourceOptions}
                   selectedOption={source}
                   setSelectedOption={handleSourceChange}
                 />
@@ -360,6 +382,7 @@ export const NewDonorModal = ({
                   fontSize="16px"
                   fontWeight="600"
                   mb="4px"
+                  minWidth="150px"
                 >
                   Status
                 </FormLabel>
@@ -371,6 +394,22 @@ export const NewDonorModal = ({
                 <FormErrorMessage minHeight="20px" />
               </FormControl>
             </HStack>
+            <FormControl mt="18px">
+              <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
+                Notes
+              </FormLabel>
+              <Textarea
+                color="black"
+                border="1px solid #D9D9D9"
+                borderRadius="0px"
+                width="100%"
+                value={notes}
+                onChange={handleNotesChange}
+                padding="10px"
+                resize="none"
+                height="50px"
+              />
+            </FormControl>
           </VStack>
         </ModalBody>
 

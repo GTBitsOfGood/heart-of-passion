@@ -1,11 +1,4 @@
-import {
-  Box,
-  Spinner,
-  Text,
-  useDisclosure,
-  useToast,
-  Button,
-} from "@chakra-ui/react";
+import { Box, Spinner, Text, useDisclosure, Button } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { trpc } from "~/utils/api";
@@ -14,8 +7,6 @@ import Sidebar from "~/components/Sidebar";
 import Select from "react-select";
 import PlanningHandler from "~/components/FundraisingPlanning/PlanningHandler";
 import { FundraisingPlanningModal } from "~/components/FundraisingPlanningModal";
-import { Fundraiser } from "~/common/types";
-import { fundraiserRouter } from "~/server/api/routers/fundraiser";
 
 export enum PlanningSort {
   ViewByDate = "View by Date",
@@ -26,6 +17,10 @@ export enum PlanningSort {
 export default function Planning() {
   const router = useRouter();
   const { id: retreatId }: { id?: string } = router.query;
+
+  const retreat = trpc.retreat.getRetreatById.useQuery(retreatId!, {
+    enabled: !!retreatId,
+  })?.data;
 
   const {
     isOpen: isOpenFundraisingPlanningModal,
@@ -54,7 +49,18 @@ export default function Planning() {
       <Box>
         {fundraisers && (
           <Box display={"flex"}>
-            <Box>{chapter ? <Sidebar chapter={chapter} /> : <Spinner />}</Box>
+            <Box>
+              {chapter ? (
+                <Sidebar
+                  chapter={chapter}
+                  year={retreat?.year}
+                  retreatId={retreatId}
+                  pageClicked={4}
+                />
+              ) : (
+                <Spinner />
+              )}
+            </Box>
             <Box
               display={"flex"}
               flexDirection={"column"}
@@ -111,6 +117,7 @@ export default function Planning() {
                     ADD FUNDRAISER
                   </Button>
                   <FundraisingPlanningModal
+                    retreatId={retreatId!}
                     isOpen={isOpenFundraisingPlanningModal}
                     onClose={onCloseFundraisingPlanningModal}
                   />

@@ -20,12 +20,14 @@ interface SidebarProps {
   chapter: Chapter;
   year?: number;
   retreatId?: string;
+  pageClicked: number;
 }
 
 const Sidebar = ({
   chapter,
   year: yearProp,
   retreatId: retreatIdProp,
+  pageClicked,
 }: SidebarProps) => {
   const id = useId();
   const {
@@ -174,7 +176,7 @@ const Sidebar = ({
           <Button
             border={"2px black solid"}
             borderRadius="none"
-            backgroundColor={clicked == 1 ? "#54A9DD" : "#F9F9F9"}
+            backgroundColor={pageClicked == 1 ? "#54A9DD" : "#F9F9F9"}
             width="98%"
             height="50px"
             justifyContent="left"
@@ -184,6 +186,7 @@ const Sidebar = ({
             p="10px"
             onClick={() => {
               handleClick("retreat");
+              setClicked(1);
             }}
           >
             Retreat Planning
@@ -209,9 +212,10 @@ const Sidebar = ({
                 p="10px"
                 width="98%"
                 justifyContent="left"
-                backgroundColor={clicked == 2 ? "#54A9DD" : "#F9F9F9"}
+                backgroundColor={pageClicked == 2 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
                   handleClick("retreat-expenses");
+                  setClicked(2);
                 }}
               >
                 Expenses
@@ -224,9 +228,11 @@ const Sidebar = ({
                 p="10px"
                 width="98%"
                 justifyContent="left"
-                backgroundColor={clicked == 3 ? "#54A9DD" : "#F9F9F9"}
+                backgroundColor={pageClicked == 3 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
-                  router.push(`/backlog/${chapterId}/`);
+                  // router.push(`/backlog/${chapterId}/`);
+                  router.push(`/backlog/${retreatId}/`);
+                  setClicked(3);
                 }}
               >
                 Previous Retreat Events
@@ -236,7 +242,7 @@ const Sidebar = ({
           <Button
             border={"2px black solid"}
             borderRadius="none"
-            backgroundColor={clicked == 4 ? "#54A9DD" : "#F9F9F9"}
+            backgroundColor={pageClicked == 4 ? "#54A9DD" : "#F9F9F9"}
             width="98%"
             height="50px"
             justifyContent="left"
@@ -251,7 +257,7 @@ const Sidebar = ({
           >
             Fundraising Planning
           </Button>
-          <Grid templateRows="repeat(3, 1fr)" templateColumns="repeat(15, 1fr)">
+          <Grid templateRows="repeat(2, 1fr)" templateColumns="repeat(15, 1fr)">
             <GridItem
               rowSpan={3}
               paddingLeft="15px"
@@ -272,25 +278,10 @@ const Sidebar = ({
                 p="10px"
                 width="98%"
                 justifyContent="left"
-                backgroundColor={clicked == 5 ? "#54A9DD" : "#F9F9F9"}
-                onClick={() => {
-                  router.push(`/fundraising-expenses/${retreatId}/`);
-                  setClicked(5);
-                }}
-              >
-                Expenses
-              </Button>
-            </GridItem>
-            <GridItem colSpan={14}>
-              <Button
-                fontFamily="nunito"
-                borderRadius="none"
-                p="10px"
-                width="98%"
-                justifyContent="left"
-                backgroundColor={clicked == 6 ? "#54A9DD" : "#F9F9F9"}
+                backgroundColor={pageClicked == 6 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
                   handleClick("hospitality");
+                  setClicked(6);
                 }}
               >
                 Hospitality
@@ -303,9 +294,11 @@ const Sidebar = ({
                 p="10px"
                 width="98%"
                 justifyContent="left"
-                backgroundColor={clicked == 7 ? "#54A9DD" : "#F9F9F9"}
+                backgroundColor={pageClicked == 7 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
-                  router.push(`/backlog/fundraiser/${chapterId}/`);
+                  // router.push(`/backlog/fundraiser/${chapterId}/`);
+                  router.push(`/backlog/fundraiser/${retreatId}/`);
+                  setClicked(7);
                 }}
               >
                 Previous Fundraiser Events
@@ -318,7 +311,7 @@ const Sidebar = ({
             p="10px"
             width="98%"
             justifyContent="left"
-            backgroundColor={clicked == 8 ? "#54A9DD" : "#F9F9F9"}
+            backgroundColor={pageClicked == 8 ? "#54A9DD" : "#F9F9F9"}
             onClick={() => {
               setClicked(8);
               router.push(`/funds/${retreatId}/`);
@@ -326,19 +319,7 @@ const Sidebar = ({
           >
             Raised Funds
           </Button>
-          <Button
-            fontFamily="nunito"
-            borderRadius="none"
-            p="10px"
-            width="98%"
-            justifyContent="left"
-            backgroundColor={clicked == 9 ? "#54A9DD" : "#F9F9F9"}
-            onClick={() => {
-              setClicked(9);
-            }}
-          >
-            Archive
-          </Button>
+
           <Image
             src="/netlify.png"
             alt="Netlify"
