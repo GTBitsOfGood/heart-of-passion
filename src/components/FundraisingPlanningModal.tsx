@@ -12,6 +12,7 @@ import {
   ModalContent,
   ModalOverlay,
   Text,
+  Textarea,
   VStack,
   useToast,
 } from "@chakra-ui/react";
@@ -20,7 +21,6 @@ import { Expense, Fundraiser, fundraiserSchema } from "~/common/types";
 import { NewExpenseForm } from "./NewExpenseForm";
 import { trpc } from "~/utils/api";
 import { IFundraiser } from "~/server/models/Fundraiser";
-import { NewNotesForm } from "./NewNotesForm";
 
 type FundraisingPlanningModalProps = {
   isOpen: boolean;
@@ -202,7 +202,7 @@ export const FundraisingPlanningModal = ({
       <ModalContent
         width={sidebarOpen ? "831px" : "494px"}
         maxWidth={sidebarOpen ? "831px" : "494px"}
-        height="879px"
+        height="979px"
         borderRadius="none"
         boxShadow={"0px 4px 29px 0px #00000040"}
         position="relative"
@@ -259,6 +259,7 @@ export const FundraisingPlanningModal = ({
                   pl="0px"
                 />
               </FormControl>
+
               <Divider borderColor="black" />
 
               <FormControl
@@ -487,7 +488,6 @@ export const FundraisingPlanningModal = ({
                           return;
                         }
                         setSelectedExpense(e);
-                        // console.log(e.notes);
                         dispatch({ type: "OPEN_EXPENSE_SIDEBAR" });
                       }}
                     >
@@ -517,6 +517,28 @@ export const FundraisingPlanningModal = ({
                   );
                 })}
               </VStack>
+              <FormControl mt="18px">
+                <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
+                  Notes
+                </FormLabel>
+                <Textarea
+                  color="black"
+                  border="1px solid #D9D9D9"
+                  borderRadius="0px"
+                  width="100%"
+                  value={state.fundraiser.notes ?? ""}
+                  onChange={(e) =>
+                    dispatch({
+                      type: "UPDATE_FUNDRAISER",
+                      field: "notes",
+                      value: e.target.value,
+                    })
+                  }
+                  padding="10px"
+                  resize="none"
+                  height="100px"
+                />
+              </FormControl>
               <Divider mt="10px" borderColor="black" />
               <HStack
                 mt="7px"
@@ -647,18 +669,6 @@ export const FundraisingPlanningModal = ({
                   setSelectedExpense={(e: Expense | undefined) =>
                     setSelectedExpense(e)
                   }
-                />
-              )}
-              {state.notesFormOpen && (
-                <NewNotesForm
-                  notes={state.fundraiser.notes ?? ""}
-                  setNotes={(notes) => {
-                    dispatch({
-                      type: "UPDATE_FUNDRAISER",
-                      field: "notes",
-                      value: notes,
-                    });
-                  }}
                 />
               )}
             </ModalBody>

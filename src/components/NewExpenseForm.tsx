@@ -13,7 +13,7 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { Expense, expenseSchema, expenseTypeSchema } from "~/common/types";
-import { useState, useEffect, ChangeEvent } from "react";
+import { useEffect, ChangeEvent } from "react";
 import { trpc } from "~/utils/api";
 
 import { useReducer } from "react";
@@ -124,7 +124,7 @@ export const NewExpenseForm = ({
   const handleNotesChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     dispatch({ type: "UPDATE_EXPENSE", field: "notes", value: e.target.value });
     // console.log(state.notes);
-  }
+  };
 
   const validateFields = () => {
     try {
@@ -195,7 +195,7 @@ export const NewExpenseForm = ({
         console.log(state);
         await createExpense.mutate({ expenseDetails: state, retreatId });
       } else {
-        console.log('hiiii')
+        console.log("hiiii");
         await createExpense.mutate({ expenseDetails: state });
       }
     } else {
@@ -233,10 +233,9 @@ export const NewExpenseForm = ({
   };
 
   useEffect(() => {
-    
     dispatch({ type: "RESET", expense: selectedExpense });
     console.log(state.notes);
-  }, [selectedExpense]);
+  }, [selectedExpense, state.notes]);
 
   const valid = true; // TODO
   let expenseTypeOptions = Object.values(expenseTypeSchema.enum);

@@ -1,23 +1,14 @@
 import {
-  Box,
   Button,
   Divider,
-  Flex,
   FormControl,
-  FormErrorMessage,
   FormLabel,
   HStack,
   Input,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
-  ModalHeader,
   ModalOverlay,
   Select,
   Text,
@@ -27,19 +18,13 @@ import {
   Textarea,
   useCallbackRef,
 } from "@chakra-ui/react";
-import debounce from "lodash/debounce";
 import { useEffect, useReducer, useState } from "react";
-import { DropdownIcon } from "~/common/theme/icons";
 import { NewTimeForm } from "./NewTimeForm";
-import { FloatingAlert } from "./FloatingAlert";
 import { NewExpenseForm } from "./NewExpenseForm";
-import { NewExpenseModal } from "./NewExpenseModal";
 import { DateObject, Event, Expense, eventSchema } from "~/common/types";
 import { IEvent } from "~/server/models/Event";
 import { z } from "zod";
 import { trpc } from "~/utils/api";
-import { error } from "console";
-import { NewNotesForm } from "./NewNotesForm";
 
 type NewEventProps = {
   isOpen: boolean;
@@ -56,7 +41,6 @@ type Action<T extends keyof Event = keyof Event> =
   | { type: "OPEN_TIME_SIDEBAR" }
   | { type: "OPEN_EXPENSE_SIDEBAR" }
   | { type: "CLOSE_SIDEBAR" }
-  | { type: "TOGGLE_NOTES_SIDEBAR" }
   | { type: "RESET_FORM"; event: Event | undefined }
   | { type: "UPDATE_EVENT"; field: T; value: Event[T] };
 
@@ -64,7 +48,6 @@ type State = {
   event: Event;
   timeFormOpen: boolean;
   expenseFormOpen: boolean;
-  notesFormOpen: boolean;
 };
 
 const reducer = (state: State, action: Action): State => {
@@ -82,28 +65,18 @@ const reducer = (state: State, action: Action): State => {
         ...state,
         timeFormOpen: true,
         expenseFormOpen: false,
-        notesFormOpen: false,
       };
     case "OPEN_EXPENSE_SIDEBAR":
       return {
         ...state,
         timeFormOpen: false,
         expenseFormOpen: true,
-        notesFormOpen: false,
       };
     case "CLOSE_SIDEBAR":
       return {
         ...state,
         timeFormOpen: false,
         expenseFormOpen: false,
-        notesFormOpen: false,
-      };
-    case "TOGGLE_NOTES_SIDEBAR":
-      return {
-        ...state,
-        notesFormOpen: !state.notesFormOpen,
-        expenseFormOpen: false,
-        timeFormOpen: false,
       };
     default:
       return state;
@@ -122,7 +95,6 @@ let initialState: State = {
 
   timeFormOpen: false,
   expenseFormOpen: false,
-  notesFormOpen: false,
 };
 
 export const NewEventModal = ({
@@ -169,25 +141,9 @@ export const NewEventModal = ({
     }
   });
 
-  // const debouncedSave = useCallbackRef(debounce(save, 50000), [save]);
-
-  // useEffect(() => {
-  //   // You might want to check if the form is in a valid state before auto-saving.
-  //   // For example, only auto-save if the name field is not empty.
-  //   if (state.event.name) {
-  //     debouncedSave();
-  //   }
-
-  //   // return () => {
-  //   //   debouncedSave.cancel();
-  //   // };
-  //   // save();
-  // }, [state.event, debouncedSave]); // Run this effect whenever the event data changes
-
-  const sidebarOpen = state.timeFormOpen || state.expenseFormOpen || state.notesFormOpen;
+  const sidebarOpen = state.timeFormOpen || state.expenseFormOpen;
 
   const onCloseModal = () => {
-    // debouncedSave.cancel();
     if (!isCopy) {
       save();
     }
@@ -203,16 +159,9 @@ export const NewEventModal = ({
     } catch (e) {
       let errorDesc = "Unknown Error";
       if (e instanceof z.ZodError) {
-        // if(e.issues.  ==="too_small") {
-        //   errorDesc = "lol";
-        //   return;
-        // }
-        // console.log(state.event);
         errorDesc = e.issues.map((issue) => issue.message).join("\n");
-        // errorDesc = `Please fill all fields marked by asterisk`;
-        // console.log(e.issues);
       }
-      // onOpenError();
+
       toast({
         title: "Error",
         description: errorDesc,
@@ -255,12 +204,6 @@ export const NewEventModal = ({
       return;
     }
 
-    // if (eventToEdit) {
-    //   updateEvent.mutate({ event: state.event, eventId: eventToEdit._id });
-    // } else {
-    //   console.log(state.event);
-    //   createEvent.mutate({ eventDetails: state.event, retreatId });
-    // }
     onCloseModal();
   };
 
@@ -277,7 +220,7 @@ export const NewEventModal = ({
         // width="494px"
         width={sidebarOpen ? "831px" : "494px"}
         maxWidth={sidebarOpen ? "831px" : "494px"}
-        height="879px"
+        height="979px"
         borderRadius="none"
         boxShadow={"0px 4px 29px 0px #00000040"}
         position="relative"
@@ -314,7 +257,7 @@ export const NewEventModal = ({
                     border="1px solid #D9D9D9"
                     borderRadius="0px"
                     width="389px"
-                    isReadOnly={isCopy ? true : false}
+                    isReadOnly={isCopy}
                     value={isCopy ? copyEvent?.name : state.event.name}
                     onChange={(e) =>
                       dispatch({
@@ -341,7 +284,7 @@ export const NewEventModal = ({
                     padding="0px"
                     textColor={"black"}
                     borderColor={"#D9D9D9"}
-                    isDisabled={isCopy ? true : false}
+                    isDisabled={isCopy}
                     value={
                       isCopy ? copyEvent?.energyLevel : state.event.energyLevel
                     }
@@ -368,7 +311,7 @@ export const NewEventModal = ({
                     borderRadius="0px"
                     width="389px"
                     // height="30px"
-                    isReadOnly={isCopy ? true : false}
+                    isReadOnly={isCopy}
                     value={isCopy ? copyEvent?.location : state.event.location}
                     onChange={(e) =>
                       dispatch({
@@ -396,7 +339,7 @@ export const NewEventModal = ({
                     padding="0px"
                     textColor={"black"}
                     borderColor={"#D9D9D9"}
-                    isDisabled={isCopy ? true : false}
+                    isDisabled={isCopy}
                     value={state.event.status}
                     onChange={(e) => {
                       dispatch({
@@ -601,6 +544,30 @@ export const NewEventModal = ({
                     },
                   )}
                 </VStack>
+
+                <FormControl mt="18px">
+                  <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
+                    Notes
+                  </FormLabel>
+                  <Textarea
+                    color="black"
+                    border="1px solid #D9D9D9"
+                    borderRadius="0px"
+                    width="100%"
+                    value={state.event.notes ?? ""}
+                    disabled={isCopy}
+                    onChange={(e) =>
+                      dispatch({
+                        type: "UPDATE_EVENT",
+                        field: "notes",
+                        value: e.target.value,
+                      })
+                    }
+                    padding="10px"
+                    resize="none"
+                    height="100px"
+                  />
+                </FormControl>
                 <Divider mt="16px" borderColor="black" width="389px" />
                 <HStack width="389px" mt="7px" justifyContent="space-between">
                   <Text
@@ -649,22 +616,7 @@ export const NewEventModal = ({
                 )} */}
               </VStack>
               <HStack width="100%" mb="34px" alignContent="center">
-                <HStack flex={1}>
-                  <Button
-                    colorScheme="twitter"
-                    bg="hop_blue.500"
-                    borderRadius="6px"
-                    fontFamily="heading"
-                    fontSize="20px"
-                    fontWeight="400"
-                    onClick={(e) => {
-                      dispatch({ type: "TOGGLE_NOTES_SIDEBAR" });
-                      setSelectedExpense(undefined);
-                    }}
-                  >
-                    NOTES
-                  </Button>
-                </HStack>
+                <HStack flex={1}></HStack>
 
                 {!sidebarOpen && isFundraiser ? (
                   <>
@@ -791,18 +743,6 @@ export const NewEventModal = ({
                   setSelectedExpense={(e: Expense | undefined) =>
                     setSelectedExpense(e)
                   }
-                />
-              )}
-              {state.notesFormOpen && (
-                <NewNotesForm
-                  notes={state.event.notes ?? ""}
-                  setNotes={(notes) => {
-                    dispatch({
-                      type: "UPDATE_EVENT",
-                      field: "notes",
-                      value: notes,
-                    });
-                  }}
                 />
               )}
             </ModalBody>
