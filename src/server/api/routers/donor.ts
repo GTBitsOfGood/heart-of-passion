@@ -10,6 +10,7 @@ import {
 import { DonorModel } from "~/server/models/Donor";
 import { Donor } from "~/common/types";
 import { donorSchema } from "~/common/types";
+import { update } from "lodash";
 export const donorRouter = createTRPCRouter({
   createDonor: studentProcedure
     .input(donorSchema)
@@ -33,6 +34,7 @@ export const donorRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       const { donorEmail, updatedDonor } = input;
+      console.log(updatedDonor);
       await DonorModel.findOneAndUpdate(
         { donorEmail: donorEmail },
         updatedDonor,
@@ -58,5 +60,6 @@ function processDonor(obj: any): Donor {
     source: obj.source,
     sponsorLevel: obj.sponsorLevel,
     status: obj.status,
+    notes: obj.notes ?? "",
   };
 }

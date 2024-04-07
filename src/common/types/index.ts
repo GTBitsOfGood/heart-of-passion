@@ -22,6 +22,7 @@ export const donorSchema = z.object({
   source: z.string(),
   sponsorLevel: sponsorLevelSchema,
   status: statusDonorSchema,
+  notes: z.string().optional(),
 });
 export type Donor = z.infer<typeof donorSchema>;
 
@@ -83,6 +84,7 @@ export const expenseSchema = z.object({
   type: expenseTypeSchema,
   cost: z.number().min(0, "Cost must be a positive amount"),
   numUnits: z.number().min(1, "Minimum 1 unit is needed"),
+  notes: z.string().optional(),
 });
 export type Expense = z.infer<typeof expenseSchema>;
 
@@ -138,6 +140,7 @@ export const fundraiserSchema = z.object({
   email: z.string().email(),
   profit: z.number().nonnegative(),
   expenses: z.array(expenseSchema),
+  notes: z.string().optional(),
 });
 
 export const savedFundraiserSchema = fundraiserSchema.extend({

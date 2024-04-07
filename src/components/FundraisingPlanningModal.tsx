@@ -20,6 +20,7 @@ import { Expense, Fundraiser, fundraiserSchema } from "~/common/types";
 import { NewExpenseForm } from "./NewExpenseForm";
 import { trpc } from "~/utils/api";
 import { IFundraiser } from "~/server/models/Fundraiser";
+import { NewNotesForm } from "./NewNotesForm";
 
 type FundraisingPlanningModalProps = {
   isOpen: boolean;
@@ -32,10 +33,12 @@ type State = {
   fundraiser: Fundraiser;
   fundraiserId: string | undefined;
   expenseFormOpen: boolean;
+  notesFormOpen: boolean;
 };
 type Action<T extends keyof Fundraiser = keyof Fundraiser> =
   | { type: "OPEN_EXPENSE_SIDEBAR" }
   | { type: "TOGGLE_EXPENSE_SIDEBAR" }
+  | { type: "TOGGLE_NOTES_SIDEBAR" }
   | { type: "CLOSE_SIDEBAR" }
   | {
       type: "RESET_FORM";
@@ -64,11 +67,21 @@ const reducer = (state: State, action: Action): State => {
         };
       return { ...initialState };
     case "OPEN_EXPENSE_SIDEBAR":
-      return { ...state, expenseFormOpen: true };
+      return { ...state, expenseFormOpen: true, notesFormOpen: false };
     case "CLOSE_SIDEBAR":
-      return { ...state, expenseFormOpen: false };
+      return { ...state, expenseFormOpen: false, notesFormOpen: false };
     case "TOGGLE_EXPENSE_SIDEBAR":
-      return { ...state, expenseFormOpen: !state.expenseFormOpen };
+      return {
+        ...state,
+        expenseFormOpen: !state.expenseFormOpen,
+        notesFormOpen: false,
+      };
+    case "TOGGLE_NOTES_SIDEBAR":
+      return {
+        ...state,
+        notesFormOpen: !state.notesFormOpen,
+        expenseFormOpen: false,
+      };
     default:
       return state;
   }
@@ -76,16 +89,18 @@ const reducer = (state: State, action: Action): State => {
 
 const initialState: State = {
   fundraiser: {
-    name: "Laser Tag",
+    name: "",
     location: "",
     date: new Date(),
     contactName: "",
     email: "",
     profit: 0,
     expenses: [],
+    notes: "",
   },
   fundraiserId: undefined,
   expenseFormOpen: false,
+  notesFormOpen: false,
 };
 
 export const FundraisingPlanningModal = ({
@@ -103,7 +118,7 @@ export const FundraisingPlanningModal = ({
     onClose();
     dispatch({ type: "RESET_FORM", fundraiser, fundraiserId: fundraiser?._id });
   };
-  const sidebarOpen = state.expenseFormOpen;
+  const sidebarOpen = state.expenseFormOpen || state.notesFormOpen;
 
   const validateFields = () => {
     let parsed = fundraiserSchema.safeParse(state.fundraiser);
@@ -241,6 +256,7 @@ export const FundraisingPlanningModal = ({
                       value: e.target.value,
                     });
                   }}
+                  pl="0px"
                 />
               </FormControl>
               <Divider borderColor="black" />
@@ -471,6 +487,7 @@ export const FundraisingPlanningModal = ({
                           return;
                         }
                         setSelectedExpense(e);
+                        // console.log(e.notes);
                         dispatch({ type: "OPEN_EXPENSE_SIDEBAR" });
                       }}
                     >
@@ -552,33 +569,52 @@ export const FundraisingPlanningModal = ({
                   }`}
                 </Text>
               </HStack>
-              <HStack alignSelf="end" mt="24px">
-                {fundraiser && (
+              <HStack width="100%" mt="24px">
+                <HStack flex={1}>
                   <Button
+                    colorScheme="twitter"
+                    bg="hop_blue.500"
+                    borderRadius="6px"
                     fontFamily="heading"
                     fontSize="20px"
                     fontWeight="400"
-                    colorScheme="red"
-                    color="hop_red.500"
-                    variant="outline"
-                    onClick={handleDelete}
-                    borderRadius="6px"
-                    mr="13px"
+                    onClick={(e) => {
+                      dispatch({ type: "TOGGLE_NOTES_SIDEBAR" });
+                      setSelectedExpense(undefined);
+                    }}
                   >
-                    DELETE
+                    NOTES
                   </Button>
-                )}
-                <Button
-                  colorScheme="twitter"
-                  bg="hop_blue.500"
-                  borderRadius="6px"
-                  fontFamily="heading"
-                  fontSize="20px"
-                  fontWeight="400"
-                  onClick={handleSubmit}
-                >
-                  {fundraiser ? "UPDATE" : "CREATE"}
-                </Button>
+                </HStack>
+
+                <HStack alignSelf="end" justifyContent="end" flex={2}>
+                  {fundraiser && (
+                    <Button
+                      fontFamily="heading"
+                      fontSize="20px"
+                      fontWeight="400"
+                      colorScheme="red"
+                      color="hop_red.500"
+                      variant="outline"
+                      onClick={handleDelete}
+                      borderRadius="6px"
+                      mr="13px"
+                    >
+                      DELETE
+                    </Button>
+                  )}
+                  <Button
+                    colorScheme="twitter"
+                    bg="hop_blue.500"
+                    borderRadius="6px"
+                    fontFamily="heading"
+                    fontSize="20px"
+                    fontWeight="400"
+                    onClick={handleSubmit}
+                  >
+                    {fundraiser ? "UPDATE" : "CREATE"}
+                  </Button>
+                </HStack>
               </HStack>
             </VStack>
           </ModalBody>
@@ -594,23 +630,37 @@ export const FundraisingPlanningModal = ({
               paddingRight="57px"
               paddingTop="73px"
             >
-              <NewExpenseForm
-                expenses={state.fundraiser.expenses}
-                setExpenses={(expenses) => {
-                  dispatch({
-                    type: "UPDATE_FUNDRAISER",
-                    field: "expenses",
-                    value: expenses,
-                  });
-                }}
-                onOpenError={() => {}}
-                onCloseError={() => {}}
-                onCloseSide={() => dispatch({ type: "CLOSE_SIDEBAR" })}
-                selectedExpense={selectedExpense}
-                setSelectedExpense={(e: Expense | undefined) =>
-                  setSelectedExpense(e)
-                }
-              />
+              {state.expenseFormOpen && (
+                <NewExpenseForm
+                  expenses={state.fundraiser.expenses}
+                  setExpenses={(expenses) => {
+                    dispatch({
+                      type: "UPDATE_FUNDRAISER",
+                      field: "expenses",
+                      value: expenses,
+                    });
+                  }}
+                  onOpenError={() => {}}
+                  onCloseError={() => {}}
+                  onCloseSide={() => dispatch({ type: "CLOSE_SIDEBAR" })}
+                  selectedExpense={selectedExpense}
+                  setSelectedExpense={(e: Expense | undefined) =>
+                    setSelectedExpense(e)
+                  }
+                />
+              )}
+              {state.notesFormOpen && (
+                <NewNotesForm
+                  notes={state.fundraiser.notes ?? ""}
+                  setNotes={(notes) => {
+                    dispatch({
+                      type: "UPDATE_FUNDRAISER",
+                      field: "notes",
+                      value: notes,
+                    });
+                  }}
+                />
+              )}
             </ModalBody>
           )}
         </HStack>
