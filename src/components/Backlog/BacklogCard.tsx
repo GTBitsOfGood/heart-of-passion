@@ -17,6 +17,7 @@ export default function BacklogCard({
       paddingX={4}
       paddingY={6}
       width={286}
+      cursor={"pointer"}
     >
       <Text
         fontFamily={"nunito"}
