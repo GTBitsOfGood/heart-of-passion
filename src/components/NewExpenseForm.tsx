@@ -112,6 +112,8 @@ export const NewExpenseForm = ({
   // const handleNotesChange = (e: ChangeEvent<HTMLTextAreaElement>) =>
   //   dispatch({ type: "UPDATE_EXPENSE", field: "notes", value: e.target.value });
 
+  const [costType, setCostType] = useState("flat")
+
   const validateFields = () => {
     try {
       expenseSchema.parse(state);
@@ -120,8 +122,9 @@ export const NewExpenseForm = ({
       let errorDesc = "Unknown Error";
       if (e instanceof z.ZodError) {
         console.log(e)
-        errorDesc = e.issues.map((issue) => issue.message).join("\n");
-        errorDesc = `Please fill all fields marked by asterisk`;
+        console.log("Bruh error ", e.issues)
+        errorDesc = e.issues.map((issue) => issue.message).join("\n")
+        errorDesc += `; please fill all fields marked by asterisk`;
       }
       onOpenError();
       toast({
@@ -297,17 +300,21 @@ export const NewExpenseForm = ({
           </FormLabel>
           <RadioGroup
             onChange={(e) => {
+              setCostType(e)
               let numUnits;
-              if (e == "unit") numUnits = state.numUnits ?? 1;
-              else numUnits = 1;
-
+              if (e === "unit") {
+                numUnits = state.numUnits ?? 1;
+              }
+              else { // e === "flat"
+                numUnits = 1;
+              }
               dispatch({
                 type: "UPDATE_EXPENSE",
                 field: "numUnits",
                 value: numUnits,
               });
             }}
-            value={state.numUnits ? "unit" : "flat"}
+            value={costType}
           >
             <HStack spacing="24px">
               <Radio value="flat">Flat Cost</Radio>
@@ -315,7 +322,7 @@ export const NewExpenseForm = ({
             </HStack>
           </RadioGroup>
         </FormControl>
-        <FormControl mt="18px">
+        <FormControl mt="18px" hidden={costType === "flat"}>
           <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
             Units
           </FormLabel>
@@ -330,6 +337,7 @@ export const NewExpenseForm = ({
             required={state.numUnits !== undefined}
             onChange={handleUnitsChange}
             padding="10px"
+            disabled={costType === "flat"}
           />
         </FormControl>
         {/* <FormControl mt="18px">
