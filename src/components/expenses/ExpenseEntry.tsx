@@ -65,7 +65,7 @@ export default function Expense({
         </GridItem>
         <GridItem colSpan={1}>
           <Box fontFamily={fonts.nunito}>
-            {numUnits ? `x${numUnits}` : 'x1'}
+            {numUnits ? `x${numUnits}` : "x1"}
           </Box>
         </GridItem>
         <GridItem colSpan={1} display="flex" justifyContent="end">

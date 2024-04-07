@@ -82,13 +82,13 @@ export type DateObject = z.infer<typeof dateObjectSchema>;
 
 // Expense
 export const expenseSchema = z.object({
-  name: z.string().min(1, "Expense name is empty"),
+  name: z.string().min(1, "Expense name must be at least 1 character long"),
   _id: z.string().optional(),
   event: z.string().optional(),
   eventId: z.string().optional(),
   type: expenseTypeSchema,
-  cost: z.number().min(0, "Cost must be a positive amount"),
-  numUnits: z.number().min(1, "Minimum 1 unit is needed"),
+  cost: z.number().min(0, "Cost must be a value of 0 or greater."),
+  numUnits: z.number().min(1, "Number of units must be at least 1"),
   notes: z.string().optional(),
 });
 export type Expense = z.infer<typeof expenseSchema>;
