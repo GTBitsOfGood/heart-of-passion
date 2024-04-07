@@ -40,7 +40,7 @@ type State = Expense;
 const initialState: State = {
   name: "",
   type: "Entertainment",
-  cost: -1000,
+  cost: -1,
   numUnits: 1,
   notes: "",
 };
@@ -243,7 +243,7 @@ export const NewExpenseForm = ({
             Name of Expense
           </FormLabel>
           <Input
-          placeholder="Expense Name"
+            placeholder="Expense Name"
             color="black"
             border="1px solid #D9D9D9"
             borderRadius="0px"
@@ -296,7 +296,7 @@ export const NewExpenseForm = ({
             width="100%"
             type="number"
             placeholder="Enter Cost"
-            value={state.cost === -1000 ? "" : state.cost.toString()}
+            value={state.cost === -1 ? "" : state.cost}
             onChange={handleCostChange}
             padding="10px"
             borderColor={!valid ? "#C63636" : "#D9D9D9"}
@@ -322,7 +322,7 @@ export const NewExpenseForm = ({
                 value: numUnits,
               });
             }}
-            value={(state.numUnits === 1 || state.numUnits === 0) ? "flat" : "unit"}
+            value={state.numUnits === 1 ? "flat" : "unit"}
           >
             <HStack spacing="24px">
               <Radio value="flat">Flat Cost</Radio>
@@ -339,7 +339,7 @@ export const NewExpenseForm = ({
             border="1px solid #D9D9D9"
             borderRadius="0px"
             placeholder="Enter Units"
-            value={(state.numUnits === 1 || state.numUnits === 0) ? "" : state.numUnits}
+            value={state.numUnits === 0 ? "" : state.numUnits}
             width="100%"
             type="number"
             onChange={handleUnitsChange}
