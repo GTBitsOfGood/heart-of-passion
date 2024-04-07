@@ -28,6 +28,7 @@ export default function Donors({
   source,
   sponsorLevel,
   retreatId,
+  notes,
 }: DonorsProps) {
   const {
     isOpen: isOpenAddDonorModal,
@@ -111,6 +112,7 @@ export default function Donors({
           sponsorLevel: sponsorLevel,
           source: source,
           status: status,
+          notes: notes,
         }}
         create={false}
         retreatId={retreatId}

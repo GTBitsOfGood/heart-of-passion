@@ -1,23 +1,14 @@
 import {
-  Box,
   Button,
   Divider,
-  Flex,
   FormControl,
-  FormErrorMessage,
   FormLabel,
   HStack,
   Input,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
-  ModalHeader,
   ModalOverlay,
   Select,
   Text,
@@ -27,18 +18,13 @@ import {
   Textarea,
   useCallbackRef,
 } from "@chakra-ui/react";
-import debounce from "lodash/debounce";
 import { useEffect, useReducer, useState } from "react";
-import { DropdownIcon } from "~/common/theme/icons";
 import { NewTimeForm } from "./NewTimeForm";
-import { FloatingAlert } from "./FloatingAlert";
 import { NewExpenseForm } from "./NewExpenseForm";
-import { NewExpenseModal } from "./NewExpenseModal";
 import { DateObject, Event, Expense, eventSchema } from "~/common/types";
 import { IEvent } from "~/server/models/Event";
 import { z } from "zod";
 import { trpc } from "~/utils/api";
-import { error } from "console";
 
 type NewEventProps = {
   isOpen: boolean;
@@ -75,11 +61,23 @@ const reducer = (state: State, action: Action): State => {
       if (action.event) return { ...initialState, event: action.event };
       return { ...initialState };
     case "OPEN_TIME_SIDEBAR":
-      return { ...state, timeFormOpen: true, expenseFormOpen: false };
+      return {
+        ...state,
+        timeFormOpen: true,
+        expenseFormOpen: false,
+      };
     case "OPEN_EXPENSE_SIDEBAR":
-      return { ...state, timeFormOpen: false, expenseFormOpen: true };
+      return {
+        ...state,
+        timeFormOpen: false,
+        expenseFormOpen: true,
+      };
     case "CLOSE_SIDEBAR":
-      return { ...state, timeFormOpen: false, expenseFormOpen: false };
+      return {
+        ...state,
+        timeFormOpen: false,
+        expenseFormOpen: false,
+      };
     default:
       return state;
   }
@@ -92,6 +90,7 @@ let initialState: State = {
     location: "",
     dates: [{ day: 1, from: "09:00 am", to: "10:00 am" }],
     expenses: [],
+    notes: "",
   },
 
   timeFormOpen: false,
@@ -142,25 +141,9 @@ export const NewEventModal = ({
     }
   });
 
-  // const debouncedSave = useCallbackRef(debounce(save, 50000), [save]);
-
-  // useEffect(() => {
-  //   // You might want to check if the form is in a valid state before auto-saving.
-  //   // For example, only auto-save if the name field is not empty.
-  //   if (state.event.name) {
-  //     debouncedSave();
-  //   }
-
-  //   // return () => {
-  //   //   debouncedSave.cancel();
-  //   // };
-  //   // save();
-  // }, [state.event, debouncedSave]); // Run this effect whenever the event data changes
-
   const sidebarOpen = state.timeFormOpen || state.expenseFormOpen;
 
   const onCloseModal = () => {
-    // debouncedSave.cancel();
     if (!isCopy) {
       save();
     }
@@ -176,16 +159,9 @@ export const NewEventModal = ({
     } catch (e) {
       let errorDesc = "Unknown Error";
       if (e instanceof z.ZodError) {
-        // if(e.issues.  ==="too_small") {
-        //   errorDesc = "lol";
-        //   return;
-        // }
-        // console.log(state.event);
         errorDesc = e.issues.map((issue) => issue.message).join("\n");
-        // errorDesc = `Please fill all fields marked by asterisk`;
-        // console.log(e.issues);
       }
-      // onOpenError();
+
       toast({
         title: "Error",
         description: errorDesc,
@@ -228,12 +204,6 @@ export const NewEventModal = ({
       return;
     }
 
-    // if (eventToEdit) {
-    //   updateEvent.mutate({ event: state.event, eventId: eventToEdit._id });
-    // } else {
-    //   console.log(state.event);
-    //   createEvent.mutate({ eventDetails: state.event, retreatId });
-    // }
     onCloseModal();
   };
 
@@ -250,7 +220,7 @@ export const NewEventModal = ({
         // width="494px"
         width={sidebarOpen ? "831px" : "494px"}
         maxWidth={sidebarOpen ? "831px" : "494px"}
-        height="879px"
+        height="979px"
         borderRadius="none"
         boxShadow={"0px 4px 29px 0px #00000040"}
         position="relative"
@@ -287,7 +257,7 @@ export const NewEventModal = ({
                     border="1px solid #D9D9D9"
                     borderRadius="0px"
                     width="389px"
-                    isReadOnly={isCopy ? true : false}
+                    isReadOnly={isCopy}
                     value={isCopy ? copyEvent?.name : state.event.name}
                     onChange={(e) =>
                       dispatch({
@@ -314,7 +284,7 @@ export const NewEventModal = ({
                     padding="0px"
                     textColor={"black"}
                     borderColor={"#D9D9D9"}
-                    isDisabled={isCopy ? true : false}
+                    isDisabled={isCopy}
                     value={
                       isCopy ? copyEvent?.energyLevel : state.event.energyLevel
                     }
@@ -341,7 +311,7 @@ export const NewEventModal = ({
                     borderRadius="0px"
                     width="389px"
                     // height="30px"
-                    isReadOnly={isCopy ? true : false}
+                    isReadOnly={isCopy}
                     value={isCopy ? copyEvent?.location : state.event.location}
                     onChange={(e) =>
                       dispatch({
@@ -369,7 +339,7 @@ export const NewEventModal = ({
                     padding="0px"
                     textColor={"black"}
                     borderColor={"#D9D9D9"}
-                    isDisabled={isCopy ? true : false}
+                    isDisabled={isCopy}
                     value={state.event.status}
                     onChange={(e) => {
                       dispatch({
@@ -574,6 +544,30 @@ export const NewEventModal = ({
                     },
                   )}
                 </VStack>
+
+                <FormControl mt="18px">
+                  <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
+                    Notes
+                  </FormLabel>
+                  <Textarea
+                    color="black"
+                    border="1px solid #D9D9D9"
+                    borderRadius="0px"
+                    width="100%"
+                    value={state.event.notes ?? ""}
+                    disabled={isCopy}
+                    onChange={(e) =>
+                      dispatch({
+                        type: "UPDATE_EVENT",
+                        field: "notes",
+                        value: e.target.value,
+                      })
+                    }
+                    padding="10px"
+                    resize="none"
+                    height="100px"
+                  />
+                </FormControl>
                 <Divider mt="16px" borderColor="black" width="389px" />
                 <HStack width="389px" mt="7px" justifyContent="space-between">
                   <Text
@@ -594,7 +588,7 @@ export const NewEventModal = ({
                     0,
                   )}`}</Text>
                 </HStack>
-                {state.event.notes && (
+                {/* {state.event.notes && (
                   <FormControl marginTop="29px">
                     <FormLabel
                       fontWeight="500"
@@ -619,11 +613,71 @@ export const NewEventModal = ({
                       }
                     />
                   </FormControl>
-                )}
+                )} */}
               </VStack>
-              {!sidebarOpen && isFundraiser ? (
-                <>
-                  <HStack width="100%" justifyContent="end" mb="34px">
+              <HStack width="100%" mb="34px" alignContent="center">
+                <HStack flex={1}></HStack>
+
+                {!sidebarOpen && isFundraiser ? (
+                  <>
+                    <HStack flex={2} justifyContent="end">
+                      <Button
+                        colorScheme="twitter"
+                        bg="hop_blue.500"
+                        onClick={submit}
+                        borderRadius="6px"
+                        fontFamily="heading"
+                        fontSize="20px"
+                        fontWeight="400"
+                      >
+                        ADD TO FUNDRAISING PLANNING
+                      </Button>
+                    </HStack>
+                  </>
+                ) : isCopy ? (
+                  <>
+                    <HStack flex={2} justifyContent="end">
+                      <Button
+                        fontFamily="heading"
+                        fontSize="20px"
+                        fontWeight="400"
+                        colorScheme="red"
+                        color="hop_red.500"
+                        variant="outline"
+                        onClick={onClose}
+                        borderRadius="6px"
+                        mr="13px"
+                      >
+                        Close
+                      </Button>
+                      <Button
+                        colorScheme="twitter"
+                        bg="hop_blue.500"
+                        borderRadius="6px"
+                        fontFamily="heading"
+                        fontSize="20px"
+                        fontWeight="400"
+                        onClick={copyToCurrentRetreat}
+                      >
+                        Copy
+                      </Button>
+                    </HStack>
+                  </>
+                ) : (
+                  <HStack flex={2} justifyContent="end">
+                    <Button
+                      fontFamily="heading"
+                      fontSize="20px"
+                      fontWeight="400"
+                      colorScheme="red"
+                      color="hop_red.500"
+                      variant="outline"
+                      onClick={deleteEventHandler}
+                      borderRadius="6px"
+                      mr="13px"
+                    >
+                      DELETE
+                    </Button>
                     <Button
                       colorScheme="twitter"
                       bg="hop_blue.500"
@@ -633,67 +687,11 @@ export const NewEventModal = ({
                       fontSize="20px"
                       fontWeight="400"
                     >
-                      ADD TO FUNDRAISING PLANNING
+                      APPLY
                     </Button>
                   </HStack>
-                </>
-              ) : isCopy ? (
-                <>
-                  <HStack width="100%" justifyContent="end" mb="34px">
-                    <Button
-                      fontFamily="heading"
-                      fontSize="20px"
-                      fontWeight="400"
-                      colorScheme="red"
-                      color="hop_red.500"
-                      variant="outline"
-                      onClick={onClose}
-                      borderRadius="6px"
-                      mr="13px"
-                    >
-                      Close
-                    </Button>
-                    <Button
-                      colorScheme="twitter"
-                      bg="hop_blue.500"
-                      borderRadius="6px"
-                      fontFamily="heading"
-                      fontSize="20px"
-                      fontWeight="400"
-                      onClick={copyToCurrentRetreat}
-                    >
-                      Copy
-                    </Button>
-                  </HStack>
-                </>
-              ) : (
-                <HStack width="100%" justifyContent="end" mb="34px">
-                  <Button
-                    fontFamily="heading"
-                    fontSize="20px"
-                    fontWeight="400"
-                    colorScheme="red"
-                    color="hop_red.500"
-                    variant="outline"
-                    onClick={deleteEventHandler}
-                    borderRadius="6px"
-                    mr="13px"
-                  >
-                    DELETE
-                  </Button>
-                  <Button
-                    colorScheme="twitter"
-                    bg="hop_blue.500"
-                    onClick={submit}
-                    borderRadius="6px"
-                    fontFamily="heading"
-                    fontSize="20px"
-                    fontWeight="400"
-                  >
-                    APPLY
-                  </Button>
-                </HStack>
-              )}
+                )}
+              </HStack>
             </VStack>
           </ModalBody>
           {sidebarOpen && (

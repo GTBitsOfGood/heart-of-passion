@@ -43,17 +43,6 @@ export const fundraiserRouter = createTRPCRouter({
 
       await fundraiser.save();
     }),
-  updateExpense: studentProcedure
-    .input(
-      z.object({
-        expenseId: z.string(),
-        expense: expenseSchema,
-      }),
-    )
-    .mutation(async ({ input }) => {
-      const { expenseId, expense } = input;
-      await ExpenseModel.findByIdAndUpdate(expenseId, expense).exec();
-    }),
   updateExpenseByFundraiser: studentProcedure
     .input(
       z.object({
@@ -66,7 +55,7 @@ export const fundraiserRouter = createTRPCRouter({
       const { expenseId, expense, fundraiserId } = input;
       const fundraiser = await FundraiserModel.findById(fundraiserId).exec();
       if (!fundraiser) {
-        throw new Error("Event not found: " + fundraiser);
+        throw new Error("Fundraiser not found with ID: " + fundraiserId);
       }
       const expenseIndex = fundraiser.expenses.findIndex(
         (exp) => exp._id?.toString() === expenseId,
@@ -77,24 +66,7 @@ export const fundraiserRouter = createTRPCRouter({
       fundraiser.expenses[expenseIndex] = expense;
       await fundraiser.save();
     }),
-  createExpense: studentProcedure
-    .input(
-      z.object({
-        retreatId: z.string().optional(),
-        expenseDetails: expenseSchema,
-      }),
-    )
-    .mutation(async ({ input }) => {
-      const { retreatId, expenseDetails } = input;
-      if (retreatId) {
-        const expense = new ExpenseModel({ retreatId, ...expenseDetails });
-        await expense.save();
-      } else {
-        const { expenseDetails } = input;
-        const expense = new ExpenseModel({ ...expenseDetails });
-        await expense.save();
-      }
-    }),
+
   deleteFundraiser: studentProcedure
     .input(z.string())
     .mutation(async ({ input }) => {
@@ -125,11 +97,20 @@ export const fundraiserRouter = createTRPCRouter({
 
       return parsedEvents;
     }),
-  getExpenses: studentProcedure.input(z.string()).query(async (opts) => {
-    const expenses = await ExpenseModel.find({ retreatId: opts.input }).exec();
-    return expenses;
-  }),
 });
+
+function processExpense(expense: any) {
+  return {
+    name: expense.name,
+    _id: expense._id.toString(),
+    event: expense.event,
+    eventId: expense.eventId,
+    type: expense.type,
+    cost: expense.cost,
+    numUnits: expense.numUnits,
+    notes: expense.notes,
+  };
+}
 
 function processEvent(fundraiser: IFundraiser) {
   return {
@@ -139,7 +120,9 @@ function processEvent(fundraiser: IFundraiser) {
     contactName: fundraiser.contactName,
     email: fundraiser.email,
     profit: fundraiser.profit,
-    expenses: fundraiser.expenses,
+    notes: fundraiser.notes,
+
+    expenses: fundraiser.expenses.map(processExpense),
     _id: fundraiser._id.toString(),
     retreatId: fundraiser.retreatId.toString(),
   };

@@ -13,10 +13,11 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Textarea,
   VStack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
 import {
   Donor,
@@ -75,6 +76,7 @@ export const NewDonorModal = ({
   const [sponsorLevel, setSponsorLevel] = useState<SponsorLevel>(
     donorData.sponsorLevel,
   );
+  const [notes, setNotes] = useState(donorData.notes ?? "");
 
   // Options
   const SponsorLevelOptions = Object.values(sponsorLevelSchema.enum);
@@ -126,6 +128,7 @@ export const NewDonorModal = ({
         setDonorName("");
         setStudentName("");
         setDonorEmail("");
+        setNotes("");
       } else {
         // Set existing values when editing
         setDonorName(donorData.donorName);
@@ -134,6 +137,7 @@ export const NewDonorModal = ({
         setStatus(donorData.status);
         setSource(donorData.source);
         setSponsorLevel(donorData.sponsorLevel);
+        setNotes(donorData.notes ?? "");
       }
     }
   }, [isOpen, create, donorData]);
@@ -146,6 +150,7 @@ export const NewDonorModal = ({
       setDonorName("");
       setStudentName("");
       setDonorEmail("");
+      setNotes("");
     }
     setNameError(DonorError.None);
     setStudentError(StudentError.None);
@@ -168,6 +173,7 @@ export const NewDonorModal = ({
       source,
       sponsorLevel,
       status,
+      notes,
     };
     if (create) {
       try {
@@ -202,6 +208,7 @@ export const NewDonorModal = ({
       status,
       source,
       sponsorLevel,
+      notes,
     };
     setSourceError(
       source === "Select Source" ? SourceError.Empty : SourceError.None,
@@ -230,6 +237,9 @@ export const NewDonorModal = ({
 
   const handleSourceChange = (newSource: string) => setSource(newSource);
 
+  const handleNotesChange = (event: ChangeEvent<HTMLTextAreaElement>) =>
+    setNotes(event.currentTarget.value);
+
   const sourceOptions = ["Other"].concat(
     trpc.event.getEvents
       .useQuery(retreatId, { enabled: !!retreatId })
@@ -241,7 +251,7 @@ export const NewDonorModal = ({
       <ModalOverlay />
       <ModalContent
         width="600px"
-        height="400px"
+        height="550px"
         maxWidth="600px"
         borderRadius="none"
         boxShadow={"0px 4px 29px 0px #00000040"}
@@ -388,6 +398,22 @@ export const NewDonorModal = ({
                 <FormErrorMessage minHeight="20px" />
               </FormControl>
             </HStack>
+            <FormControl mt="18px">
+              <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
+                Notes
+              </FormLabel>
+              <Textarea
+                color="black"
+                border="1px solid #D9D9D9"
+                borderRadius="0px"
+                width="100%"
+                value={notes}
+                onChange={handleNotesChange}
+                padding="10px"
+                resize="none"
+                height="50px"
+              />
+            </FormControl>
           </VStack>
         </ModalBody>
 
