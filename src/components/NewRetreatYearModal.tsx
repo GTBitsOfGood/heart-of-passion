@@ -60,7 +60,7 @@ export const NewRetreatYearModal = ({
   const createRetreat = trpc.retreat.createRetreat.useMutation({
     onSuccess: (data) => {
       //console.log("year"+year)
-      //router.push(`/retreats/${data.id}`);
+      // router.push(`/retreats/${data.id}`);
       trpcUtils.retreat.invalidate();
     },
   });
@@ -87,8 +87,9 @@ export const NewRetreatYearModal = ({
       chapterId: chapterId ?? "",
       year: parseInt(year),
     };
-    await createRetreat.mutate(retreat);
-
+    const result = await createRetreat.mutateAsync(retreat);
+    console.log(result._id);
+    router.push(`/retreat/${result._id}`);
     onCloseModal();
   };
 
