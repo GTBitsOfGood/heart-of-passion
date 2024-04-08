@@ -19,14 +19,14 @@ import { useRouter } from "next/router";
 
 interface SidebarProps {
   chapter: Chapter;
-  year?: number;
+  year: number;
   retreatId?: string;
   pageClicked: number;
 }
 
 const Sidebar = ({
   chapter,
-  year: yearProp,
+  year,
   retreatId: retreatIdProp,
   pageClicked,
 }: SidebarProps) => {
@@ -95,11 +95,13 @@ const Sidebar = ({
     router.push(`/${path}/${retreatId}`);
   }
 
-  const [year, setYear] = useState<number>(
-    yearProp ?? new Date().getFullYear(),
-  );
+  // const [year, setYear] = useState<number>(
+  //   yearProp ?? new Date().getFullYear(),
+  // );
+  // const [selectedYear, setSelectedYear] = useState<number>(year); 
 
   console.log(year);
+  // console.log(selectedYear);
 
   const getRetreat = trpc.retreat.getRetreat.useQuery(
     { chapterId: chapterId ?? "", year },
@@ -117,7 +119,7 @@ const Sidebar = ({
     );
 
     if (retreat?.id) {
-      setYear(parseInt(value));
+      // setSelectedYear(parseInt(value));
       router.push(`/retreat/${retreat.id}`);
     }
   }
