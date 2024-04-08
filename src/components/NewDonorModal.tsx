@@ -16,6 +16,7 @@ import {
   Textarea,
   VStack,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { ChangeEvent, useEffect, useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
@@ -27,7 +28,6 @@ import {
   sponsorLevelSchema,
 } from "~/common/types";
 import { trpc } from "~/utils/api";
-import { FloatingAlert } from "./FloatingAlert";
 import { TRPCError } from "@trpc/server";
 
 type NewDonorProps = {
@@ -94,6 +94,7 @@ export const NewDonorModal = ({
     onClose: onCloseError,
     onOpen: onOpenError,
   } = useDisclosure({ defaultIsOpen: false });
+  const toast = useToast();
 
   // TRPC Queries and Mutations
   const trpcUtils = trpc.useUtils();
@@ -160,7 +161,13 @@ export const NewDonorModal = ({
   // Create the donor in the backend and update the frontend with dummy data temporarily on success
   const handleSave = async () => {
     if (!validateFields()) {
-      onOpenError();
+      toast({
+        title: "ERROR INCOMPLETE FIELDS",
+        description: "Fill in the incomplete fields that are outlined in red!",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
       return false;
     }
     const donor: Donor = {
@@ -439,7 +446,6 @@ export const NewDonorModal = ({
             APPLY
           </Button>
         </ModalFooter>
-        {isError && <FloatingAlert onClose={onCloseError} />}
       </ModalContent>
     </Modal>
   );
