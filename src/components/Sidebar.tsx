@@ -9,7 +9,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import ChapterProgress from "./chapters/ChapterProgress";
-import { useToast } from "@chakra-ui/react"
+import { useToast } from "@chakra-ui/react";
 import { Chapter } from "src/common/types";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import Select, { ActionMeta } from "react-select";
@@ -19,7 +19,7 @@ import { useRouter } from "next/router";
 
 interface SidebarProps {
   chapter: Chapter;
-  year: number;
+  year?: number;
   retreatId?: string;
   pageClicked: number;
 }
@@ -60,16 +60,15 @@ const Sidebar = ({
   const router = useRouter();
 
   const trpcUtils = trpc.useUtils();
-  const deleteRetreat = 
-    trpc.retreat.deleteRetreat.useMutation({
-      onSuccess: () => {
-        trpcUtils.event.invalidate();
-        trpcUtils.fund.invalidate();
-        trpcUtils.fundraiser.invalidate();
-        trpcUtils.retreat.invalidate();
-        trpcUtils.chapter.invalidate();
-      },
-    });
+  const deleteRetreat = trpc.retreat.deleteRetreat.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+      trpcUtils.fund.invalidate();
+      trpcUtils.fundraiser.invalidate();
+      trpcUtils.retreat.invalidate();
+      trpcUtils.chapter.invalidate();
+    },
+  });
 
   const toast = useToast();
   function handleDeleteYear() {
@@ -98,13 +97,13 @@ const Sidebar = ({
   // const [year, setYear] = useState<number>(
   //   yearProp ?? new Date().getFullYear(),
   // );
-  // const [selectedYear, setSelectedYear] = useState<number>(year); 
+  // const [selectedYear, setSelectedYear] = useState<number>(year);
 
   console.log(year);
   // console.log(selectedYear);
 
   const getRetreat = trpc.retreat.getRetreat.useQuery(
-    { chapterId: chapterId ?? "", year },
+    { chapterId: chapterId ?? "", year: year ?? new Date().getFullYear() },
     { enabled: false },
   );
 
@@ -376,7 +375,7 @@ const Sidebar = ({
               setClicked(9);
               handleDeleteYear();
               router.push(`/chapters/${chapterId}/`);
-            }} 
+            }}
           >
             Delete Current Year
           </Button>
