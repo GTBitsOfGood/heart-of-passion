@@ -15,7 +15,14 @@ export default function Users({ name, email, role, chapter }: User) {
 
   return (
     <>
-      <Flex justifyContent="space-around" alignItems="center" py="0.2em">
+      <Flex
+        justifyContent="space-around"
+        alignItems="center"
+        py="0.2em"
+        onClick={onOpenAddUserModal}
+        _hover={{ bg: "lightgrey" }}
+        borderRadius={5}
+      >
         <Box fontFamily={fonts.nunito} minW="10%">
           {name}
         </Box>
@@ -43,13 +50,13 @@ export default function Users({ name, email, role, chapter }: User) {
         >
           {chapter}
         </Box>
-        <IconButton
+        {/* <IconButton
           aria-label="settings"
           variant="ghost"
           height="40px"
           width="40px"
           icon={<EditIcon onClick={onOpenAddUserModal} />}
-        />
+        /> */}
         <NewUserModal
           isOpen={isOpenAddUserModal}
           onClose={onCloseAddUserModal}

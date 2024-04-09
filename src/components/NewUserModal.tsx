@@ -15,12 +15,13 @@ import {
   ModalOverlay,
   VStack,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
 import { User, Role, userSchema, roleSchema, Chapter } from "~/common/types";
 import { trpc } from "~/utils/api";
-import { FloatingAlert } from "./FloatingAlert";
+import { set } from "lodash";
 
 type NewUserProps = {
   isOpen: boolean;
@@ -33,6 +34,7 @@ enum EmailError {
   None, // No error
   Empty, // Empty email
   Invalid, // Invalid email
+  Exists,
 }
 
 enum UserError {
@@ -57,30 +59,77 @@ export const NewUserModal = ({
   // Errors
   const [nameError, setNameError] = useState<UserError>(UserError.None);
   const [emailError, setEmailError] = useState<EmailError>(EmailError.None);
-  const {
-    isOpen: isError,
-    onClose: onCloseError,
-    onOpen: onOpenError,
-  } = useDisclosure({ defaultIsOpen: false });
-
   // TRPC Queries and Mutations
   const trpcUtils = trpc.useUtils();
+  const toast = useToast();
   const chapters = trpc.chapter.getChapters.useQuery();
   const createUser = trpc.user.createUser.useMutation({
     onSuccess: () => {
       trpcUtils.user.invalidate();
+      onCloseModal();
+    },
+    onError: (error) => {
+      if (error.message.includes("E11000")) {
+        toast({
+          title: "Error",
+          description: `User with email already exists.`,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+        setEmailError(EmailError.Exists);
+      } else {
+        toast({
+          title: "Error",
+          description: `An error occured while creating User.`,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
     },
   });
 
   const updateUser = trpc.user.updateUser.useMutation({
     onSuccess: () => {
       trpcUtils.user.invalidate();
+      onCloseModal();
+    },
+    onError: (error) => {
+      if (error.message.includes("E11000")) {
+        toast({
+          title: "Error",
+          description: `User with email already exists.`,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+        setEmailError(EmailError.Exists);
+      } else {
+        toast({
+          title: "Error",
+          description: `An error occured while updating User.`,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
     },
   });
 
   const deleteUser = trpc.user.deleteUser.useMutation({
     onSuccess: () => {
       trpcUtils.user.invalidate();
+      onCloseModal();
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: `An error occured while deleting User.`,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     },
   });
 
@@ -103,6 +152,11 @@ export const NewUserModal = ({
       }
       setName("");
       setEmail("");
+    } else {
+      setName(userData.name);
+      setEmail(userData.email);
+      setRole(userData.role);
+      setChapter(userData.chapter);
     }
     setNameError(UserError.None);
     setEmailError(EmailError.None);
@@ -112,10 +166,13 @@ export const NewUserModal = ({
   // Create the user in the backend and update the frontend with dummy data temporarily on success
   const handleSave = () => {
     if (!validateFields()) {
-      if (emailError !== EmailError.Empty) {
-        setEmailError(EmailError.Invalid);
-      }
-      onOpenError();
+      toast({
+        title: "ERROR INCOMPLETE FIELDS",
+        description: "Fill in the incomplete fields that are outlined in red!",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
       return false;
     }
     const user: User = {
@@ -129,14 +186,11 @@ export const NewUserModal = ({
     } else {
       updateUser.mutate({ email: userData.email, updateData: user });
     }
-    onCloseModal();
     return true;
   };
 
   const handleDelete = () => {
     deleteUser.mutate(userData.email);
-    onCloseModal();
-    onCloseError();
     return true;
   };
 
@@ -148,8 +202,22 @@ export const NewUserModal = ({
       chapter,
     };
     setNameError(name === "" ? UserError.Empty : UserError.None);
-    setEmailError(email === "" ? EmailError.Empty : EmailError.None);
-    return userSchema.safeParse(user).success;
+    setEmailError(
+      email === ""
+        ? EmailError.Empty
+        : email.match(
+            /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+          )
+        ? EmailError.None
+        : EmailError.Invalid,
+    );
+    return (
+      name !== "" &&
+      email !== "" &&
+      email.match(
+        /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+      )
+    );
   };
 
   const handleRoleChange = (role: string) => {
@@ -252,6 +320,7 @@ export const NewUserModal = ({
                   <FormErrorMessage mt={0}>
                     {emailError === EmailError.Empty && "Email is required"}
                     {emailError === 2 && "Invalid email"}
+                    {emailError === EmailError.Exists && "Email already exists"}
                   </FormErrorMessage>
                 </Box>
               </FormControl>
@@ -302,7 +371,6 @@ export const NewUserModal = ({
             APPLY
           </Button>
         </ModalFooter>
-        {isError && <FloatingAlert onClose={onCloseError} />}
       </ModalContent>
     </Modal>
   );
