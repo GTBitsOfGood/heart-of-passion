@@ -166,6 +166,7 @@ export const transactionSchema = z.object({
   payerEmail: z.string().email().or(z.literal("")),
   message: z.string(),
   payerName: z.string(),
+
 });
 export type Transaction = z.infer<typeof transactionSchema>;
 

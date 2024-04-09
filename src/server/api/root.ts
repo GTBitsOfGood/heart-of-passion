@@ -21,7 +21,6 @@ export const appRouter = createTRPCRouter({
   donor: donorRouter,
   fundraiser: fundraiserRouter,
   fund: fundRouter,
-  transaction: transactionRouter
   transaction: transactionRouter,
 });
 
