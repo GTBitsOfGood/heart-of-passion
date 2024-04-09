@@ -5,6 +5,18 @@ import { use } from "react";
 import { auth } from "~/server/auth";
 
 export const getServerSideProps = (async (context) => {
+  const authRequest = auth.handleRequest(context);
+  const session = await authRequest.validate();
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+
   return {
     redirect: {
       destination: "/chapters",
