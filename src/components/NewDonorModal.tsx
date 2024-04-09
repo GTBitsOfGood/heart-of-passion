@@ -180,13 +180,6 @@ export const NewDonorModal = ({
 
   const handleSave = async () => {
     if (!validateFields()) {
-      toast({
-        title: "ERROR INCOMPLETE FIELDS",
-        description: "Fill in the incomplete fields that are outlined in red!",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
       return false;
     }
     const donor: Donor = {
@@ -234,7 +227,18 @@ export const NewDonorModal = ({
       studentName === "" ? StudentError.Empty : StudentError.None,
     );
     setEmailError(donorEmail === "" ? EmailError.Empty : EmailError.None);
-    return donorSchema.safeParse(donor).success;
+
+    const result = donorSchema.safeParse(donor);
+    if (!result.success) {
+      toast({
+        title: "Validation Error",
+        description: result.error.errors.map((e) => e.message).join(", "),
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+    return result.success;
   };
 
   const handleSponsorLevelChange = (sponsorLevel: string) => {

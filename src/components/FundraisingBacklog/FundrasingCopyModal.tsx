@@ -1,18 +1,4 @@
-import {
-  Box,
-  Button,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  useDisclosure,
-} from "@chakra-ui/react";
-import { DateObject, Event, Fundraiser } from "~/common/types";
-import { NewEventModal } from "../NewEventModal";
+import { Fundraiser } from "~/common/types";
 import { FundraisingPlanningModal } from "../FundraisingPlanningModal";
 
 type BacklogCopyModalProps = {
@@ -37,7 +23,7 @@ export default function BacklogCopyModal({
         onClose={onClose}
         isCopy={true}
         copyToCurrentRetreat={copyToCurrentRetreat}
-        retreatId="test"
+        retreatId="UNNEEDED BECAUSE NOT USED WHEN COPY"
         copyFundraiser={event}
       />
     </>
