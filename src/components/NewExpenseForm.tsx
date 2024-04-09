@@ -13,7 +13,7 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { Expense, expenseSchema, expenseTypeSchema } from "~/common/types";
-import { useEffect, ChangeEvent } from "react";
+import { useEffect, ChangeEvent, useState } from "react";
 import { trpc } from "~/utils/api";
 
 import { useReducer } from "react";
@@ -104,26 +104,48 @@ export const NewExpenseForm = ({
       });
     }
   };
+  
+  const trpcUtils = trpc.useContext();
+  const updateExpense = trpc.event.updateExpense.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+    },
+  });
+  const updateExpenseByEvent = trpc.event.updateExpenseByEvent.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+    },
+  });
+  const createExpense = trpc.event.createExpense.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+    },
+  });
+  const deleteExpenseByEvent = trpc.event.deleteExpenseByEvent.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+    }
+  })
+  const deleteExpense = trpc.event.deleteExpense.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+    }
+  })
 
   const handleUnitsChange = (event: React.FormEvent<HTMLInputElement>) => {
-    const numUnits = parseInt(event.currentTarget.value);
-    if (!isNaN(numUnits) && numUnits > 0) {
+    if (parseInt(event.currentTarget.value) > 0) {
       dispatch({
         type: "UPDATE_EXPENSE",
         field: "numUnits",
-        value: numUnits,
+        value: parseInt(event.currentTarget.value),
       });
-    } else {
-      dispatch({
-        type: "UPDATE_EXPENSE",
-        field: "numUnits",
-        value: 0,
-      });
-    }
-  };
+    } 
+  }
   const handleNotesChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     dispatch({ type: "UPDATE_EXPENSE", field: "notes", value: e.target.value });
   };
+
+  const [costType, setCostType] = useState(create || selectedExpense.numUnits === 1 ? "flat" : "unit")
 
   const validateFields = () => {
     try {
@@ -132,7 +154,8 @@ export const NewExpenseForm = ({
     } catch (e) {
       let errorDesc = "Unknown Error";
       if (e instanceof z.ZodError) {
-        errorDesc = e.issues.map((issue) => issue.message).join("\n");
+        errorDesc = e.issues.map((issue) => issue.message).join("; ")
+        errorDesc += `; please fill all fields marked by asterisk`;
       }
       onOpenError();
       toast({
@@ -150,34 +173,31 @@ export const NewExpenseForm = ({
     if (onCloseSide) {
       onCloseSide();
     }
-    const updatedExpenses = (expenses ?? []).filter(
-      (e) => e !== selectedExpense,
-    );
-    setExpenses && setExpenses(updatedExpenses);
-
+    console.log('a');
+    if (!create) {
+      console.log('b');
+      const updatedExpenses = (expenses ?? []).filter(
+        (e) => e !== selectedExpense,
+      );
+      if (setExpenses) {
+        console.log('c');
+        setExpenses(updatedExpenses);
+      } else if (selectedExpense._id) {
+        console.log('d');
+        if (thisEvent) {
+          deleteExpenseByEvent.mutate({ eventId: thisEvent, expenseId: selectedExpense._id })
+        } else {
+          deleteExpense.mutate(selectedExpense._id)
+        }
+      }
+    }
     if (setSelectedExpense) {
       setSelectedExpense(undefined);
     }
     dispatch({ type: "RESET" });
     return;
   };
-
-  const trpcUtils = trpc.useUtils();
-  const updateExpense = trpc.event.updateExpense.useMutation({
-    onSuccess: () => {
-      trpcUtils.event.invalidate();
-    },
-  });
-  const updateExpenseByEvent = trpc.event.updateExpenseByEvent.useMutation({
-    onSuccess: () => {
-      trpcUtils.event.invalidate();
-    },
-  });
-  const createExpense = trpc.event.createExpense.useMutation({
-    onSuccess: () => {
-      trpcUtils.event.invalidate();
-    },
-  });
+  
 
   const handleApply = async () => {
     if (!validateFields()) {
@@ -307,22 +327,22 @@ export const NewExpenseForm = ({
             Cost Type
           </FormLabel>
           <RadioGroup
-            onChange={(val) => {
-              let numUnits = state.numUnits;
-
-              if (val == "flat") {
-                numUnits = 1;
-              } else if (val == "unit" && numUnits == 1) {
-                numUnits++;
+            onChange={(e) => {
+              setCostType(e)
+              let numUnits;
+              if (e === "unit") {
+                numUnits = state.numUnits ?? 1;
               }
-
+              else { // e === "flat"
+                numUnits = 1;
+              }
               dispatch({
                 type: "UPDATE_EXPENSE",
                 field: "numUnits",
                 value: numUnits,
               });
             }}
-            value={state.numUnits === 1 ? "flat" : "unit"}
+            value={costType}
           >
             <HStack spacing="24px">
               <Radio value="flat">Flat Cost</Radio>
@@ -330,7 +350,7 @@ export const NewExpenseForm = ({
             </HStack>
           </RadioGroup>
         </FormControl>
-        <FormControl mt="18px">
+        <FormControl mt="18px" hidden={costType === "flat"}>
           <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
             Units
           </FormLabel>
@@ -338,12 +358,14 @@ export const NewExpenseForm = ({
             color="black"
             border="1px solid #D9D9D9"
             borderRadius="0px"
-            placeholder="Enter Units"
-            value={state.numUnits === 0 ? "" : state.numUnits}
+            value={state.numUnits}
             width="100%"
             type="number"
+            required={costType !== "flat"}
+            placeholder="Enter Units"
             onChange={handleUnitsChange}
             padding="10px"
+            isDisabled={costType === "flat"}
           />
         </FormControl>
         <FormControl mt="18px">

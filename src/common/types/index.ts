@@ -87,8 +87,8 @@ export const expenseSchema = z.object({
   event: z.string().optional(),
   eventId: z.string().optional(),
   type: expenseTypeSchema,
-  cost: z.number().min(0, "Cost must be a value of 0 or greater."),
-  numUnits: z.number().min(1, "Number of units must be at least 1"),
+  cost: z.number().min(0, "Cost cannot be empty or negative"),
+  numUnits: z.number().min(1, "Minimum 1 unit is needed"),
   notes: z.string().optional(),
 });
 export type Expense = z.infer<typeof expenseSchema>;
