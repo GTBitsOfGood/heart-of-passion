@@ -13,6 +13,11 @@ const TransactionSchema = new Schema<ITransaction>({
   chapterId: {
     ref: "Chapter",
     type: Schema.Types.ObjectId,
+}
+
+const TransactionSchema = new Schema<ITransaction>({
+  chapter: {
+    type: String,
     required: true,
   },
   transactionId: {
@@ -40,6 +45,8 @@ const TransactionSchema = new Schema<ITransaction>({
     type: Number,
     required: true
   }
+    required: true,
+  },
 });
 
 export const TransactionModel =
