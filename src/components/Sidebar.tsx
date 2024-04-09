@@ -2,6 +2,7 @@ import {
   Text,
   Grid,
   GridItem,
+  IconButton,
   Button,
   Image,
   Box,
@@ -18,6 +19,7 @@ import { trpc } from "~/utils/api";
 import { NewRetreatYearModal } from "./NewRetreatYearModal";
 import { useRouter } from "next/router";
 import DeleteConfirmation from "./DeleteConfirmation"; // Import DeleteConfirmation
+import { IoIosLogOut } from "react-icons/io";
 
 interface SidebarProps {
   chapter: Chapter;
@@ -57,6 +59,8 @@ const Sidebar = ({
   const latestRetreatId = trpc.chapter.getLatestRetreatId.useQuery(chapterId!, {
     enabled: !!retreatIdProp && !!chapterId,
   }).data;
+
+  const isAdmin = trpc.user.isAdmin.useQuery().data;
 
   const retreatId = retreatIdProp ?? latestRetreatId;
 
@@ -168,6 +172,22 @@ const Sidebar = ({
               >
                 {chapter.name.toUpperCase()}
               </Text>
+            </GridItem>
+            <GridItem>
+              <IconButton
+                mt="10px"
+                icon={
+                  <IoIosLogOut
+                    size="30px"
+                    onClick={() => {
+                      router.push("/logout");
+                    }}
+                  />
+                }
+                aria-label={"logout"}
+              />
+            </GridItem>
+            <GridItem>
               {year && (
                 <Select
                   instanceId={id}
@@ -344,21 +364,10 @@ const Sidebar = ({
           >
             Raised Funds
           </Button>
-          <Button
-            fontFamily="nunito"
-            borderRadius="none"
-            p="10px"
-            width="98%"
-            justifyContent="left"
-            onClick={() => {
-              router.push(`/logout`);
-            }}
-          >
-            Logout
-          </Button>
 
           <HStack>
             <Button
+              hidden={!isAdmin}
               fontFamily="nunito"
               borderRadius="none"
               mt="20px"

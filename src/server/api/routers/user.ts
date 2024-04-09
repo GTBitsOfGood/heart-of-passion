@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import {
+  adminProcedure,
   createTRPCRouter,
   mentorProcedure,
   publicProcedure,
@@ -37,6 +38,10 @@ export const userRouter = createTRPCRouter({
   deleteUser: mentorProcedure.input(z.string()).mutation(async (opts) => {
     const user = await UserModel.findOneAndDelete({ email: opts.input }).exec();
     return user;
+  }),
+
+  isAdmin: studentProcedure.query(async (opts) => {
+    return opts.ctx.user?.role === "admin";
   }),
 
   updateUser: mentorProcedure
