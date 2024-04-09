@@ -8,9 +8,11 @@ interface ChapterProgressProps {
 }
 
 const ChapterProgress = ({ chapter }: ChapterProgressProps) => {
-  const progress = Math.floor(
-    (chapter?.fundActual / chapter?.fundExpected) * 100,
-  );
+  const progress =
+    chapter.fundExpected == 0
+      ? 100
+      : Math.floor((chapter?.fundActual / chapter?.fundExpected) * 100);
+
   return (
     <>
       <ProgressBar

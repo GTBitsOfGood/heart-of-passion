@@ -11,6 +11,7 @@ import {
   VStack,
   Input,
   useDisclosure,
+  useToast,
   Select,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
@@ -40,6 +41,8 @@ export const NewTimeForm = ({
 
   const startTimeRef = useRef<any>();
   const endTimeRef = useRef<any>();
+
+  const toast = useToast();
 
   const to24hrs = (time: string): string => {
     let [hours, minutes] = time.split(/[:\s]/);
@@ -144,6 +147,13 @@ export const NewTimeForm = ({
   const validateFields = () => {
     if (toMinutes(endTime) <= toMinutes(startTime)) {
       setEndTimeError(true);
+      toast({
+        title: "Error",
+        description: "End time must be after start time.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
       return false;
     }
 
@@ -238,7 +248,7 @@ export const NewTimeForm = ({
           fontSize="20px"
           fontWeight="400"
         >
-          APPLY
+          {editing ? "UPDATE" : "ADD"}
         </Button>
       </HStack>
     </VStack>

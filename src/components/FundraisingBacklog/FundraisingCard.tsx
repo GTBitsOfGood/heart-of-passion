@@ -1,12 +1,12 @@
 import { Box, Text } from "@chakra-ui/react";
-import { DateObject, Event } from "~/common/types";
+import { DateObject, Event, Fundraiser, fundraiserSchema } from "~/common/types";
 
 export default function BacklogCard({
   event,
   openCopyModal,
 }: {
-  event: Event;
-  openCopyModal: (event: Event) => void;
+  event: Fundraiser;
+  openCopyModal: (event: Fundraiser) => void;
 }) {
   const totalCost = event.expenses.reduce((acc, { cost }) => acc + cost, 0);
 
@@ -17,6 +17,7 @@ export default function BacklogCard({
       paddingX={4}
       paddingY={6}
       width={286}
+      cursor={"pointer"}
     >
       <Text
         fontFamily={"nunito"}
@@ -29,7 +30,7 @@ export default function BacklogCard({
       </Text>
       <Box display={"flex"} justifyContent={"space-between"}>
         <Text fontFamily={"nunito"} fontWeight={500} fontSize={20}>
-          {"1/1/2024"}
+          {new Date(event.date).toLocaleDateString("en-US")}
         </Text>
         <Text fontFamily={"nunito"} fontWeight={500} fontSize={20}>
           {"Revenue: $" + totalCost}

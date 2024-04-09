@@ -1,5 +1,5 @@
 import { Box, Grid, GridItem, useDisclosure } from "@chakra-ui/react";
-import { Expense } from "~/common/types";
+import type { Expense } from "~/common/types";
 import fonts from "~/common/theme/fonts";
 import { NewExpenseModal } from "../NewExpenseModal";
 
@@ -11,6 +11,7 @@ export default function Expense({
   type,
   cost,
   numUnits,
+  notes,
 }: Expense) {
   const expense: Expense = {
     _id: _id,
@@ -20,6 +21,7 @@ export default function Expense({
     type: type,
     cost: cost,
     numUnits: numUnits,
+    notes: notes,
   };
   const {
     isOpen: isOpenAddExpenseModal,
@@ -62,7 +64,9 @@ export default function Expense({
           <Box fontFamily={fonts.nunito}>${cost}</Box>
         </GridItem>
         <GridItem colSpan={1}>
-          <Box fontFamily={fonts.nunito}>x{numUnits}</Box>
+          <Box fontFamily={fonts.nunito}>
+            {numUnits ? `x${numUnits}` : "x1"}
+          </Box>
         </GridItem>
         <GridItem colSpan={1} display="flex" justifyContent="end">
           <Box fontFamily={fonts.nunito}>

@@ -1,11 +1,4 @@
-import {
-  Box,
-  Spinner,
-  Text,
-  useDisclosure,
-  useToast,
-  Button,
-} from "@chakra-ui/react";
+import { Box, Spinner, Text, useDisclosure, Button } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { trpc } from "~/utils/api";
@@ -14,8 +7,6 @@ import Sidebar from "~/components/Sidebar";
 import Select from "react-select";
 import PlanningHandler from "~/components/FundraisingPlanning/PlanningHandler";
 import { FundraisingPlanningModal } from "~/components/FundraisingPlanningModal";
-import { Fundraiser } from "~/common/types";
-import { fundraiserRouter } from "~/server/api/routers/fundraiser";
 
 export enum PlanningSort {
   ViewByDate = "View by Date",
@@ -25,7 +16,11 @@ export enum PlanningSort {
 
 export default function Planning() {
   const router = useRouter();
-  const { id: chapterId, id: fundraiserId }: { id?: string } = router.query;
+  const { id: retreatId }: { id?: string } = router.query;
+
+  const retreat = trpc.retreat.getRetreatById.useQuery(retreatId!, {
+    enabled: !!retreatId,
+  })?.data;
 
   const {
     isOpen: isOpenFundraisingPlanningModal,
@@ -33,12 +28,12 @@ export default function Planning() {
     onClose: onCloseFundraisingPlanningModal,
   } = useDisclosure();
 
-  const fundraisers = trpc.fundraiser.getFundraisers.useQuery(fundraiserId!, {
-    enabled: !!fundraiserId,
+  const fundraisers = trpc.fundraiser.getFundraisers.useQuery(retreatId!, {
+    enabled: !!retreatId,
   }).data;
 
-  const chapter = trpc.chapter.getChapterById.useQuery(chapterId!, {
-    enabled: !!chapterId,
+  const chapter = trpc.chapter.getChapterByRetreatId.useQuery(retreatId!, {
+    enabled: !!retreatId,
   })?.data;
 
   const sortOptions = Object.values(PlanningSort).map((sortMethod) => ({
@@ -54,7 +49,18 @@ export default function Planning() {
       <Box>
         {fundraisers && (
           <Box display={"flex"}>
-            <Box>{chapter ? <Sidebar chapter={chapter} /> : <Spinner />}</Box>
+            <Box>
+              {chapter ? (
+                <Sidebar
+                  chapter={chapter}
+                  year={retreat?.year}
+                  retreatId={retreatId}
+                  pageClicked={4}
+                />
+              ) : (
+                <Spinner />
+              )}
+            </Box>
             <Box
               display={"flex"}
               flexDirection={"column"}
@@ -111,8 +117,10 @@ export default function Planning() {
                     ADD FUNDRAISER
                   </Button>
                   <FundraisingPlanningModal
+                    retreatId={retreatId!}
                     isOpen={isOpenFundraisingPlanningModal}
                     onClose={onCloseFundraisingPlanningModal}
+                    isCopy={false}
                   />
                 </Box>
               </Box>

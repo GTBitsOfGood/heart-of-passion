@@ -4,7 +4,7 @@ import "@fontsource/oswald/700.css";
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 
 import FundraisingCard from "~/components/FundraisingBacklog/FundraisingCard";
-import { Event, EventsByYear } from "~/common/types";
+import { Event, EventsByYear, Fundraiser, FundraisersByYear } from "~/common/types";
 import { BacklogSort } from "~/pages/backlog/[id]";
 
 export default function BacklogHandler({
@@ -13,8 +13,8 @@ export default function BacklogHandler({
   openCopyModal,
 }: {
   sortMethod: BacklogSort;
-  eventsByYear: EventsByYear;
-  openCopyModal: (event: Event) => void;
+  eventsByYear: FundraisersByYear;
+  openCopyModal: (event: Fundraiser) => void;
 }) {
   return (
     <Box>
@@ -39,10 +39,10 @@ function BacklogYearContainer({
   sortMethod,
   openCopyModal,
 }: {
-  events: Event[];
+  events: Fundraiser[];
   year: number;
   sortMethod: BacklogSort;
-  openCopyModal: (event: Event) => void;
+  openCopyModal: (event: Fundraiser) => void;
 }) {
   const [open, setOpen] = useState(true);
   const toggleOpen = () => setOpen(!open);

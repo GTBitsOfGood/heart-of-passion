@@ -30,7 +30,8 @@ export const ExpenseSchema = new Schema<IExpense>({
   event: { type: String },
   type: { type: String, required: true },
   cost: { type: Number, required: true },
-  numUnits: { type: Number, required: true },
+  numUnits: { type: Number },
+  notes: { type: String, required: false },
 });
 export const EventSchema = new Schema<IEvent>({
   retreatId: {

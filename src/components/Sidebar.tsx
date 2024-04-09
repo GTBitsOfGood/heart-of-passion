@@ -7,25 +7,30 @@ import {
   Box,
   Divider,
   useDisclosure,
+  HStack,
 } from "@chakra-ui/react";
 import ChapterProgress from "./chapters/ChapterProgress";
+import { useToast } from "@chakra-ui/react";
 import { Chapter } from "src/common/types";
-import { useCallback, useEffect, useId, useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import Select, { ActionMeta } from "react-select";
 import { trpc } from "~/utils/api";
 import { NewRetreatYearModal } from "./NewRetreatYearModal";
 import { useRouter } from "next/router";
+import DeleteConfirmation from "./DeleteConfirmation"; // Import DeleteConfirmation
 
 interface SidebarProps {
   chapter: Chapter;
   year?: number;
   retreatId?: string;
+  pageClicked: number;
 }
 
 const Sidebar = ({
   chapter,
-  year: yearProp,
+  year,
   retreatId: retreatIdProp,
+  pageClicked,
 }: SidebarProps) => {
   const id = useId();
   const {
@@ -33,6 +38,7 @@ const Sidebar = ({
     onOpen: onOpenAddYearModal,
     onClose: onCloseAddYearModal,
   } = useDisclosure();
+  const deleteModal = useDisclosure(); // Use useDisclosure for DeleteConfirmation modal
   const [clicked, setClicked] = useState(0);
 
   const chapterId = trpc.chapter.getChapterIdByName.useQuery(chapter.name).data;
@@ -56,6 +62,32 @@ const Sidebar = ({
 
   const router = useRouter();
 
+  const trpcUtils = trpc.useUtils();
+  const deleteRetreat = trpc.retreat.deleteRetreat.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+      trpcUtils.fund.invalidate();
+      trpcUtils.fundraiser.invalidate();
+      trpcUtils.retreat.invalidate();
+      trpcUtils.chapter.invalidate();
+    },
+  });
+
+  const toast = useToast();
+  function handleDeleteYear() {
+    if (options.length <= 2 || !retreatId) return;
+
+    deleteRetreat.mutate(retreatId);
+    toast({
+      title: "Success",
+      description: "You successfully deleted current year!",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+    deleteModal.onClose(); // Close the modal after deletion using useDisclosure
+  }
+
   function handleClick(path: String) {
     if (!retreatId) {
       // TODO
@@ -65,12 +97,10 @@ const Sidebar = ({
     router.push(`/${path}/${retreatId}`);
   }
 
-  const [year, setYear] = useState<number>(
-    yearProp ?? new Date().getFullYear(),
-  );
+  console.log(year);
 
   const getRetreat = trpc.retreat.getRetreat.useQuery(
-    { chapterId: chapterId ?? "", year },
+    { chapterId: chapterId ?? "", year: year ?? new Date().getFullYear() },
     { enabled: false },
   );
 
@@ -85,7 +115,6 @@ const Sidebar = ({
     );
 
     if (retreat?.id) {
-      setYear(parseInt(value));
       router.push(`/retreat/${retreat.id}`);
     }
   }
@@ -105,7 +134,7 @@ const Sidebar = ({
 
   return (
     <>
-      <Box pos="fixed" w="400px" h="100%">
+      <Box pos="fixed" w="400px" h="100%" className="no-scroll-bar">
         <Box
           bg={"#F9F9F9"}
           borderRight="1px"
@@ -113,6 +142,7 @@ const Sidebar = ({
           marginRight="-20px"
           paddingRight="20px"
           h="100%"
+          className="no-scroll-bar"
           scrollBehavior={"smooth"}
           overflowY={"scroll"}
           p="20px"
@@ -173,7 +203,7 @@ const Sidebar = ({
           <Button
             border={"2px black solid"}
             borderRadius="none"
-            backgroundColor={clicked == 1 ? "#54A9DD" : "#F9F9F9"}
+            backgroundColor={pageClicked == 1 ? "#54A9DD" : "#F9F9F9"}
             width="98%"
             height="50px"
             justifyContent="left"
@@ -183,6 +213,7 @@ const Sidebar = ({
             p="10px"
             onClick={() => {
               handleClick("retreat");
+              setClicked(1);
             }}
           >
             Retreat Planning
@@ -208,9 +239,10 @@ const Sidebar = ({
                 p="10px"
                 width="98%"
                 justifyContent="left"
-                backgroundColor={clicked == 2 ? "#54A9DD" : "#F9F9F9"}
+                backgroundColor={pageClicked == 2 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
                   handleClick("retreat-expenses");
+                  setClicked(2);
                 }}
               >
                 Expenses
@@ -223,9 +255,10 @@ const Sidebar = ({
                 p="10px"
                 width="98%"
                 justifyContent="left"
-                backgroundColor={clicked == 3 ? "#54A9DD" : "#F9F9F9"}
+                backgroundColor={pageClicked == 3 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
-                  router.push(`/backlog/${chapterId}/`);
+                  router.push(`/backlog/${retreatId}/`);
+                  setClicked(3);
                 }}
               >
                 Previous Retreat Events
@@ -235,7 +268,7 @@ const Sidebar = ({
           <Button
             border={"2px black solid"}
             borderRadius="none"
-            backgroundColor={clicked == 4 ? "#54A9DD" : "#F9F9F9"}
+            backgroundColor={pageClicked == 4 ? "#54A9DD" : "#F9F9F9"}
             width="98%"
             height="50px"
             justifyContent="left"
@@ -244,13 +277,13 @@ const Sidebar = ({
             mb="2px"
             p="10px"
             onClick={() => {
-              router.push(`/planning/${chapterId}/`);
+              router.push(`/planning/${retreatId}/`);
               setClicked(4);
             }}
           >
             Fundraising Planning
           </Button>
-          <Grid templateRows="repeat(3, 1fr)" templateColumns="repeat(15, 1fr)">
+          <Grid templateRows="repeat(2, 1fr)" templateColumns="repeat(15, 1fr)">
             <GridItem
               rowSpan={3}
               paddingLeft="15px"
@@ -271,25 +304,10 @@ const Sidebar = ({
                 p="10px"
                 width="98%"
                 justifyContent="left"
-                backgroundColor={clicked == 5 ? "#54A9DD" : "#F9F9F9"}
-                onClick={() => {
-                  router.push(`/fundraising-expenses/${retreatId}/`);
-                  setClicked(5);
-                }}
-              >
-                Expenses
-              </Button>
-            </GridItem>
-            <GridItem colSpan={14}>
-              <Button
-                fontFamily="nunito"
-                borderRadius="none"
-                p="10px"
-                width="98%"
-                justifyContent="left"
-                backgroundColor={clicked == 6 ? "#54A9DD" : "#F9F9F9"}
+                backgroundColor={pageClicked == 6 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
                   handleClick("hospitality");
+                  setClicked(6);
                 }}
               >
                 Hospitality
@@ -302,9 +320,10 @@ const Sidebar = ({
                 p="10px"
                 width="98%"
                 justifyContent="left"
-                backgroundColor={clicked == 7 ? "#54A9DD" : "#F9F9F9"}
+                backgroundColor={pageClicked == 7 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
-                  router.push(`/backlog/fundraiser/${chapterId}/`);
+                  router.push(`/backlog/fundraiser/${retreatId}/`);
+                  setClicked(7);
                 }}
               >
                 Previous Fundraiser Events
@@ -317,7 +336,7 @@ const Sidebar = ({
             p="10px"
             width="98%"
             justifyContent="left"
-            backgroundColor={clicked == 8 ? "#54A9DD" : "#F9F9F9"}
+            backgroundColor={pageClicked == 8 ? "#54A9DD" : "#F9F9F9"}
             onClick={() => {
               setClicked(8);
               router.push(`/funds/${retreatId}/`);
@@ -331,21 +350,39 @@ const Sidebar = ({
             p="10px"
             width="98%"
             justifyContent="left"
-            backgroundColor={clicked == 9 ? "#54A9DD" : "#F9F9F9"}
             onClick={() => {
-              setClicked(9);
+              router.push(`/logout`);
             }}
           >
-            Archive
+            Logout
           </Button>
-          <Image
-            src="/netlify.png"
-            alt="Netlify"
-            height="30px"
-            mt="20px"
-            ml="auto"
-            mr="0px"
-          />
+
+          <HStack>
+            <Button
+              fontFamily="nunito"
+              borderRadius="none"
+              mt="20px"
+              width="50%"
+              justifyContent="left"
+              backgroundColor={pageClicked == 9 ? "#54A9DD" : "#F9F9F9"}
+              color="red"
+              onClick={() => {
+                setClicked(9);
+                deleteModal.onOpen(); // Open the DeleteConfirmation modal using useDisclosure
+              }}
+            >
+              Delete Current Year
+            </Button>
+
+            <Image
+              src="/netlify.png"
+              alt="Netlify"
+              height="30px"
+              mt="20px"
+              ml="auto"
+              mr="0px"
+            />
+          </HStack>
         </Box>
       </Box>
       <NewRetreatYearModal
@@ -353,6 +390,11 @@ const Sidebar = ({
         onClose={onCloseAddYearModal}
         chapterName={chapter.name}
       ></NewRetreatYearModal>
+      <DeleteConfirmation
+        isOpen={deleteModal.isOpen}
+        onClose={deleteModal.onClose}
+        handleDelete={handleDeleteYear}
+      />
     </>
   );
 };
