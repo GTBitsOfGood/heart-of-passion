@@ -7,7 +7,6 @@ import {
   ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
-import { FloatingAlert } from "./FloatingAlert";
 import { NewExpenseForm } from "./NewExpenseForm";
 import { Expense } from "~/common/types";
 

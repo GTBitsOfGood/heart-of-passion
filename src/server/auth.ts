@@ -1,4 +1,4 @@
-import { UserSchema, lucia } from "lucia";
+import { lucia } from "lucia";
 import { nextjs_future } from "lucia/middleware";
 import { mongoose } from "@lucia-auth/adapter-mongoose";
 import { google } from "@lucia-auth/oauth/providers";
@@ -25,6 +25,8 @@ export const auth = lucia({
       ...data,
     };
   },
+
+  csrfProtection: false,
 });
 
 let baseUrl = process.env.BASE_URL ?? "http://localhost:3000";

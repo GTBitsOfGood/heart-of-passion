@@ -14,25 +14,16 @@ import {
   Tooltip,
   useDisclosure,
 } from "@chakra-ui/react";
-import CalendarCard from "src/components/Calendar/CalendarCard";
 
 import "@fontsource/oswald/700.css";
 import { useRouter } from "next/router";
 import { trpc } from "~/utils/api";
 import Sidebar from "~/components/Sidebar";
-import { DateObject } from "~/common/types";
-import { Event } from "~/common/types";
 import { useState, useEffect, useRef } from "react";
-import { computeHeight } from "~/components/Calendar/computeHeight";
 import { IEvent } from "~/server/models/Event";
 import { NewEventModal } from "~/components/NewEventModal";
 import CalendarContent from "../../components/Calendar/CalendarContent";
 
-type EventWithStamp = {
-  event: IEvent;
-  from: string;
-  to: string;
-};
 export default function Calendar() {
   const router = useRouter();
   const { id }: { id?: string } = router.query;
@@ -84,6 +75,9 @@ export default function Calendar() {
       e.removeEventListener("wheel", handler);
     };
   }, []);
+
+  console.log(retreat);
+  console.log(retreat?.year);
   return (
     <Grid gridTemplateColumns="436px 1fr" h="100vh">
       <GridItem zIndex={1000}>
@@ -92,6 +86,7 @@ export default function Calendar() {
             chapter={chapter}
             year={retreat.year}
             retreatId={retreat._id}
+            pageClicked={1}
           />
         )}
       </GridItem>

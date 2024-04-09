@@ -14,10 +14,10 @@ import {
   ModalOverlay,
   VStack,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { trpc } from "~/utils/api";
-import { FloatingAlert } from "./FloatingAlert";
 
 type NewChapterProps = {
   isOpen: boolean;
@@ -41,6 +41,7 @@ export const NewChapterModal = ({
   } = useDisclosure({ defaultIsOpen: false });
 
   const trpcUtils = trpc.useUtils();
+  const toast = useToast();
   const createChapter = trpc.chapter.createChapter.useMutation({
     onSuccess: () => {
       trpcUtils.chapter.invalidate();
@@ -86,7 +87,13 @@ export const NewChapterModal = ({
 
     if (chapter === "") {
       setChapterError(true);
-      onOpenError();
+      toast({
+        title: "ERROR INCOMPLETE FIELDS",
+        description: "Fill in the incomplete fields that are outlined in red!",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
       valid = false;
     } else {
       setChapterError(false);
@@ -154,7 +161,6 @@ export const NewChapterModal = ({
             APPLY
           </Button>
         </ModalFooter>
-        {isError && <FloatingAlert onClose={onCloseError} />}
       </ModalContent>
     </Modal>
   );

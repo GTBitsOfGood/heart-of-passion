@@ -15,11 +15,11 @@ import {
   ModalOverlay,
   VStack,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
 import { Fund } from "~/common/types";
-import { FloatingAlert } from "./FloatingAlert";
 import { trpc } from "~/utils/api";
 
 type NewFundProps = {
@@ -30,18 +30,10 @@ type NewFundProps = {
   retreatId: string;
 };
 
-enum FundError {
+enum Error {
   None, // No error
   Empty, // Empty user
 }
-
-const eventOptions = [
-  "Select Source",
-  "Donation",
-  "Event 1",
-  "Event 2",
-  "Event 3",
-];
 
 export const NewFundModal = ({
   isOpen,
@@ -65,7 +57,10 @@ export const NewFundModal = ({
   }, [fund]);
 
   // Error
-  const [amountError, setAmountError] = useState<FundError>(FundError.None);
+  const [nameError, setNameError] = useState<Error>(Error.None);
+  const [dateError, setDateError] = useState<Error>(Error.None);
+  const [amountError, setAmountError] = useState<Error>(Error.None);
+  const [sourceError, setSourceError] = useState<Error>(Error.None);
 
   const {
     isOpen: isError,
@@ -74,6 +69,7 @@ export const NewFundModal = ({
   } = useDisclosure({ defaultIsOpen: false });
 
   const trpcUtils = trpc.useUtils();
+  const toast = useToast();
   const updateFund = trpc.fund.updateFund.useMutation({
     onSuccess: () => {
       trpcUtils.fund.invalidate();
@@ -93,13 +89,42 @@ export const NewFundModal = ({
     },
   });
 
+  const fundraiserData = trpc.fundraiser.getFundraisers.useQuery(retreatId, {
+    enabled: !!retreatId,
+  }).data;
+
+  const sourceOptions = useMemo(
+    () => ["Other"].concat(fundraiserData?.map((f) => f.name) ?? []),
+    [fundraiserData],
+  );
+
   const onCloseModal = () => {
+    setNameError(Error.None);
+    setDateError(Error.None);
+    setAmountError(Error.None);
+    setSourceError(Error.None);
     onClose();
   };
 
+  const validateFields = () => {
+    setNameError(name === "" ? Error.Empty : Error.None);
+    setDateError(date === "" ? Error.Empty : Error.None);
+    setAmountError(amount === 0 ? Error.Empty : Error.None);
+    setSourceError(source === "Select Source" ? Error.Empty : Error.None);
+    return (
+      name !== "" && date !== "" && amount !== 0 && source !== "Select Source"
+    );
+  };
+
   const handleSave = () => {
-    if (!amount) {
-      setAmountError(FundError.Empty);
+    if (!validateFields()) {
+      toast({
+        title: "ERROR INCOMPLETE FIELDS",
+        description: "Fill in the incomplete fields that are outlined in red!",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
       return false; // Return false to prevent saving
     }
 
@@ -138,9 +163,9 @@ export const NewFundModal = ({
 
     // Validate the input and update the error state
     if (!inputValue) {
-      setAmountError(FundError.Empty);
+      setAmountError(Error.Empty);
     } else {
-      setAmountError(FundError.None);
+      setAmountError(Error.None);
     }
   };
 
@@ -171,7 +196,7 @@ export const NewFundModal = ({
             mt="24px"
           >
             <HStack align="start" spacing="55px">
-              <FormControl>
+              <FormControl isInvalid={nameError !== Error.None}>
                 <FormLabel textColor="black" fontWeight="600" mb="4px">
                   Name*
                 </FormLabel>
@@ -191,7 +216,7 @@ export const NewFundModal = ({
                   <FormErrorMessage mt={0}>Name is required</FormErrorMessage>
                 </Box>
               </FormControl>
-              <FormControl>
+              <FormControl isInvalid={sourceError !== Error.None}>
                 <FormLabel
                   fontFamily="body"
                   fontSize="16px"
@@ -201,15 +226,17 @@ export const NewFundModal = ({
                   Source*
                 </FormLabel>
                 <RadioDropdown
-                  options={eventOptions}
+                  options={sourceOptions}
                   selectedOption={source}
                   setSelectedOption={handleSourceChange}
                 />
-                <FormErrorMessage minHeight="20px" />
+                <Box minHeight="20px" mt={2}>
+                  <FormErrorMessage mt={0}>Source is required</FormErrorMessage>
+                </Box>
               </FormControl>
             </HStack>
             <HStack align="start" spacing="55px">
-              <FormControl>
+              <FormControl isInvalid={dateError !== Error.None}>
                 <FormLabel textColor="black" fontWeight="600" mb="4px">
                   Date*
                 </FormLabel>
@@ -227,10 +254,10 @@ export const NewFundModal = ({
                   required
                 />
                 <Box minHeight="20px" mt={2}>
-                  <FormErrorMessage mt={0}></FormErrorMessage>
+                  <FormErrorMessage mt={0}>Date is required</FormErrorMessage>
                 </Box>
               </FormControl>
-              <FormControl isInvalid={amountError !== FundError.None}>
+              <FormControl isInvalid={amountError !== Error.None}>
                 <FormLabel
                   fontFamily="body"
                   fontSize="16px"
@@ -286,7 +313,6 @@ export const NewFundModal = ({
             APPLY
           </Button>
         </ModalFooter>
-        {isError && <FloatingAlert onClose={onCloseError} />}
       </ModalContent>
     </Modal>
   );

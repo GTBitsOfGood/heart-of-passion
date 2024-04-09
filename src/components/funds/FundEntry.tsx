@@ -19,6 +19,10 @@ export default function Fund({ handleSelectFund, fund }: FundEntryProps) {
         templateColumns="repeat(9, 1fr)"
         gap={4}
         onClick={() => handleSelectFund(fund)}
+        _hover={{
+          backgroundColor: "LightGray",
+          cursor: "pointer",
+        }}
       >
         <GridItem colSpan={2}>
           <Box fontFamily={fonts.nunito}>{formattedDate}</Box>
