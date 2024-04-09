@@ -12,6 +12,7 @@ import {
   ModalContent,
   ModalOverlay,
   Text,
+  Textarea,
   VStack,
   useToast,
 } from "@chakra-ui/react";
@@ -71,7 +72,10 @@ const reducer = (state: State, action: Action): State => {
     case "CLOSE_SIDEBAR":
       return { ...state, expenseFormOpen: false };
     case "TOGGLE_EXPENSE_SIDEBAR":
-      return { ...state, expenseFormOpen: !state.expenseFormOpen };
+      return {
+        ...state,
+        expenseFormOpen: !state.expenseFormOpen,
+      };
     default:
       return state;
   }
@@ -79,13 +83,14 @@ const reducer = (state: State, action: Action): State => {
 
 const initialState: State = {
   fundraiser: {
-    name: "Laser Tag",
+    name: "",
     location: "",
     date: new Date(),
     contactName: "",
     email: "",
     profit: 0,
     expenses: [],
+    notes: "",
   },
   fundraiserId: undefined,
   expenseFormOpen: false,
@@ -193,7 +198,7 @@ export const FundraisingPlanningModal = ({
       <ModalContent
         width={sidebarOpen ? "831px" : "494px"}
         maxWidth={sidebarOpen ? "831px" : "494px"}
-        height="879px"
+        height="979px"
         borderRadius="none"
         boxShadow={"0px 4px 29px 0px #00000040"}
         position="relative"
@@ -248,8 +253,10 @@ export const FundraisingPlanningModal = ({
                       value: e.target.value,
                     });
                   }}
+                  pl="0px"
                 />
               </FormControl>
+
               <Divider borderColor="black" />
 
               <FormControl
@@ -539,6 +546,29 @@ export const FundraisingPlanningModal = ({
                   );
                 })}
               </VStack>
+              <FormControl mt="18px">
+                <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
+                  Notes
+                </FormLabel>
+                <Textarea
+                  color="black"
+                  border="1px solid #D9D9D9"
+                  borderRadius="0px"
+                  width="100%"
+                  value={state.fundraiser.notes ?? ""}
+                  isDisabled={isCopy}
+                  onChange={(e) =>
+                    dispatch({
+                      type: "UPDATE_FUNDRAISER",
+                      field: "notes",
+                      value: e.target.value,
+                    })
+                  }
+                  padding="10px"
+                  resize="none"
+                  height="100px"
+                />
+              </FormControl>
               <Divider mt="10px" borderColor="black" />
               <HStack
                 mt="7px"
@@ -602,8 +632,8 @@ export const FundraisingPlanningModal = ({
                   }`}
                 </Text>
               </HStack>
-              {isCopy ? (
-                <>
+              <HStack width="100%" mt="24px">
+                {isCopy ? (
                   <HStack width="100%" justifyContent="end" mb="34px">
                     <Button
                       fontFamily="heading"
@@ -630,37 +660,37 @@ export const FundraisingPlanningModal = ({
                       Copy
                     </Button>
                   </HStack>
-                </>
-              ) : (
-                <HStack alignSelf="end" mt="24px">
-                  {fundraiser && (
+                ) : (
+                  <HStack alignSelf="end" justifyContent="end" flex={2}>
+                    {fundraiser && (
+                      <Button
+                        fontFamily="heading"
+                        fontSize="20px"
+                        fontWeight="400"
+                        colorScheme="red"
+                        color="hop_red.500"
+                        variant="outline"
+                        onClick={handleDelete}
+                        borderRadius="6px"
+                        mr="13px"
+                      >
+                        DELETE
+                      </Button>
+                    )}
                     <Button
+                      colorScheme="twitter"
+                      bg="hop_blue.500"
+                      borderRadius="6px"
                       fontFamily="heading"
                       fontSize="20px"
                       fontWeight="400"
-                      colorScheme="red"
-                      color="hop_red.500"
-                      variant="outline"
-                      onClick={handleDelete}
-                      borderRadius="6px"
-                      mr="13px"
+                      onClick={handleSubmit}
                     >
-                      DELETE
+                      {fundraiser ? "UPDATE" : "CREATE"}
                     </Button>
-                  )}
-                  <Button
-                    colorScheme="twitter"
-                    bg="hop_blue.500"
-                    borderRadius="6px"
-                    fontFamily="heading"
-                    fontSize="20px"
-                    fontWeight="400"
-                    onClick={handleSubmit}
-                  >
-                    {fundraiser ? "UPDATE" : "CREATE"}
-                  </Button>
-                </HStack>
-              )}
+                  </HStack>
+                )}
+              </HStack>
             </VStack>
           </ModalBody>
           {sidebarOpen && (
@@ -675,23 +705,25 @@ export const FundraisingPlanningModal = ({
               paddingRight="57px"
               paddingTop="73px"
             >
-              <NewExpenseForm
-                expenses={state.fundraiser.expenses}
-                setExpenses={(expenses) => {
-                  dispatch({
-                    type: "UPDATE_FUNDRAISER",
-                    field: "expenses",
-                    value: expenses,
-                  });
-                }}
-                onOpenError={() => {}}
-                onCloseError={() => {}}
-                onCloseSide={() => dispatch({ type: "CLOSE_SIDEBAR" })}
-                selectedExpense={selectedExpense}
-                setSelectedExpense={(e: Expense | undefined) =>
-                  setSelectedExpense(e)
-                }
-              />
+              {state.expenseFormOpen && (
+                <NewExpenseForm
+                  expenses={state.fundraiser.expenses}
+                  setExpenses={(expenses) => {
+                    dispatch({
+                      type: "UPDATE_FUNDRAISER",
+                      field: "expenses",
+                      value: expenses,
+                    });
+                  }}
+                  onOpenError={() => {}}
+                  onCloseError={() => {}}
+                  onCloseSide={() => dispatch({ type: "CLOSE_SIDEBAR" })}
+                  selectedExpense={selectedExpense}
+                  setSelectedExpense={(e: Expense | undefined) =>
+                    setSelectedExpense(e)
+                  }
+                />
+              )}
             </ModalBody>
           )}
         </HStack>
