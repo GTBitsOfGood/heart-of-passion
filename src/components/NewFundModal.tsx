@@ -6,6 +6,8 @@ import {
   FormLabel,
   HStack,
   Input,
+  InputGroup,
+  InputLeftAddon,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -196,9 +198,9 @@ export const NewFundModal = ({
             mt="24px"
           >
             <HStack align="start" spacing="55px">
-              <FormControl isInvalid={nameError !== Error.None}>
+              <FormControl isRequired isInvalid={nameError !== Error.None}>
                 <FormLabel textColor="black" fontWeight="600" mb="4px">
-                  Name*
+                  Name
                 </FormLabel>
                 <Input
                   placeholder="Jane Doe"
@@ -216,14 +218,14 @@ export const NewFundModal = ({
                   <FormErrorMessage mt={0}>Name is required</FormErrorMessage>
                 </Box>
               </FormControl>
-              <FormControl isInvalid={sourceError !== Error.None}>
+              <FormControl isRequired isInvalid={sourceError !== Error.None}>
                 <FormLabel
                   fontFamily="body"
                   fontSize="16px"
                   fontWeight="600"
                   mb="4px"
                 >
-                  Source*
+                  Source
                 </FormLabel>
                 <RadioDropdown
                   options={sourceOptions}
@@ -236,9 +238,9 @@ export const NewFundModal = ({
               </FormControl>
             </HStack>
             <HStack align="start" spacing="55px">
-              <FormControl isInvalid={dateError !== Error.None}>
+              <FormControl isRequired isInvalid={dateError !== Error.None}>
                 <FormLabel textColor="black" fontWeight="600" mb="4px">
-                  Date*
+                  Date
                 </FormLabel>
                 <Input
                   placeholder="2/24/2022"
@@ -257,28 +259,31 @@ export const NewFundModal = ({
                   <FormErrorMessage mt={0}>Date is required</FormErrorMessage>
                 </Box>
               </FormControl>
-              <FormControl isInvalid={amountError !== Error.None}>
+              <FormControl isRequired isInvalid={amountError !== Error.None}>
                 <FormLabel
                   fontFamily="body"
                   fontSize="16px"
                   fontWeight="600"
                   mb="4px"
                 >
-                  Amount*
+                  Amount
                 </FormLabel>
-                <Input
-                  placeholder="$150"
-                  color="#black"
-                  _placeholder={{ color: "#666666" }}
-                  border="1px solid #D9D9D9"
-                  borderRadius="0px"
-                  width="182px"
-                  height="30px"
-                  value={amount}
-                  onChange={handleAmountChange}
-                  type="text"
-                  required
-                />
+                <InputGroup width="182px" height="30px">
+                  <InputLeftAddon height="30px">$</InputLeftAddon>
+                  <Input
+                    width="182px"
+                    height="30px"
+                    placeholder="$150"
+                    color="#black"
+                    _placeholder={{ color: "#666666" }}
+                    border="1px solid #D9D9D9"
+                    borderRadius="0px"
+                    value={amount}
+                    onChange={handleAmountChange}
+                    type="text"
+                    required
+                  />
+                </InputGroup>
                 <Box minHeight="20px" mt={2}>
                   <FormErrorMessage mt={0}>Amount is required</FormErrorMessage>
                 </Box>
