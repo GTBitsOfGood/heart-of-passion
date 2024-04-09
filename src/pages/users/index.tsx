@@ -174,16 +174,10 @@ export default function Users() {
               create={true}
             />
           </Box>
-          <SettingsIcon
-            boxSize="2.5em"
-            position="absolute"
-            right={{ base: "5em", "2xl": "12em" }}
-            top={{ base: "5.6em", "2xl": "6em" }}
-          />
         </Flex>
         {groupsRendered}
         {adminRendered ? (
-          <UserList key={"admin"} title={"admin"} users={...adminRendered} />
+          <UserList key={"admin"} title={"admin"} users={adminRendered} />
         ) : (
           <></>
         )}

@@ -18,9 +18,6 @@ export enum BacklogSort {
 export default function Backlog() {
   const router = useRouter();
   const { id: retreatId }: { id?: string } = router.query;
-  // console.log(retreatId);
-  // const chapterId = retreatId? trpc.retreat.getRetreatById.useQuery(retreatId).data?._id : undefined;
-  // console.log(chapterId);
   const retreat = trpc.retreat.getRetreatById.useQuery(retreatId!, {
     enabled: !!retreatId,
   })?.data;

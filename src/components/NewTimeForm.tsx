@@ -248,7 +248,7 @@ export const NewTimeForm = ({
           fontSize="20px"
           fontWeight="400"
         >
-          APPLY
+          {editing ? "UPDATE" : "ADD"}
         </Button>
       </HStack>
     </VStack>

@@ -12,6 +12,7 @@ import {
   ModalContent,
   ModalOverlay,
   Text,
+  Textarea,
   VStack,
   useToast,
 } from "@chakra-ui/react";
@@ -35,10 +36,12 @@ type State = {
   fundraiser: Fundraiser;
   fundraiserId: string | undefined;
   expenseFormOpen: boolean;
+  notesFormOpen: boolean;
 };
 type Action<T extends keyof Fundraiser = keyof Fundraiser> =
   | { type: "OPEN_EXPENSE_SIDEBAR" }
   | { type: "TOGGLE_EXPENSE_SIDEBAR" }
+  | { type: "TOGGLE_NOTES_SIDEBAR" }
   | { type: "CLOSE_SIDEBAR" }
   | {
       type: "RESET_FORM";
@@ -67,11 +70,21 @@ const reducer = (state: State, action: Action): State => {
         };
       return { ...initialState };
     case "OPEN_EXPENSE_SIDEBAR":
-      return { ...state, expenseFormOpen: true };
+      return { ...state, expenseFormOpen: true, notesFormOpen: false };
     case "CLOSE_SIDEBAR":
-      return { ...state, expenseFormOpen: false };
+      return { ...state, expenseFormOpen: false, notesFormOpen: false };
     case "TOGGLE_EXPENSE_SIDEBAR":
-      return { ...state, expenseFormOpen: !state.expenseFormOpen };
+      return {
+        ...state,
+        expenseFormOpen: !state.expenseFormOpen,
+        notesFormOpen: false,
+      };
+    case "TOGGLE_NOTES_SIDEBAR":
+      return {
+        ...state,
+        notesFormOpen: !state.notesFormOpen,
+        expenseFormOpen: false,
+      };
     default:
       return state;
   }
@@ -79,16 +92,18 @@ const reducer = (state: State, action: Action): State => {
 
 const initialState: State = {
   fundraiser: {
-    name: "Laser Tag",
+    name: "",
     location: "",
     date: new Date(),
     contactName: "",
     email: "",
     profit: 0,
     expenses: [],
+    notes: "",
   },
   fundraiserId: undefined,
   expenseFormOpen: false,
+  notesFormOpen: false,
 };
 
 export const FundraisingPlanningModal = ({
@@ -109,7 +124,7 @@ export const FundraisingPlanningModal = ({
     onClose();
     dispatch({ type: "RESET_FORM", fundraiser, fundraiserId: fundraiser?._id });
   };
-  const sidebarOpen = state.expenseFormOpen;
+  const sidebarOpen = state.expenseFormOpen || state.notesFormOpen;
 
   const validateFields = () => {
     let parsed = fundraiserSchema.safeParse(state.fundraiser);
@@ -193,7 +208,7 @@ export const FundraisingPlanningModal = ({
       <ModalContent
         width={sidebarOpen ? "831px" : "494px"}
         maxWidth={sidebarOpen ? "831px" : "494px"}
-        height="879px"
+        height="979px"
         borderRadius="none"
         boxShadow={"0px 4px 29px 0px #00000040"}
         position="relative"
@@ -248,8 +263,10 @@ export const FundraisingPlanningModal = ({
                       value: e.target.value,
                     });
                   }}
+                  pl="0px"
                 />
               </FormControl>
+
               <Divider borderColor="black" />
 
               <FormControl
@@ -518,6 +535,28 @@ export const FundraisingPlanningModal = ({
                   );
                 })}
               </VStack>
+              <FormControl mt="18px">
+                <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
+                  Notes
+                </FormLabel>
+                <Textarea
+                  color="black"
+                  border="1px solid #D9D9D9"
+                  borderRadius="0px"
+                  width="100%"
+                  value={state.fundraiser.notes ?? ""}
+                  onChange={(e) =>
+                    dispatch({
+                      type: "UPDATE_FUNDRAISER",
+                      field: "notes",
+                      value: e.target.value,
+                    })
+                  }
+                  padding="10px"
+                  resize="none"
+                  height="100px"
+                />
+              </FormControl>
               <Divider mt="10px" borderColor="black" />
               <HStack
                 mt="7px"
@@ -623,6 +662,40 @@ export const FundraisingPlanningModal = ({
                       DELETE
                     </Button>
                   )}
+              <HStack width="100%" mt="24px">
+                <HStack flex={1}>
+                  <Button
+                    colorScheme="twitter"
+                    bg="hop_blue.500"
+                    borderRadius="6px"
+                    fontFamily="heading"
+                    fontSize="20px"
+                    fontWeight="400"
+                    onClick={(e) => {
+                      dispatch({ type: "TOGGLE_NOTES_SIDEBAR" });
+                      setSelectedExpense(undefined);
+                    }}
+                  >
+                    NOTES
+                  </Button>
+                </HStack>
+
+                <HStack alignSelf="end" justifyContent="end" flex={2}>
+                  {fundraiser && (
+                    <Button
+                      fontFamily="heading"
+                      fontSize="20px"
+                      fontWeight="400"
+                      colorScheme="red"
+                      color="hop_red.500"
+                      variant="outline"
+                      onClick={handleDelete}
+                      borderRadius="6px"
+                      mr="13px"
+                    >
+                      DELETE
+                    </Button>
+                  )}
                   <Button
                     colorScheme="twitter"
                     bg="hop_blue.500"
@@ -637,6 +710,7 @@ export const FundraisingPlanningModal = ({
                 </HStack>
               )}
 
+              </HStack>
             </VStack>
           </ModalBody>
           {sidebarOpen && (
@@ -651,23 +725,25 @@ export const FundraisingPlanningModal = ({
               paddingRight="57px"
               paddingTop="73px"
             >
-              <NewExpenseForm
-                expenses={state.fundraiser.expenses}
-                setExpenses={(expenses) => {
-                  dispatch({
-                    type: "UPDATE_FUNDRAISER",
-                    field: "expenses",
-                    value: expenses,
-                  });
-                }}
-                onOpenError={() => {}}
-                onCloseError={() => {}}
-                onCloseSide={() => dispatch({ type: "CLOSE_SIDEBAR" })}
-                selectedExpense={selectedExpense}
-                setSelectedExpense={(e: Expense | undefined) =>
-                  setSelectedExpense(e)
-                }
-              />
+              {state.expenseFormOpen && (
+                <NewExpenseForm
+                  expenses={state.fundraiser.expenses}
+                  setExpenses={(expenses) => {
+                    dispatch({
+                      type: "UPDATE_FUNDRAISER",
+                      field: "expenses",
+                      value: expenses,
+                    });
+                  }}
+                  onOpenError={() => {}}
+                  onCloseError={() => {}}
+                  onCloseSide={() => dispatch({ type: "CLOSE_SIDEBAR" })}
+                  selectedExpense={selectedExpense}
+                  setSelectedExpense={(e: Expense | undefined) =>
+                    setSelectedExpense(e)
+                  }
+                />
+              )}
             </ModalBody>
           )}
         </HStack>

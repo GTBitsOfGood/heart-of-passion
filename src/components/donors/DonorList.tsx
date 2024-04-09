@@ -44,6 +44,7 @@ export default function DonorList({
                   donor.source
                 }
                 {...donor}
+                // width=
               />
             ))
           ) : (

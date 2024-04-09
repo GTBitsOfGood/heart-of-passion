@@ -351,6 +351,18 @@ const Sidebar = ({
           >
             Raised Funds
           </Button>
+          <Button
+            fontFamily="nunito"
+            borderRadius="none"
+            p="10px"
+            width="98%"
+            justifyContent="left"
+            onClick={() => {
+              router.push(`/logout`);
+            }}
+          >
+            Logout
+          </Button>
 
           <Button
             fontFamily="nunito"
