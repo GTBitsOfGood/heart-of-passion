@@ -21,6 +21,7 @@ import { Expense, Fundraiser, fundraiserSchema } from "~/common/types";
 import { NewExpenseForm } from "./NewExpenseForm";
 import { trpc } from "~/utils/api";
 import { IFundraiser } from "~/server/models/Fundraiser";
+import DeleteConfirmation from "./DeleteConfirmation";
 
 type FundraisingPlanningModalProps = {
   isOpen: boolean;
@@ -107,6 +108,8 @@ export const FundraisingPlanningModal = ({
 }: FundraisingPlanningModalProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [selectedExpense, setSelectedExpense] = useState<Expense>();
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
+    useState(false);
 
   const toast = useToast();
 
@@ -162,9 +165,12 @@ export const FundraisingPlanningModal = ({
     },
   });
 
-  const handleDelete = async () => {
-    if (fundraiser) await deleteFundraiser.mutate(fundraiser._id);
+  const handleDelete = () => {
+    setIsDeleteConfirmationOpen(true);
+  };
 
+  const confirmDelete = async () => {
+    if (fundraiser) await deleteFundraiser.mutate(fundraiser._id);
     onCloseModal();
   };
 
@@ -214,7 +220,6 @@ export const FundraisingPlanningModal = ({
             width="494px"
             maxWidth="494px"
             height="100%"
-            // alignSelf="center"
             fontFamily="body"
             paddingInlineEnd="none"
             paddingInlineStart="none"
@@ -227,7 +232,6 @@ export const FundraisingPlanningModal = ({
             <VStack height="100%" spacing="0px">
               <FormControl isRequired mt="23px">
                 <Input
-                  //Enter Fundraiser Name
                   height="53px"
                   minHeight="53px"
                   color="black"
@@ -259,10 +263,7 @@ export const FundraisingPlanningModal = ({
 
               <Divider borderColor="black" />
 
-              <FormControl
-                //Location
-                marginTop="23px"
-              >
+              <FormControl marginTop="23px">
                 <FormLabel
                   mb="10px"
                   fontWeight="500"
@@ -292,18 +293,8 @@ export const FundraisingPlanningModal = ({
                 ></Input>
               </FormControl>
 
-              <HStack
-                //Date - Name of Contact
-                mt="23px"
-                width="100%"
-                justifyContent="space-between"
-              >
-                <FormControl
-                  isRequired
-                  //Date
-                  width="182px"
-                  maxWidth="182px"
-                >
+              <HStack mt="23px" width="100%" justifyContent="space-between">
+                <FormControl isRequired width="182px" maxWidth="182px">
                   <FormLabel
                     mb="10px"
                     fontWeight="500"
@@ -334,12 +325,7 @@ export const FundraisingPlanningModal = ({
                     }}
                   />
                 </FormControl>
-                <FormControl
-                  //Name of Contact
-                  isRequired
-                  width="182px"
-                  maxWidth="182px"
-                >
+                <FormControl isRequired width="182px" maxWidth="182px">
                   <FormLabel
                     mb="10px"
                     fontWeight="500"
@@ -450,7 +436,6 @@ export const FundraisingPlanningModal = ({
 
               <HStack mt="26px" width="100%" justifyContent="space-between">
                 <Text
-                  //Expenses text
                   fontFamily="body"
                   fontSize="20px"
                   fontWeight="500"
@@ -462,7 +447,6 @@ export const FundraisingPlanningModal = ({
                   <></>
                 ) : (
                   <Button
-                    //ADD EXPENSE
                     colorScheme="twitter"
                     bg="hop_blue.500"
                     borderRadius="6px"
@@ -471,7 +455,6 @@ export const FundraisingPlanningModal = ({
                     fontSize="16px"
                     lineHeight="23px"
                     minWidth="auto"
-                    // maxWidth="auto"
                     width="89px"
                     height="28px"
                     onClick={(e) => {
@@ -728,6 +711,11 @@ export const FundraisingPlanningModal = ({
           )}
         </HStack>
       </ModalContent>
+      <DeleteConfirmation
+        isOpen={isDeleteConfirmationOpen}
+        onClose={() => setIsDeleteConfirmationOpen(false)}
+        handleDelete={confirmDelete}
+      />
     </Modal>
   );
 };

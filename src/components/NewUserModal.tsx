@@ -21,7 +21,7 @@ import { useEffect, useState } from "react";
 import { RadioDropdown } from "./RadioDropdown";
 import { User, Role, userSchema, roleSchema, Chapter } from "~/common/types";
 import { trpc } from "~/utils/api";
-import { set } from "lodash";
+import DeleteConfirmation from "./DeleteConfirmation"; // Import DeleteConfirmation component
 
 type NewUserProps = {
   isOpen: boolean;
@@ -133,6 +133,13 @@ export const NewUserModal = ({
     },
   });
 
+  // Hook to control the DeleteConfirmation modal
+  const {
+    isOpen: isDeleteConfirmationOpen,
+    onOpen: onDeleteConfirmationOpen,
+    onClose: onDeleteConfirmationClose,
+  } = useDisclosure();
+
   useEffect(() => {
     if (
       chapter === "" &&
@@ -163,6 +170,11 @@ export const NewUserModal = ({
     onClose();
   };
 
+  // Modify handleDelete to just open the DeleteConfirmation modal
+  const handleDelete = () => {
+    onDeleteConfirmationOpen();
+  };
+
   // Create the user in the backend and update the frontend with dummy data temporarily on success
   const handleSave = () => {
     if (!validateFields()) {
@@ -186,11 +198,6 @@ export const NewUserModal = ({
     } else {
       updateUser.mutate({ email: userData.email, updateData: user });
     }
-    return true;
-  };
-
-  const handleDelete = () => {
-    deleteUser.mutate(userData.email);
     return true;
   };
 
@@ -235,143 +242,153 @@ export const NewUserModal = ({
     setEmail(event.currentTarget.value);
 
   return (
-    <Modal isOpen={isOpen} onClose={onCloseModal} isCentered>
-      <ModalOverlay />
-      <ModalContent
-        width="515px"
-        height="332px"
-        maxWidth="515px"
-        borderRadius="none"
-        boxShadow={"0px 4px 29px 0px #00000040"}
-      >
-        <ModalHeader />
-        <ModalCloseButton
-          borderRadius="50%"
-          outline="solid"
-          width="28px"
-          height="28px"
-        />
-        <ModalBody pl="33px" pr="33px" lineHeight="24px">
-          <VStack
-            fontFamily="body"
-            fontSize="16px"
-            fontWeight="light"
-            alignItems="start"
-            spacing="5px"
-            mt="24px"
-          >
-            <HStack align="start" spacing="55px">
-              <FormControl isInvalid={nameError !== UserError.None}>
-                <FormLabel textColor="black" fontWeight="600" mb="4px">
-                  Name
-                </FormLabel>
-                <Input
-                  placeholder="Jane Doe"
-                  color="black"
-                  _placeholder={{ color: "#666666" }}
-                  border="1px solid #D9D9D9"
-                  borderRadius="0px"
-                  width="240px"
-                  height="30px"
-                  value={name}
-                  onChange={handleNameChange}
-                  required
-                />
-                <Box minHeight="20px" mt={2}>
-                  <FormErrorMessage mt={0}>Name is required</FormErrorMessage>
-                </Box>
-              </FormControl>
-              <FormControl>
-                <FormLabel
-                  fontFamily="body"
-                  fontSize="16px"
-                  fontWeight="600"
-                  mb="4px"
-                >
-                  Permission
-                </FormLabel>
-                <RadioDropdown
-                  options={roleOptions}
-                  selectedOption={role}
-                  setSelectedOption={handleRoleChange}
-                />
-                <FormErrorMessage minHeight="20px" />
-              </FormControl>
-            </HStack>
-            <HStack align="start" spacing="55px">
-              <FormControl isInvalid={emailError !== EmailError.None}>
-                <FormLabel textColor="black" fontWeight="600" mb="4px">
-                  Email
-                </FormLabel>
-                <Input
-                  placeholder="jdoe@gmail.com"
-                  color="#black"
-                  _placeholder={{ color: "#666666" }}
-                  border="1px solid #D9D9D9"
-                  borderRadius="0px"
-                  width="240px"
-                  height="30px"
-                  value={email}
-                  onChange={handleEmailChange}
-                  type="email"
-                  required
-                />
-                <Box minHeight="20px" mt={2}>
-                  <FormErrorMessage mt={0}>
-                    {emailError === EmailError.Empty && "Email is required"}
-                    {emailError === 2 && "Invalid email"}
-                    {emailError === EmailError.Exists && "Email already exists"}
-                  </FormErrorMessage>
-                </Box>
-              </FormControl>
-              <FormControl isDisabled={role === "admin"}>
-                <FormLabel
-                  fontFamily="body"
-                  fontSize="16px"
-                  fontWeight="600"
-                  mb="4px"
-                >
-                  Chapter
-                </FormLabel>
-                <RadioDropdown
-                  options={chapters.data?.map((ch: Chapter) => ch.name) ?? []}
-                  selectedOption={chapter}
-                  setSelectedOption={handleChapterChange}
-                  isDisabled={role === "admin"}
-                />
-                <FormErrorMessage minHeight="20px" />
-              </FormControl>
-            </HStack>
-          </VStack>
-        </ModalBody>
+    <>
+      <Modal isOpen={isOpen} onClose={onCloseModal} isCentered>
+        <ModalOverlay />
+        <ModalContent
+          width="515px"
+          height="332px"
+          maxWidth="515px"
+          borderRadius="none"
+          boxShadow={"0px 4px 29px 0px #00000040"}
+        >
+          <ModalHeader />
+          <ModalCloseButton
+            borderRadius="50%"
+            outline="solid"
+            width="28px"
+            height="28px"
+          />
+          <ModalBody pl="33px" pr="33px" lineHeight="24px">
+            <VStack
+              fontFamily="body"
+              fontSize="16px"
+              fontWeight="light"
+              alignItems="start"
+              spacing="5px"
+              mt="24px"
+            >
+              <HStack align="start" spacing="55px">
+                <FormControl isInvalid={nameError !== UserError.None}>
+                  <FormLabel textColor="black" fontWeight="600" mb="4px">
+                    Name
+                  </FormLabel>
+                  <Input
+                    placeholder="Jane Doe"
+                    color="black"
+                    _placeholder={{ color: "#666666" }}
+                    border="1px solid #D9D9D9"
+                    borderRadius="0px"
+                    width="240px"
+                    height="30px"
+                    value={name}
+                    onChange={handleNameChange}
+                    required
+                  />
+                  <Box minHeight="20px" mt={2}>
+                    <FormErrorMessage mt={0}>Name is required</FormErrorMessage>
+                  </Box>
+                </FormControl>
+                <FormControl>
+                  <FormLabel
+                    fontFamily="body"
+                    fontSize="16px"
+                    fontWeight="600"
+                    mb="4px"
+                  >
+                    Permission
+                  </FormLabel>
+                  <RadioDropdown
+                    options={roleOptions}
+                    selectedOption={role}
+                    setSelectedOption={handleRoleChange}
+                  />
+                  <FormErrorMessage minHeight="20px" />
+                </FormControl>
+              </HStack>
+              <HStack align="start" spacing="55px">
+                <FormControl isInvalid={emailError !== EmailError.None}>
+                  <FormLabel textColor="black" fontWeight="600" mb="4px">
+                    Email
+                  </FormLabel>
+                  <Input
+                    placeholder="jdoe@gmail.com"
+                    color="#black"
+                    _placeholder={{ color: "#666666" }}
+                    border="1px solid #D9D9D9"
+                    borderRadius="0px"
+                    width="240px"
+                    height="30px"
+                    value={email}
+                    onChange={handleEmailChange}
+                    type="email"
+                    required
+                  />
+                  <Box minHeight="20px" mt={2}>
+                    <FormErrorMessage mt={0}>
+                      {emailError === EmailError.Empty && "Email is required"}
+                      {emailError === 2 && "Invalid email"}
+                      {emailError === EmailError.Exists &&
+                        "Email already exists"}
+                    </FormErrorMessage>
+                  </Box>
+                </FormControl>
+                <FormControl isDisabled={role === "admin"}>
+                  <FormLabel
+                    fontFamily="body"
+                    fontSize="16px"
+                    fontWeight="600"
+                    mb="4px"
+                  >
+                    Chapter
+                  </FormLabel>
+                  <RadioDropdown
+                    options={chapters.data?.map((ch: Chapter) => ch.name) ?? []}
+                    selectedOption={chapter}
+                    setSelectedOption={handleChapterChange}
+                    isDisabled={role === "admin"}
+                  />
+                  <FormErrorMessage minHeight="20px" />
+                </FormControl>
+              </HStack>
+            </VStack>
+          </ModalBody>
 
-        <ModalFooter pr="14px" pb="30px" pt="0px">
-          <Button
-            fontSize="20px"
-            fontWeight="400"
-            colorScheme="red"
-            color="hop_red.500"
-            variant="outline"
-            mr="15px"
-            fontFamily="oswald"
-            onClick={handleDelete}
-            isDisabled={create}
-          >
-            DELETE
-          </Button>
-          <Button
-            colorScheme="twitter"
-            bg="hop_blue.500"
-            onClick={handleSave}
-            fontSize="20px"
-            fontWeight="400"
-            fontFamily="oswald"
-            mr="15px"
-          >
-            APPLY
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+          <ModalFooter pr="14px" pb="30px" pt="0px">
+            <Button
+              fontSize="20px"
+              fontWeight="400"
+              colorScheme="red"
+              color="hop_red.500"
+              variant="outline"
+              mr="15px"
+              fontFamily="oswald"
+              onClick={handleDelete}
+              isDisabled={create}
+            >
+              DELETE
+            </Button>
+            <Button
+              colorScheme="twitter"
+              bg="hop_blue.500"
+              onClick={handleSave}
+              fontSize="20px"
+              fontWeight="400"
+              fontFamily="oswald"
+              mr="15px"
+            >
+              APPLY
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <DeleteConfirmation
+        isOpen={isDeleteConfirmationOpen}
+        onClose={onDeleteConfirmationClose}
+        handleDelete={() => {
+          deleteUser.mutate(userData.email);
+        }}
+      />
+    </>
   );
 };

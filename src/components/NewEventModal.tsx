@@ -25,6 +25,7 @@ import { DateObject, Event, Expense, eventSchema } from "~/common/types";
 import { IEvent } from "~/server/models/Event";
 import { z } from "zod";
 import { trpc } from "~/utils/api";
+import DeleteConfirmation from "./DeleteConfirmation";
 
 type NewEventProps = {
   isOpen: boolean;
@@ -120,6 +121,12 @@ export const NewEventModal = ({
     defaultIsOpen: false,
   });
 
+  const {
+    isOpen: isDeleteConfirmationOpen,
+    onOpen: onDeleteConfirmationOpen,
+    onClose: onDeleteConfirmationClose,
+  } = useDisclosure();
+
   useEffect(() => {
     if (eventToEdit) {
       dispatch({ type: "RESET_FORM", event: eventToEdit });
@@ -192,10 +199,7 @@ export const NewEventModal = ({
   });
 
   const deleteEventHandler = () => {
-    if (eventToEdit) {
-      deleteEvent.mutate(eventToEdit._id);
-    }
-    onCloseModal();
+    onDeleteConfirmationOpen();
   };
 
   const toast = useToast();
@@ -217,7 +221,6 @@ export const NewEventModal = ({
       <ModalOverlay />
 
       <ModalContent
-        // width="494px"
         width={sidebarOpen ? "831px" : "494px"}
         maxWidth={sidebarOpen ? "831px" : "494px"}
         height="979px"
@@ -236,7 +239,6 @@ export const NewEventModal = ({
             width="494px"
             maxWidth="494px"
             height="100%"
-            // alignSelf="center"
             fontFamily="body"
             paddingInlineEnd="none"
             paddingInlineStart="none"
@@ -310,7 +312,6 @@ export const NewEventModal = ({
                     border="1px solid #D9D9D9"
                     borderRadius="0px"
                     width="389px"
-                    // height="30px"
                     isReadOnly={isCopy}
                     value={isCopy ? copyEvent?.location : state.event.location}
                     onChange={(e) =>
@@ -321,7 +322,6 @@ export const NewEventModal = ({
                       })
                     }
                     padding="10px"
-                    // required
                   />
                 </FormControl>
                 <FormControl marginTop="29px" isRequired>
@@ -380,7 +380,6 @@ export const NewEventModal = ({
                       fontSize="16px"
                       lineHeight="23px"
                       minWidth="auto"
-                      // maxWidth="auto"
                       width="66px"
                       height="28px"
                     >
@@ -399,10 +398,6 @@ export const NewEventModal = ({
                   overflowY="auto"
                 >
                   {(isCopy ? copyEvent?.dates : state.event.dates)?.map((t) => {
-                    // const isSelected =
-                    //   selectedTime?.day === t.day &&
-                    //   selectedTime?.start === t.start &&
-                    //   selectedTime?.end === t.end;
                     const isSelected = selectedTime === t;
                     const isHovered = hoveredTime === t;
 
@@ -434,8 +429,6 @@ export const NewEventModal = ({
                               ? "hop_blue.500"
                               : "white"
                           }
-                          // paddingLeft: "10px",
-                          // paddingRight: "10px",
                           padding="10px"
                         >
                           {<Text>Day {t.day}</Text>}
@@ -472,7 +465,6 @@ export const NewEventModal = ({
                       fontSize="16px"
                       lineHeight="23px"
                       minWidth="auto"
-                      // maxWidth="auto"
                       width="89px"
                       height="28px"
                     >
@@ -482,7 +474,6 @@ export const NewEventModal = ({
                 </HStack>
                 <VStack
                   mt="8px"
-                  // minHeight="19px"
                   spacing="0px"
                   width="372px"
                   alignItems="end"
@@ -493,7 +484,6 @@ export const NewEventModal = ({
                       display: "none",
                     },
                   }}
-                  // height="148px"
                   maxHeight="90px"
                 >
                   {(isCopy ? copyEvent?.expenses : state.event.expenses)?.map(
@@ -588,32 +578,6 @@ export const NewEventModal = ({
                     0,
                   )}`}</Text>
                 </HStack>
-                {/* {state.event.notes && (
-                  <FormControl marginTop="29px">
-                    <FormLabel
-                      fontWeight="500"
-                      fontSize="20px"
-                      lineHeight="27px"
-                    >
-                      Notes
-                    </FormLabel>
-                    <Textarea
-                      color="black"
-                      border="1px solid #D9D9D9"
-                      borderRadius="0px"
-                      height="150px"
-                      width="389px"
-                      value={state.event.notes}
-                      onChange={(e) =>
-                        dispatch({
-                          type: "UPDATE_EVENT",
-                          field: "notes",
-                          value: e.target.value,
-                        })
-                      }
-                    />
-                  </FormControl>
-                )} */}
               </VStack>
               <HStack width="100%" mb="34px" alignContent="center">
                 <HStack flex={1}></HStack>
@@ -749,6 +713,17 @@ export const NewEventModal = ({
           )}
         </HStack>
       </ModalContent>
+      <DeleteConfirmation
+        isOpen={isDeleteConfirmationOpen}
+        onClose={onDeleteConfirmationClose}
+        handleDelete={() => {
+          if (eventToEdit) {
+            deleteEvent.mutate(eventToEdit._id);
+          }
+          onDeleteConfirmationClose();
+          onCloseModal();
+        }}
+      />
     </Modal>
   );
 };

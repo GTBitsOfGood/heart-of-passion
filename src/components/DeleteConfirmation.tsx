@@ -11,12 +11,10 @@ import {
 
 export default function DeleteConfirmation({
   isOpen,
-  onOpen,
   onClose,
   handleDelete,
 }: {
   isOpen: boolean;
-  onOpen: () => void;
   onClose: () => void;
   handleDelete: () => void;
 }) {

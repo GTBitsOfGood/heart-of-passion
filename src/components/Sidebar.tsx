@@ -12,7 +12,7 @@ import {
 import ChapterProgress from "./chapters/ChapterProgress";
 import { useToast } from "@chakra-ui/react";
 import { Chapter } from "src/common/types";
-import { useCallback, useEffect, useId, useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import Select, { ActionMeta } from "react-select";
 import { trpc } from "~/utils/api";
 import { NewRetreatYearModal } from "./NewRetreatYearModal";
@@ -364,9 +364,12 @@ const Sidebar = ({
               mt="20px"
               width="50%"
               justifyContent="left"
-              backgroundColor={pageClicked == 8 ? "#54A9DD" : "#F9F9F9"}
+              backgroundColor={pageClicked == 9 ? "#54A9DD" : "#F9F9F9"}
               color="red"
-              onClick={deleteModal.onOpen} // Open the DeleteConfirmation modal using useDisclosure
+              onClick={() => {
+                setClicked(9);
+                deleteModal.onOpen(); // Open the DeleteConfirmation modal using useDisclosure
+              }}
             >
               Delete Current Year
             </Button>
@@ -389,7 +392,6 @@ const Sidebar = ({
       ></NewRetreatYearModal>
       <DeleteConfirmation
         isOpen={deleteModal.isOpen}
-        onOpen={deleteModal.onOpen}
         onClose={deleteModal.onClose}
         handleDelete={handleDeleteYear}
       />
