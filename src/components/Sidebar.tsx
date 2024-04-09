@@ -7,6 +7,7 @@ import {
   Box,
   Divider,
   useDisclosure,
+  HStack,
 } from "@chakra-ui/react";
 import ChapterProgress from "./chapters/ChapterProgress";
 import { useToast } from "@chakra-ui/react";
@@ -16,6 +17,7 @@ import Select, { ActionMeta } from "react-select";
 import { trpc } from "~/utils/api";
 import { NewRetreatYearModal } from "./NewRetreatYearModal";
 import { useRouter } from "next/router";
+import DeleteConfirmation from "./DeleteConfirmation"; // Import DeleteConfirmation
 
 interface SidebarProps {
   chapter: Chapter;
@@ -36,6 +38,7 @@ const Sidebar = ({
     onOpen: onOpenAddYearModal,
     onClose: onCloseAddYearModal,
   } = useDisclosure();
+  const deleteModal = useDisclosure(); // Use useDisclosure for DeleteConfirmation modal
   const [clicked, setClicked] = useState(0);
 
   const chapterId = trpc.chapter.getChapterIdByName.useQuery(chapter.name).data;
@@ -73,7 +76,6 @@ const Sidebar = ({
   const toast = useToast();
   function handleDeleteYear() {
     if (options.length <= 2 || !retreatId) return;
-    console.log(options);
 
     deleteRetreat.mutate(retreatId);
     toast({
@@ -83,6 +85,7 @@ const Sidebar = ({
       duration: 3000,
       isClosable: true,
     });
+    deleteModal.onClose(); // Close the modal after deletion using useDisclosure
   }
 
   function handleClick(path: String) {
@@ -94,13 +97,7 @@ const Sidebar = ({
     router.push(`/${path}/${retreatId}`);
   }
 
-  // const [year, setYear] = useState<number>(
-  //   yearProp ?? new Date().getFullYear(),
-  // );
-  // const [selectedYear, setSelectedYear] = useState<number>(year);
-
   console.log(year);
-  // console.log(selectedYear);
 
   const getRetreat = trpc.retreat.getRetreat.useQuery(
     { chapterId: chapterId ?? "", year: year ?? new Date().getFullYear() },
@@ -118,7 +115,6 @@ const Sidebar = ({
     );
 
     if (retreat?.id) {
-      // setSelectedYear(parseInt(value));
       router.push(`/retreat/${retreat.id}`);
     }
   }
@@ -261,7 +257,6 @@ const Sidebar = ({
                 justifyContent="left"
                 backgroundColor={pageClicked == 3 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
-                  // router.push(`/backlog/${chapterId}/`);
                   router.push(`/backlog/${retreatId}/`);
                   setClicked(3);
                 }}
@@ -327,7 +322,6 @@ const Sidebar = ({
                 justifyContent="left"
                 backgroundColor={pageClicked == 7 ? "#54A9DD" : "#F9F9F9"}
                 onClick={() => {
-                  // router.push(`/backlog/fundraiser/${chapterId}/`);
                   router.push(`/backlog/fundraiser/${retreatId}/`);
                   setClicked(7);
                 }}
@@ -363,31 +357,29 @@ const Sidebar = ({
             Logout
           </Button>
 
-          <Button
-            fontFamily="nunito"
-            borderRadius="none"
-            p="10px"
-            width="98%"
-            justifyContent="left"
-            backgroundColor={pageClicked == 8 ? "#54A9DD" : "#F9F9F9"}
-            color="red"
-            onClick={() => {
-              setClicked(9);
-              handleDeleteYear();
-              router.push(`/chapters/${chapterId}/`);
-            }}
-          >
-            Delete Current Year
-          </Button>
+          <HStack>
+            <Button
+              fontFamily="nunito"
+              borderRadius="none"
+              mt="20px"
+              width="50%"
+              justifyContent="left"
+              backgroundColor={pageClicked == 8 ? "#54A9DD" : "#F9F9F9"}
+              color="red"
+              onClick={deleteModal.onOpen} // Open the DeleteConfirmation modal using useDisclosure
+            >
+              Delete Current Year
+            </Button>
 
-          <Image
-            src="/netlify.png"
-            alt="Netlify"
-            height="30px"
-            mt="20px"
-            ml="auto"
-            mr="0px"
-          />
+            <Image
+              src="/netlify.png"
+              alt="Netlify"
+              height="30px"
+              mt="20px"
+              ml="auto"
+              mr="0px"
+            />
+          </HStack>
         </Box>
       </Box>
       <NewRetreatYearModal
@@ -395,6 +387,12 @@ const Sidebar = ({
         onClose={onCloseAddYearModal}
         chapterName={chapter.name}
       ></NewRetreatYearModal>
+      <DeleteConfirmation
+        isOpen={deleteModal.isOpen}
+        onOpen={deleteModal.onOpen}
+        onClose={deleteModal.onClose}
+        handleDelete={handleDeleteYear}
+      />
     </>
   );
 };
