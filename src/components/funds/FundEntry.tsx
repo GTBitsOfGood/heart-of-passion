@@ -7,6 +7,12 @@ type FundEntryProps = {
   fund: Fund;
 };
 export default function Fund({ handleSelectFund, fund }: FundEntryProps) {
+  const formattedDate = new Date(fund.date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+  });
+
   return (
     <>
       <Grid
@@ -19,7 +25,7 @@ export default function Fund({ handleSelectFund, fund }: FundEntryProps) {
         }}
       >
         <GridItem colSpan={2}>
-          <Box fontFamily={fonts.nunito}>{fund.date}</Box>
+          <Box fontFamily={fonts.nunito}>{formattedDate}</Box>
         </GridItem>
         <GridItem colSpan={2}>
           <Box fontFamily={fonts.nunito}>{fund.name}</Box>

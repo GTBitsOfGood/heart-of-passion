@@ -22,6 +22,7 @@ export const appRouter = createTRPCRouter({
   fundraiser: fundraiserRouter,
   fund: fundRouter,
   transaction: transactionRouter
+  transaction: transactionRouter,
 });
 
 // export type definition of API

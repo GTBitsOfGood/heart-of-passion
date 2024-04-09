@@ -33,6 +33,7 @@ export type Donor = z.infer<typeof donorSchema>;
 
 //DonorList
 export const donorListSchema = z.object({
+  includeTitle: z.boolean(),
   title: z.string(),
   donors: z.array(donorSchema),
 });
@@ -160,12 +161,24 @@ export type FundraisersByYear = z.infer<typeof fundraisersByYearSchema>;
 export const transactionSchema = z.object({
   transactionId: z.string(),
   transactionDate: z.string().datetime({ offset: true }),
+  transactionDate: z.string(),
   amount: z.number(),
   payerEmail: z.string().email().or(z.literal("")),
   message: z.string(),
   payerName: z.string(),
 });
 export type Transaction = z.infer<typeof transactionSchema>;
+
+  chapter: z.string(),
+});
+export type Transaction = z.infer<typeof transactionSchema>;
+
+export const transactionListSchema = z.object({
+  includeTitle: z.boolean(),
+  title: z.string(),
+  transactions: z.array(transactionSchema),
+});
+export type TransactionList = z.infer<typeof transactionListSchema>;
 
 export const eventsByYearSchema = z.record(z.number(), z.array(eventSchema));
 export type EventsByYear = z.infer<typeof eventsByYearSchema>;
@@ -189,6 +202,7 @@ export type Fund = z.infer<typeof fundSchema>;
 
 // Fund List
 export const fundListSchema = z.object({
+  includeTitle: z.boolean(),
   title: z.string(),
   funds: z.array(fundSchema),
 });
