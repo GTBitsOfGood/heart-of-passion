@@ -7,7 +7,7 @@ import Sidebar from "~/components/Sidebar";
 import Select from "react-select";
 import FundraisingHandler from "~/components/FundraisingBacklog/FundraisingHandler";
 import FundraisingCopyModal from "~/components/FundraisingBacklog/FundrasingCopyModal";
-import { Event, EventsByYear } from "~/common/types";
+import { Event, EventsByYear, Fundraiser, FundraisersByYear} from "~/common/types";
 
 export enum BacklogSort {
   ViewByDate = "View by Date",
@@ -29,34 +29,41 @@ export default function Backlog() {
   // const chapter = trpc.chapter.getChapterById.useQuery(chapterId!, {
   //   enabled: !!chapterId,
   // })?.data;
-  const eventsByYear: EventsByYear = {
-    2024: [
-      {
-        name: "Yoga and Meditation Retreat",
-        dates: [
-          {
-            from: "9am",
-            day: 1,
-            to: "10am",
-          },
-        ],
-        expenses: [
-          {
-            name: "TestExpense",
-            type: "Entertainment",
-            cost: 1000,
-            numUnits: 1,
-            event: "Test",
-            eventId: "Test",
-            _id: "Test",
-          },
-        ],
-        location: "Mountain Retreat Center",
-        status: "planning",
-        energyLevel: "low",
-      },
-    ],
-  };
+  // const eventsByYear: EventsByYear = {
+  //   2024: [
+  //     {
+  //       name: "Yoga and Meditation Retreat",
+  //       dates: [
+  //         {
+  //           from: "9am",
+  //           day: 1,
+  //           to: "10am",
+  //         },
+  //       ],
+  //       expenses: [
+  //         {
+  //           name: "TestExpense",
+  //           type: "Entertainment",
+  //           cost: 1000,
+  //           numUnits: 1,
+  //           event: "Test",
+  //           eventId: "Test",
+  //           _id: "Test",
+  //         },
+  //       ],
+  //       location: "Mountain Retreat Center",
+  //       status: "planning",
+  //       energyLevel: "low",
+  //     },
+  //   ],
+  // };
+  const eventsByYear = trpc.retreat.getAllFundraisersForChapter.useQuery(
+    chapterId!,
+    {
+      enabled: !!chapterId,
+    },
+  )?.data;
+
   const sortOptions = Object.values(BacklogSort).map((sortMethod) => ({
     value: sortMethod,
     label: sortMethod,
@@ -67,11 +74,41 @@ export default function Backlog() {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const [eventToCopy, setEventToCopy] = useState<Event | undefined>(undefined);
+  const [eventToCopy, setEventToCopy] = useState<Fundraiser | undefined>(undefined);
 
-  const openCopyModal = (event: Event) => {
+  const openCopyModal = (event: Fundraiser) => {
     setEventToCopy(event);
     onOpen();
+  };
+
+  const trpcUtils = trpc.useUtils();
+  const createFundraiserInLatestRetreat = 
+    trpc.fundraiser.createFundraiserInLatestRetreat.useMutation({
+      onSuccess: () => {
+        trpcUtils.fundraiser.invalidate();
+        trpcUtils.retreat.invalidate();
+      },
+    });
+
+  const copyToCurrentRetreat = () => {
+    if (!eventToCopy) return;
+
+    console.log(eventToCopy);
+    let newFundraiser = eventToCopy;
+    newFundraiser.date = new Date(newFundraiser.date);
+
+    createFundraiserInLatestRetreat.mutate({
+      chapterId: chapterId!,
+      eventDetails: newFundraiser,
+    });
+    toast({
+      title: "Success",
+      description: "You successfully copied the event!",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+    onClose();
   };
 
   return (
@@ -150,6 +187,7 @@ export default function Backlog() {
         isOpen={isOpen}
         onOpen={onOpen}
         onClose={onClose}
+        copyToCurrentRetreat={copyToCurrentRetreat}
       />
     </>
   );

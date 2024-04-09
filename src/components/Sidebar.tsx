@@ -9,6 +9,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import ChapterProgress from "./chapters/ChapterProgress";
+import { useToast } from "@chakra-ui/react";
 import { Chapter } from "src/common/types";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import Select, { ActionMeta } from "react-select";
@@ -25,7 +26,7 @@ interface SidebarProps {
 
 const Sidebar = ({
   chapter,
-  year: yearProp,
+  year,
   retreatId: retreatIdProp,
   pageClicked,
 }: SidebarProps) => {
@@ -58,6 +59,32 @@ const Sidebar = ({
 
   const router = useRouter();
 
+  const trpcUtils = trpc.useUtils();
+  const deleteRetreat = trpc.retreat.deleteRetreat.useMutation({
+    onSuccess: () => {
+      trpcUtils.event.invalidate();
+      trpcUtils.fund.invalidate();
+      trpcUtils.fundraiser.invalidate();
+      trpcUtils.retreat.invalidate();
+      trpcUtils.chapter.invalidate();
+    },
+  });
+
+  const toast = useToast();
+  function handleDeleteYear() {
+    if (options.length <= 2 || !retreatId) return;
+    console.log(options);
+
+    deleteRetreat.mutate(retreatId);
+    toast({
+      title: "Success",
+      description: "You successfully deleted current year!",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+  }
+
   function handleClick(path: String) {
     if (!retreatId) {
       // TODO
@@ -67,12 +94,16 @@ const Sidebar = ({
     router.push(`/${path}/${retreatId}`);
   }
 
-  const [year, setYear] = useState<number>(
-    yearProp ?? new Date().getFullYear(),
-  );
+  // const [year, setYear] = useState<number>(
+  //   yearProp ?? new Date().getFullYear(),
+  // );
+  // const [selectedYear, setSelectedYear] = useState<number>(year);
+
+  console.log(year);
+  // console.log(selectedYear);
 
   const getRetreat = trpc.retreat.getRetreat.useQuery(
-    { chapterId: chapterId ?? "", year },
+    { chapterId: chapterId ?? "", year: year ?? new Date().getFullYear() },
     { enabled: false },
   );
 
@@ -87,7 +118,7 @@ const Sidebar = ({
     );
 
     if (retreat?.id) {
-      setYear(parseInt(value));
+      // setSelectedYear(parseInt(value));
       router.push(`/retreat/${retreat.id}`);
     }
   }
@@ -330,6 +361,23 @@ const Sidebar = ({
             }}
           >
             Logout
+          </Button>
+
+          <Button
+            fontFamily="nunito"
+            borderRadius="none"
+            p="10px"
+            width="98%"
+            justifyContent="left"
+            backgroundColor={pageClicked == 8 ? "#54A9DD" : "#F9F9F9"}
+            color="red"
+            onClick={() => {
+              setClicked(9);
+              handleDeleteYear();
+              router.push(`/chapters/${chapterId}/`);
+            }}
+          >
+            Delete Current Year
           </Button>
 
           <Image

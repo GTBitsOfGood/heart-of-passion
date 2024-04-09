@@ -27,18 +27,19 @@ type FundraisingPlanningModalProps = {
   retreatId: string;
   onClose: () => void;
   fundraiser?: IFundraiser;
+  isCopy: boolean;
+  copyFundraiser?: Fundraiser;
+  copyToCurrentRetreat?: () => void;
 };
 
 type State = {
   fundraiser: Fundraiser;
   fundraiserId: string | undefined;
   expenseFormOpen: boolean;
-  notesFormOpen: boolean;
 };
 type Action<T extends keyof Fundraiser = keyof Fundraiser> =
   | { type: "OPEN_EXPENSE_SIDEBAR" }
   | { type: "TOGGLE_EXPENSE_SIDEBAR" }
-  | { type: "TOGGLE_NOTES_SIDEBAR" }
   | { type: "CLOSE_SIDEBAR" }
   | {
       type: "RESET_FORM";
@@ -67,20 +68,13 @@ const reducer = (state: State, action: Action): State => {
         };
       return { ...initialState };
     case "OPEN_EXPENSE_SIDEBAR":
-      return { ...state, expenseFormOpen: true, notesFormOpen: false };
+      return { ...state, expenseFormOpen: true };
     case "CLOSE_SIDEBAR":
-      return { ...state, expenseFormOpen: false, notesFormOpen: false };
+      return { ...state, expenseFormOpen: false };
     case "TOGGLE_EXPENSE_SIDEBAR":
       return {
         ...state,
         expenseFormOpen: !state.expenseFormOpen,
-        notesFormOpen: false,
-      };
-    case "TOGGLE_NOTES_SIDEBAR":
-      return {
-        ...state,
-        notesFormOpen: !state.notesFormOpen,
-        expenseFormOpen: false,
       };
     default:
       return state;
@@ -100,7 +94,6 @@ const initialState: State = {
   },
   fundraiserId: undefined,
   expenseFormOpen: false,
-  notesFormOpen: false,
 };
 
 export const FundraisingPlanningModal = ({
@@ -108,6 +101,9 @@ export const FundraisingPlanningModal = ({
   retreatId,
   onClose,
   fundraiser,
+  isCopy,
+  copyFundraiser,
+  copyToCurrentRetreat,
 }: FundraisingPlanningModalProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [selectedExpense, setSelectedExpense] = useState<Expense>();
@@ -118,7 +114,7 @@ export const FundraisingPlanningModal = ({
     onClose();
     dispatch({ type: "RESET_FORM", fundraiser, fundraiserId: fundraiser?._id });
   };
-  const sidebarOpen = state.expenseFormOpen || state.notesFormOpen;
+  const sidebarOpen = state.expenseFormOpen;
 
   const validateFields = () => {
     let parsed = fundraiserSchema.safeParse(state.fundraiser);
@@ -248,7 +244,8 @@ export const FundraisingPlanningModal = ({
                   _focusVisible={{
                     outline: "none",
                   }}
-                  value={state.fundraiser.name}
+                  isReadOnly={isCopy ? true : false}
+                  value={isCopy ? copyFundraiser?.name : state.fundraiser.name}
                   onChange={(e) => {
                     dispatch({
                       type: "UPDATE_FUNDRAISER",
@@ -279,7 +276,12 @@ export const FundraisingPlanningModal = ({
                   color="black"
                   border="1px solid #D9D9D9"
                   borderRadius="0px"
-                  value={state.fundraiser.location}
+                  isReadOnly={isCopy ? true : false}
+                  value={
+                    isCopy
+                      ? copyFundraiser?.location
+                      : state.fundraiser.location
+                  }
                   onChange={(e) => {
                     dispatch({
                       type: "UPDATE_FUNDRAISER",
@@ -315,7 +317,14 @@ export const FundraisingPlanningModal = ({
                     type="date"
                     border="1px solid #D9D9D9"
                     borderRadius="0px"
-                    value={state.fundraiser.date.toISOString().split("T")[0]}
+                    isReadOnly={isCopy ? true : false}
+                    value={
+                      isCopy && copyFundraiser
+                        ? new Date(copyFundraiser.date)
+                            .toISOString()
+                            .split("T")[0]
+                        : state.fundraiser.date.toISOString().split("T")[0]
+                    }
                     onChange={(e) => {
                       dispatch({
                         type: "UPDATE_FUNDRAISER",
@@ -344,7 +353,12 @@ export const FundraisingPlanningModal = ({
                     color="black"
                     border="1px solid #D9D9D9"
                     borderRadius="0px"
-                    value={state.fundraiser.contactName}
+                    isReadOnly={isCopy ? true : false}
+                    value={
+                      isCopy
+                        ? copyFundraiser?.contactName
+                        : state.fundraiser.contactName
+                    }
                     onChange={(e) => {
                       dispatch({
                         type: "UPDATE_FUNDRAISER",
@@ -370,7 +384,10 @@ export const FundraisingPlanningModal = ({
                   color="black"
                   border="1px solid #D9D9D9"
                   borderRadius="0px"
-                  value={state.fundraiser.email}
+                  isReadOnly={isCopy ? true : false}
+                  value={
+                    isCopy ? copyFundraiser?.email : state.fundraiser.email
+                  }
                   onChange={(e) => {
                     dispatch({
                       type: "UPDATE_FUNDRAISER",
@@ -416,7 +433,10 @@ export const FundraisingPlanningModal = ({
                     paddingInlineStart="none"
                     paddingInlineEnd="none"
                     _focusVisible={{ outline: "none" }}
-                    value={state.fundraiser.profit}
+                    isReadOnly={isCopy ? true : false}
+                    value={
+                      isCopy ? copyFundraiser?.profit : state.fundraiser.profit
+                    }
                     onChange={(e) => {
                       dispatch({
                         type: "UPDATE_FUNDRAISER",
@@ -438,30 +458,34 @@ export const FundraisingPlanningModal = ({
                 >
                   Expenses
                 </Text>
-                <Button
-                  //ADD EXPENSE
-                  colorScheme="twitter"
-                  bg="hop_blue.500"
-                  borderRadius="6px"
-                  fontFamily="heading"
-                  fontWeight="400"
-                  fontSize="16px"
-                  lineHeight="23px"
-                  minWidth="auto"
-                  // maxWidth="auto"
-                  width="89px"
-                  height="28px"
-                  onClick={(e) => {
-                    if (selectedExpense === undefined) {
-                      dispatch({ type: "TOGGLE_EXPENSE_SIDEBAR" });
-                      return;
-                    }
-                    setSelectedExpense(undefined);
-                    dispatch({ type: "OPEN_EXPENSE_SIDEBAR" });
-                  }}
-                >
-                  ADD EXPENSE
-                </Button>
+                {isCopy ? (
+                  <></>
+                ) : (
+                  <Button
+                    //ADD EXPENSE
+                    colorScheme="twitter"
+                    bg="hop_blue.500"
+                    borderRadius="6px"
+                    fontFamily="heading"
+                    fontWeight="400"
+                    fontSize="16px"
+                    lineHeight="23px"
+                    minWidth="auto"
+                    // maxWidth="auto"
+                    width="89px"
+                    height="28px"
+                    onClick={(e) => {
+                      if (selectedExpense === undefined) {
+                        dispatch({ type: "TOGGLE_EXPENSE_SIDEBAR" });
+                        return;
+                      }
+                      setSelectedExpense(undefined);
+                      dispatch({ type: "OPEN_EXPENSE_SIDEBAR" });
+                    }}
+                  >
+                    ADD EXPENSE
+                  </Button>
+                )}
               </HStack>
               <VStack
                 mt="7px"
@@ -476,19 +500,24 @@ export const FundraisingPlanningModal = ({
                   },
                 }}
               >
-                {state.fundraiser.expenses.map((e, i) => {
+                {(isCopy
+                  ? copyFundraiser?.expenses
+                  : state.fundraiser.expenses
+                )?.map((e, i) => {
                   const isSelected = e === selectedExpense;
                   return (
                     <button
                       key={i}
                       onClick={() => {
-                        if (isSelected) {
-                          setSelectedExpense(undefined);
-                          dispatch({ type: "CLOSE_SIDEBAR" });
-                          return;
+                        if (!isCopy) {
+                          if (isSelected) {
+                            setSelectedExpense(undefined);
+                            dispatch({ type: "CLOSE_SIDEBAR" });
+                            return;
+                          }
+                          setSelectedExpense(e);
+                          dispatch({ type: "OPEN_EXPENSE_SIDEBAR" });
                         }
-                        setSelectedExpense(e);
-                        dispatch({ type: "OPEN_EXPENSE_SIDEBAR" });
                       }}
                     >
                       <HStack
@@ -527,6 +556,7 @@ export const FundraisingPlanningModal = ({
                   borderRadius="0px"
                   width="100%"
                   value={state.fundraiser.notes ?? ""}
+                  isDisabled={isCopy}
                   onChange={(e) =>
                     dispatch({
                       type: "UPDATE_FUNDRAISER",
@@ -560,7 +590,10 @@ export const FundraisingPlanningModal = ({
                   lineHeight="24px"
                   pr="10px"
                 >
-                  {`$${state.fundraiser.expenses.reduce(
+                  {`$${(isCopy
+                    ? copyFundraiser?.expenses
+                    : state.fundraiser.expenses
+                  )?.reduce(
                     (acc, cv) =>
                       acc + cv.cost * (cv.numUnits ? cv.numUnits : 1),
                     0,
@@ -583,34 +616,25 @@ export const FundraisingPlanningModal = ({
                   pr="10px"
                 >
                   {`$${
-                    state.fundraiser.expenses.reduce(
-                      (acc, cv) =>
-                        acc + cv.cost * (cv.numUnits ? cv.numUnits : 1),
-                      0,
-                    ) + state.fundraiser.profit
+                    isCopy
+                      ? copyFundraiser
+                        ? copyFundraiser.expenses.reduce(
+                            (acc, cv) =>
+                              acc + cv.cost * (cv.numUnits ? cv.numUnits : 1),
+                            0,
+                          ) + copyFundraiser.profit
+                        : 0
+                      : state.fundraiser.expenses.reduce(
+                          (acc, cv) =>
+                            acc + cv.cost * (cv.numUnits ? cv.numUnits : 1),
+                          0,
+                        ) + state.fundraiser.profit
                   }`}
                 </Text>
               </HStack>
               <HStack width="100%" mt="24px">
-                <HStack flex={1}>
-                  <Button
-                    colorScheme="twitter"
-                    bg="hop_blue.500"
-                    borderRadius="6px"
-                    fontFamily="heading"
-                    fontSize="20px"
-                    fontWeight="400"
-                    onClick={(e) => {
-                      dispatch({ type: "TOGGLE_NOTES_SIDEBAR" });
-                      setSelectedExpense(undefined);
-                    }}
-                  >
-                    NOTES
-                  </Button>
-                </HStack>
-
-                <HStack alignSelf="end" justifyContent="end" flex={2}>
-                  {fundraiser && (
+                {isCopy ? (
+                  <HStack width="100%" justifyContent="end" mb="34px">
                     <Button
                       fontFamily="heading"
                       fontSize="20px"
@@ -618,25 +642,54 @@ export const FundraisingPlanningModal = ({
                       colorScheme="red"
                       color="hop_red.500"
                       variant="outline"
-                      onClick={handleDelete}
+                      onClick={onClose}
                       borderRadius="6px"
                       mr="13px"
                     >
-                      DELETE
+                      Close
                     </Button>
-                  )}
-                  <Button
-                    colorScheme="twitter"
-                    bg="hop_blue.500"
-                    borderRadius="6px"
-                    fontFamily="heading"
-                    fontSize="20px"
-                    fontWeight="400"
-                    onClick={handleSubmit}
-                  >
-                    {fundraiser ? "UPDATE" : "CREATE"}
-                  </Button>
-                </HStack>
+                    <Button
+                      colorScheme="twitter"
+                      bg="hop_blue.500"
+                      borderRadius="6px"
+                      fontFamily="heading"
+                      fontSize="20px"
+                      fontWeight="400"
+                      onClick={copyToCurrentRetreat}
+                    >
+                      Copy
+                    </Button>
+                  </HStack>
+                ) : (
+                  <HStack alignSelf="end" justifyContent="end" flex={2}>
+                    {fundraiser && (
+                      <Button
+                        fontFamily="heading"
+                        fontSize="20px"
+                        fontWeight="400"
+                        colorScheme="red"
+                        color="hop_red.500"
+                        variant="outline"
+                        onClick={handleDelete}
+                        borderRadius="6px"
+                        mr="13px"
+                      >
+                        DELETE
+                      </Button>
+                    )}
+                    <Button
+                      colorScheme="twitter"
+                      bg="hop_blue.500"
+                      borderRadius="6px"
+                      fontFamily="heading"
+                      fontSize="20px"
+                      fontWeight="400"
+                      onClick={handleSubmit}
+                    >
+                      {fundraiser ? "UPDATE" : "CREATE"}
+                    </Button>
+                  </HStack>
+                )}
               </HStack>
             </VStack>
           </ModalBody>

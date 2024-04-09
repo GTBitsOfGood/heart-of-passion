@@ -75,6 +75,9 @@ export default function Calendar() {
       e.removeEventListener("wheel", handler);
     };
   }, []);
+
+  console.log(retreat);
+  console.log(retreat?.year);
   return (
     <Grid gridTemplateColumns="436px 1fr" h="100vh">
       <GridItem zIndex={1000}>

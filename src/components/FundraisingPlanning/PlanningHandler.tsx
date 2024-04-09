@@ -89,6 +89,7 @@ function PlanningYearContainer({
         isOpen={isOpen}
         retreatId={""}
         fundraiser={editingFundraiser}
+        isCopy={false}
         onClose={onClose}
       />
     </Box>

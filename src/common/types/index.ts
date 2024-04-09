@@ -154,6 +154,8 @@ export const savedFundraiserSchema = fundraiserSchema.extend({
 });
 
 export type Fundraiser = z.infer<typeof fundraiserSchema>;
+export const fundraisersByYearSchema = z.record(z.number(), z.array(fundraiserSchema));
+export type FundraisersByYear = z.infer<typeof fundraisersByYearSchema>;
 
 export const eventsByYearSchema = z.record(z.number(), z.array(eventSchema));
 export type EventsByYear = z.infer<typeof eventsByYearSchema>;

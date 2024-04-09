@@ -85,8 +85,9 @@ export const NewRetreatYearModal = ({
       chapterId: chapterId ?? "",
       year: parseInt(year),
     };
-    await createRetreat.mutate(retreat);
-
+    const result = await createRetreat.mutateAsync(retreat);
+    console.log(result._id);
+    router.push(`/retreat/${result._id}`);
     onCloseModal();
   };
 

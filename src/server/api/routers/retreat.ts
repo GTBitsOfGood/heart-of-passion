@@ -10,6 +10,9 @@ import {
 import { IRetreat, RetreatModel } from "~/server/models/Retreat";
 import { EventModel, IEvent } from "~/server/models/Event";
 import { Event, eventsByYearSchema } from "~/common/types";
+import { Fundraiser, fundraisersByYearSchema} from "~/common/types";
+import { FundraiserModel } from "~/server/models/Fundraiser";
+import { FundModel } from "~/server/models/Fund";
 
 export const retreatRouter = createTRPCRouter({
   createRetreat: mentorProcedure
@@ -117,4 +120,34 @@ export const retreatRouter = createTRPCRouter({
 
       return eventsByYear;
     }),
+
+  getAllFundraisersForChapter: studentProcedure
+    .input(z.string())
+    .query(async (opts) => {
+      const retreats: IRetreat[] = await RetreatModel.find({
+        chapterId: opts.input,
+      }).exec();
+
+      let fundraisersByYear: { [year: number]: Fundraiser[] } = {};
+
+      for (const retreat of retreats) {
+        if (!fundraisersByYear[retreat.year]) {
+          fundraisersByYear[retreat.year] = [];
+        }
+
+        const fundraisers = await FundraiserModel.find({ retreatId: retreat._id }).exec();
+        for (const fundraiser of fundraisers) {
+          fundraisersByYear[retreat.year]!.push(fundraiser);
+        }
+      }
+
+      return fundraisersByYear;
+    }),
+
+  deleteRetreat: mentorProcedure.input(z.string()).mutation(async ({ input }) => {
+      await EventModel.deleteMany({ retreatId: input}).exec();
+      await FundModel.deleteMany({ retreatId: input}).exec();
+      await FundraiserModel.deleteMany({ retreatId: input}).exec();
+      await RetreatModel.findByIdAndDelete(input).exec();
+  }),
 });
