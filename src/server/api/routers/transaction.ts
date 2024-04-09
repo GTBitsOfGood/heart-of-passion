@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { Transaction, transactionSchema } from "~/common/types";
 import { Chapter, Transaction, transactionSchema } from "~/common/types";
 
 import {
@@ -98,10 +99,12 @@ export const transactionRouter = createTRPCRouter({
   storeTransaction: studentProcedure
     .input(
       z.object({
+        chapterId: z.string(),
         transactionDetails: transactionSchema,
       }),
     )
     .mutation(async ({ input }) => {
+      const { chapterId, transactionDetails } = input;
       const { transactionDetails } = input;
       // const transaction = new TransactionModel({
       //   chapterId,
@@ -111,6 +114,11 @@ export const transactionRouter = createTRPCRouter({
       const transactionId = transactionDetails.transactionId;
       await TransactionModel.updateOne(
         { transactionId },
+        { $set: { chapterId, ...transactionDetails } },
+        { upsert: true },
+      );
+    }),
+});
         { $set: { ...transactionDetails } },
         { upsert: true },
       );
