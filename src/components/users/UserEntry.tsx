@@ -20,7 +20,7 @@ export default function Users({ name, email, role, chapter }: User) {
         alignItems="center"
         py="0.2em"
         onClick={onOpenAddUserModal}
-        _hover={{ bg: "lightgrey" }}
+        _hover={{ bg: "lightgrey", cursor: "pointer" }}
         borderRadius={5}
       >
         <Box fontFamily={fonts.nunito} minW="10%">
