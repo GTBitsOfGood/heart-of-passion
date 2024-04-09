@@ -154,20 +154,15 @@ export const savedFundraiserSchema = fundraiserSchema.extend({
 });
 
 export type Fundraiser = z.infer<typeof fundraiserSchema>;
-export const fundraisersByYearSchema = z.record(z.number(), z.array(fundraiserSchema));
+export const fundraisersByYearSchema = z.record(
+  z.number(),
+  z.array(fundraiserSchema),
+);
 export type FundraisersByYear = z.infer<typeof fundraisersByYearSchema>;
 
 export const eventsByYearSchema = z.record(z.number(), z.array(eventSchema));
 export type EventsByYear = z.infer<typeof eventsByYearSchema>;
 
-// Fund
-/*
-export const fundDateSchema = z.object({
-  month: z.number(),
-  date: z.number(),
-  year: z.number(),
-});
-*/
 export const fundSchema = z.object({
   _id: z.string().optional(),
   name: z.string(),
@@ -183,3 +178,14 @@ export const fundListSchema = z.object({
   funds: z.array(fundSchema),
 });
 export type FundList = z.infer<typeof fundListSchema>;
+
+export const formDonationSchema = z.object({
+  referenceNumber: z.string(),
+  name: z.string(),
+  amount: z.number(),
+  chapterId: z.string().optional(),
+  date: z.date(),
+  note: z.string().optional(),
+});
+
+export type FormDonation = z.infer<typeof formDonationSchema>;

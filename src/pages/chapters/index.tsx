@@ -9,7 +9,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import ChapterCard from "~/components/chapters/ChapterCard";
-import { IoMdPeople } from "react-icons/io";
+import { IoMdPeople, IoIosCash } from "react-icons/io";
 import "@fontsource/oswald/600.css";
 import { NewChapterModal } from "~/components/NewChapterModal";
 import { useRef } from "react";
@@ -23,7 +23,6 @@ export default function Home() {
     onOpen: onOpenAddChapterModal,
     onClose: onCloseAddChapterModal,
   } = useDisclosure();
-  const finalRef = useRef(null);
 
   // Get all the chapters from the backend and populate the frontend afterwards
   let chapters = trpc.chapter.getChapters.useQuery();
@@ -32,7 +31,7 @@ export default function Home() {
 
   return (
     <Box m="2%">
-      <Grid templateColumns="repeat(8, 1fr)" mb="3%">
+      <Grid templateColumns="repeat(9, 1fr)" mb="3%">
         <GridItem>
           <Image src="/logo.png" alt="Heart of Passion Logo" height="120px" />
         </GridItem>
@@ -57,7 +56,7 @@ export default function Home() {
             create={true}
           />
         </GridItem>
-        <GridItem alignSelf="flex-end">
+        <GridItem alignSelf="flex-end" colSpan={2}>
           <IconButton
             aria-label="settings"
             variant="ghost"
@@ -68,6 +67,21 @@ export default function Home() {
                 size="50px"
                 onClick={() => {
                   router.push("/users");
+                }}
+              />
+            }
+          />
+          <IconButton
+            aria-label="settings"
+            variant="ghost"
+            height="50px"
+            width="50px"
+            ml="10px"
+            icon={
+              <IoIosCash
+                size="50px"
+                onClick={() => {
+                  router.push("/form-donations");
                 }}
               />
             }
