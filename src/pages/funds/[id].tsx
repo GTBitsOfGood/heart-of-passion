@@ -25,7 +25,7 @@ import { IChapter } from "~/server/models/Chapter";
 import { NewFundModal } from "~/components/NewFundModal";
 
 export default function RaisedFunds() {
-  const [filter, setFilter] = useState("date");
+  const [filter, setFilter] = useState("category");
   const [selectedFund, setSelectedFund] = useState<Fund | null>(null);
 
   const {
@@ -84,9 +84,9 @@ export default function RaisedFunds() {
               source: e.source,
             }),
         );
+
         return uniqueSources
           .map((e: string) => ({
-            includeTitle: true,
             title: e,
             funds: emap.get(e)!,
           }))
@@ -94,15 +94,11 @@ export default function RaisedFunds() {
       } else if (filter === "highest amount") {
         // Sort by amount descending (highest to lowest)
         funds.sort((a, b) => b.amount - a.amount);
-        return [
-          { includeTitle: false, title: "Highest to Lowest", funds: funds },
-        ];
+        return [{ title: "Highest to Lowest", funds: funds }];
       } else if (filter === "lowest amount") {
         // Sort by amount ascending (lowest to highest)
         funds.sort((a, b) => a.amount - b.amount);
-        return [
-          { includeTitle: false, title: "Lowest to Highest", funds: funds },
-        ];
+        return [{ title: "Lowest to Highest", funds: funds }];
       } else {
         // Sort by date ascending (earliest to latest)
         funds.sort((a, b) => {
@@ -112,21 +108,12 @@ export default function RaisedFunds() {
           return dateA.getTime() - dateB.getTime();
           // return new Date(a.date).getTime() - new Date(b.date).getTime();
         });
-        return [{ includeTitle: false, title: "Date", funds: funds }];
+        return [{ title: "Date", funds: funds }];
       }
     } else {
       return [];
     }
   })();
-
-  const groupsRendered = groups.map((gr: any) => (
-    <FundList
-      handleSelectFund={handleSelectFund}
-      includeTitle={gr.includeTitle}
-      key={gr.title}
-      {...gr}
-    />
-  ));
 
   if (!chapter || !retreat) {
     return <div>Loading...</div>;

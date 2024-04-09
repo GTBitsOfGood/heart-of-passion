@@ -4,9 +4,6 @@ import { useState } from "react";
 import DonorEntry from "./DonorEntry";
 import { Donor, DonorList } from "src/common/types";
 
-
-// export default function DonorList({ includeTitle, title, donors }: DonorList) {
-
 interface DonorListProps extends DonorList {
   retreatId: string;
 }
@@ -24,16 +21,14 @@ export default function DonorList({
         <Flex
           justifyContent="space-between"
           onClick={() => setOpen(!open)}
-          borderBottom={includeTitle ? "1px solid #AEAEAE" : "none"}
-          p={includeTitle ? ".5em" : "none"}
-          marginBottom={includeTitle ? "1em" : "none"}
+          borderBottom="1px #AEAEAE solid"
+          p=".5em"
+          marginBottom="1em"
         >
-          {includeTitle && (
-            <Heading size="md" textTransform="capitalize">
-              {title}
-            </Heading>
-          )}
-          {includeTitle && (open ? <TriangleUpIcon /> : <TriangleDownIcon />)}
+          <Heading size="md" textTransform="capitalize">
+            {title}
+          </Heading>
+          {open ? <TriangleUpIcon /> : <TriangleDownIcon />}
         </Flex>
         <Stack pl="3em" gap="1em">
           {open ? (

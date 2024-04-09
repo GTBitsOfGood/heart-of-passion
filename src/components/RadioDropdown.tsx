@@ -6,7 +6,6 @@ import {
   Radio,
   RadioGroup,
   Stack,
-  Box,
 } from "@chakra-ui/react";
 import { DownArrowIcon } from "~/common/theme/icons";
 
@@ -30,7 +29,7 @@ export const RadioDropdown = ({
         variant="outline"
         rightIcon={<DownArrowIcon width="22px" height="auto" />}
         fontWeight="400"
-        bg={selectedOption == "Unclassified" ? "#FFDEDF" : "#DEEBFF"}
+        bg="#DEEBFF"
         minWidth="103px"
         width="fit-content"
         height="fit-content"
@@ -62,15 +61,7 @@ export const RadioDropdown = ({
         >
           <Stack direction="column" justify="center" spacing="11px">
             {options.map((option) => (
-              <Radio
-                key={option}
-                value={option}
-                variant={
-                  option == "Unclassified"
-                    ? "customRadioUnclassified"
-                    : "customRadio"
-                }
-              >
+              <Radio key={option} value={option} variant="customRadio">
                 {option}
               </Radio>
             ))}

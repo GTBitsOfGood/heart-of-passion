@@ -72,19 +72,17 @@ export default function Donors() {
         const emap = new Map(uniques.map((e) => [e, new Array()])); // map of val to empty array
         donors?.forEach((e) => emap.get(e.studentName)?.push(e));
         return uniques?.map((e) => ({
-          includeTitle: true,
           title: e,
           donors: emap.get(e) || [],
         }));
       } else if (filter === "donorName") {
         donors.sort((a, b) => a.donorName.localeCompare(b.donorName)); // Sort alphabetically
-        return [{ includeTitle: false, title: "Donor Names", donors: donors }];
+        return [{ title: "Donor Names", donors: donors }];
       } else if (filter === "status") {
         const uniques = [...new Set(donors?.map((u) => u.status))]; // array of unique vals
         const emap = new Map(uniques.map((e) => [e, new Array()])); // map of val to empty array
         donors?.forEach((e) => emap.get(e.status)?.push(e));
         return uniques?.map((e) => ({
-          includeTitle: true,
           title: e,
           donors: emap.get(e) || [],
         }));
@@ -93,7 +91,6 @@ export default function Donors() {
         const emap = new Map(uniques.map((e) => [e, new Array()])); // map of val to empty array
         donors?.forEach((e) => emap.get(e.sponsorLevel)?.push(e));
         return uniques?.map((e) => ({
-          includeTitle: true,
           title: e,
           donors: emap.get(e) || [],
         }));
@@ -102,7 +99,6 @@ export default function Donors() {
         const emap = new Map(uniques.map((e) => [e, new Array()])); // map of val to empty array
         donors?.forEach((e) => emap.get(e.source)?.push(e));
         return uniques?.map((e) => ({
-          includeTitle: true,
           title: e,
           donors: emap.get(e) || [],
         }));
@@ -112,7 +108,7 @@ export default function Donors() {
     }
   })();
   const groupsRendered = groups.map((gr: any) => (
-    <DonorList includeTitle={gr.includeTitle} key={gr.title} {...gr} />
+    <DonorList key={gr.title} {...gr} />
   ));
 
   return (
