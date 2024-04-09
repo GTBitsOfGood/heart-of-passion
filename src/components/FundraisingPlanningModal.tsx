@@ -12,7 +12,6 @@ import {
   ModalContent,
   ModalOverlay,
   Text,
-  Textarea,
   VStack,
   useToast,
 } from "@chakra-ui/react";
@@ -36,12 +35,10 @@ type State = {
   fundraiser: Fundraiser;
   fundraiserId: string | undefined;
   expenseFormOpen: boolean;
-  notesFormOpen: boolean;
 };
 type Action<T extends keyof Fundraiser = keyof Fundraiser> =
   | { type: "OPEN_EXPENSE_SIDEBAR" }
   | { type: "TOGGLE_EXPENSE_SIDEBAR" }
-  | { type: "TOGGLE_NOTES_SIDEBAR" }
   | { type: "CLOSE_SIDEBAR" }
   | {
       type: "RESET_FORM";
@@ -70,21 +67,11 @@ const reducer = (state: State, action: Action): State => {
         };
       return { ...initialState };
     case "OPEN_EXPENSE_SIDEBAR":
-      return { ...state, expenseFormOpen: true, notesFormOpen: false };
+      return { ...state, expenseFormOpen: true };
     case "CLOSE_SIDEBAR":
-      return { ...state, expenseFormOpen: false, notesFormOpen: false };
+      return { ...state, expenseFormOpen: false };
     case "TOGGLE_EXPENSE_SIDEBAR":
-      return {
-        ...state,
-        expenseFormOpen: !state.expenseFormOpen,
-        notesFormOpen: false,
-      };
-    case "TOGGLE_NOTES_SIDEBAR":
-      return {
-        ...state,
-        notesFormOpen: !state.notesFormOpen,
-        expenseFormOpen: false,
-      };
+      return { ...state, expenseFormOpen: !state.expenseFormOpen };
     default:
       return state;
   }
@@ -92,25 +79,23 @@ const reducer = (state: State, action: Action): State => {
 
 const initialState: State = {
   fundraiser: {
-    name: "",
+    name: "Laser Tag",
     location: "",
     date: new Date(),
     contactName: "",
     email: "",
     profit: 0,
     expenses: [],
-    notes: "",
   },
   fundraiserId: undefined,
   expenseFormOpen: false,
-  notesFormOpen: false,
 };
 
 export const FundraisingPlanningModal = ({
   isOpen,
   retreatId,
   onClose,
-  fundraiser,  
+  fundraiser,
   isCopy,
   copyFundraiser,
   copyToCurrentRetreat,
@@ -124,7 +109,7 @@ export const FundraisingPlanningModal = ({
     onClose();
     dispatch({ type: "RESET_FORM", fundraiser, fundraiserId: fundraiser?._id });
   };
-  const sidebarOpen = state.expenseFormOpen || state.notesFormOpen;
+  const sidebarOpen = state.expenseFormOpen;
 
   const validateFields = () => {
     let parsed = fundraiserSchema.safeParse(state.fundraiser);
@@ -208,7 +193,7 @@ export const FundraisingPlanningModal = ({
       <ModalContent
         width={sidebarOpen ? "831px" : "494px"}
         maxWidth={sidebarOpen ? "831px" : "494px"}
-        height="979px"
+        height="879px"
         borderRadius="none"
         boxShadow={"0px 4px 29px 0px #00000040"}
         position="relative"
@@ -255,7 +240,7 @@ export const FundraisingPlanningModal = ({
                     outline: "none",
                   }}
                   isReadOnly={isCopy ? true : false}
-                  value={isCopy? copyFundraiser?.name: state.fundraiser.name}
+                  value={isCopy ? copyFundraiser?.name : state.fundraiser.name}
                   onChange={(e) => {
                     dispatch({
                       type: "UPDATE_FUNDRAISER",
@@ -263,10 +248,8 @@ export const FundraisingPlanningModal = ({
                       value: e.target.value,
                     });
                   }}
-                  pl="0px"
                 />
               </FormControl>
-
               <Divider borderColor="black" />
 
               <FormControl
@@ -287,7 +270,11 @@ export const FundraisingPlanningModal = ({
                   border="1px solid #D9D9D9"
                   borderRadius="0px"
                   isReadOnly={isCopy ? true : false}
-                  value={isCopy? copyFundraiser?.location : state.fundraiser.location}
+                  value={
+                    isCopy
+                      ? copyFundraiser?.location
+                      : state.fundraiser.location
+                  }
                   onChange={(e) => {
                     dispatch({
                       type: "UPDATE_FUNDRAISER",
@@ -324,7 +311,13 @@ export const FundraisingPlanningModal = ({
                     border="1px solid #D9D9D9"
                     borderRadius="0px"
                     isReadOnly={isCopy ? true : false}
-                    value={(isCopy && copyFundraiser) ? new Date(copyFundraiser.date).toISOString().split("T")[0] : state.fundraiser.date.toISOString().split("T")[0]}
+                    value={
+                      isCopy && copyFundraiser
+                        ? new Date(copyFundraiser.date)
+                            .toISOString()
+                            .split("T")[0]
+                        : state.fundraiser.date.toISOString().split("T")[0]
+                    }
                     onChange={(e) => {
                       dispatch({
                         type: "UPDATE_FUNDRAISER",
@@ -354,7 +347,11 @@ export const FundraisingPlanningModal = ({
                     border="1px solid #D9D9D9"
                     borderRadius="0px"
                     isReadOnly={isCopy ? true : false}
-                    value={isCopy? copyFundraiser?.contactName: state.fundraiser.contactName}  
+                    value={
+                      isCopy
+                        ? copyFundraiser?.contactName
+                        : state.fundraiser.contactName
+                    }
                     onChange={(e) => {
                       dispatch({
                         type: "UPDATE_FUNDRAISER",
@@ -381,7 +378,9 @@ export const FundraisingPlanningModal = ({
                   border="1px solid #D9D9D9"
                   borderRadius="0px"
                   isReadOnly={isCopy ? true : false}
-                  value={isCopy? copyFundraiser?.email: state.fundraiser.email}
+                  value={
+                    isCopy ? copyFundraiser?.email : state.fundraiser.email
+                  }
                   onChange={(e) => {
                     dispatch({
                       type: "UPDATE_FUNDRAISER",
@@ -428,7 +427,9 @@ export const FundraisingPlanningModal = ({
                     paddingInlineEnd="none"
                     _focusVisible={{ outline: "none" }}
                     isReadOnly={isCopy ? true : false}
-                    value={isCopy? copyFundraiser?.profit: state.fundraiser.profit}  
+                    value={
+                      isCopy ? copyFundraiser?.profit : state.fundraiser.profit
+                    }
                     onChange={(e) => {
                       dispatch({
                         type: "UPDATE_FUNDRAISER",
@@ -452,7 +453,7 @@ export const FundraisingPlanningModal = ({
                 </Text>
                 {isCopy ? (
                   <></>
-                ): (
+                ) : (
                   <Button
                     //ADD EXPENSE
                     colorScheme="twitter"
@@ -476,7 +477,7 @@ export const FundraisingPlanningModal = ({
                     }}
                   >
                     ADD EXPENSE
-                  </Button> 
+                  </Button>
                 )}
               </HStack>
               <VStack
@@ -492,7 +493,10 @@ export const FundraisingPlanningModal = ({
                   },
                 }}
               >
-                {(isCopy ? copyFundraiser?.expenses : state.fundraiser.expenses)?.map((e, i) => {
+                {(isCopy
+                  ? copyFundraiser?.expenses
+                  : state.fundraiser.expenses
+                )?.map((e, i) => {
                   const isSelected = e === selectedExpense;
                   return (
                     <button
@@ -535,28 +539,6 @@ export const FundraisingPlanningModal = ({
                   );
                 })}
               </VStack>
-              <FormControl mt="18px">
-                <FormLabel fontWeight="500" fontSize="20px" lineHeight="27px">
-                  Notes
-                </FormLabel>
-                <Textarea
-                  color="black"
-                  border="1px solid #D9D9D9"
-                  borderRadius="0px"
-                  width="100%"
-                  value={state.fundraiser.notes ?? ""}
-                  onChange={(e) =>
-                    dispatch({
-                      type: "UPDATE_FUNDRAISER",
-                      field: "notes",
-                      value: e.target.value,
-                    })
-                  }
-                  padding="10px"
-                  resize="none"
-                  height="100px"
-                />
-              </FormControl>
               <Divider mt="10px" borderColor="black" />
               <HStack
                 mt="7px"
@@ -578,7 +560,10 @@ export const FundraisingPlanningModal = ({
                   lineHeight="24px"
                   pr="10px"
                 >
-                  {`$${(isCopy ? copyFundraiser?.expenses : state.fundraiser.expenses)?.reduce(
+                  {`$${(isCopy
+                    ? copyFundraiser?.expenses
+                    : state.fundraiser.expenses
+                  )?.reduce(
                     (acc, cv) =>
                       acc + cv.cost * (cv.numUnits ? cv.numUnits : 1),
                     0,
@@ -601,22 +586,23 @@ export const FundraisingPlanningModal = ({
                   pr="10px"
                 >
                   {`$${
-                    (isCopy ? (
-                      copyFundraiser ? 
-                        copyFundraiser.expenses.reduce(
+                    isCopy
+                      ? copyFundraiser
+                        ? copyFundraiser.expenses.reduce(
+                            (acc, cv) =>
+                              acc + cv.cost * (cv.numUnits ? cv.numUnits : 1),
+                            0,
+                          ) + copyFundraiser.profit
+                        : 0
+                      : state.fundraiser.expenses.reduce(
                           (acc, cv) =>
                             acc + cv.cost * (cv.numUnits ? cv.numUnits : 1),
                           0,
-                        ) + copyFundraiser.profit : 0
-                      ) : state.fundraiser.expenses.reduce(
-                        (acc, cv) =>
-                          acc + cv.cost * (cv.numUnits ? cv.numUnits : 1),
-                        0,
-                      ) + state.fundraiser.profit)
+                        ) + state.fundraiser.profit
                   }`}
                 </Text>
               </HStack>
-              {isCopy ? (                
+              {isCopy ? (
                 <>
                   <HStack width="100%" justifyContent="end" mb="34px">
                     <Button
@@ -662,40 +648,6 @@ export const FundraisingPlanningModal = ({
                       DELETE
                     </Button>
                   )}
-              <HStack width="100%" mt="24px">
-                <HStack flex={1}>
-                  <Button
-                    colorScheme="twitter"
-                    bg="hop_blue.500"
-                    borderRadius="6px"
-                    fontFamily="heading"
-                    fontSize="20px"
-                    fontWeight="400"
-                    onClick={(e) => {
-                      dispatch({ type: "TOGGLE_NOTES_SIDEBAR" });
-                      setSelectedExpense(undefined);
-                    }}
-                  >
-                    NOTES
-                  </Button>
-                </HStack>
-
-                <HStack alignSelf="end" justifyContent="end" flex={2}>
-                  {fundraiser && (
-                    <Button
-                      fontFamily="heading"
-                      fontSize="20px"
-                      fontWeight="400"
-                      colorScheme="red"
-                      color="hop_red.500"
-                      variant="outline"
-                      onClick={handleDelete}
-                      borderRadius="6px"
-                      mr="13px"
-                    >
-                      DELETE
-                    </Button>
-                  )}
                   <Button
                     colorScheme="twitter"
                     bg="hop_blue.500"
@@ -709,8 +661,6 @@ export const FundraisingPlanningModal = ({
                   </Button>
                 </HStack>
               )}
-
-              </HStack>
             </VStack>
           </ModalBody>
           {sidebarOpen && (
@@ -725,25 +675,23 @@ export const FundraisingPlanningModal = ({
               paddingRight="57px"
               paddingTop="73px"
             >
-              {state.expenseFormOpen && (
-                <NewExpenseForm
-                  expenses={state.fundraiser.expenses}
-                  setExpenses={(expenses) => {
-                    dispatch({
-                      type: "UPDATE_FUNDRAISER",
-                      field: "expenses",
-                      value: expenses,
-                    });
-                  }}
-                  onOpenError={() => {}}
-                  onCloseError={() => {}}
-                  onCloseSide={() => dispatch({ type: "CLOSE_SIDEBAR" })}
-                  selectedExpense={selectedExpense}
-                  setSelectedExpense={(e: Expense | undefined) =>
-                    setSelectedExpense(e)
-                  }
-                />
-              )}
+              <NewExpenseForm
+                expenses={state.fundraiser.expenses}
+                setExpenses={(expenses) => {
+                  dispatch({
+                    type: "UPDATE_FUNDRAISER",
+                    field: "expenses",
+                    value: expenses,
+                  });
+                }}
+                onOpenError={() => {}}
+                onCloseError={() => {}}
+                onCloseSide={() => dispatch({ type: "CLOSE_SIDEBAR" })}
+                selectedExpense={selectedExpense}
+                setSelectedExpense={(e: Expense | undefined) =>
+                  setSelectedExpense(e)
+                }
+              />
             </ModalBody>
           )}
         </HStack>
