@@ -12,31 +12,31 @@ import { useMemo } from "react";
 import { DownArrowIcon } from "~/common/theme/icons";
 
 type Props = {
-  chapters: { name: string; id: string }[];
-  selectedChapter: string;
-  setSelectedChapter: (chapterId: string) => void;
+  retreats: { name: string; id: string }[];
+  selectedRetreat: string;
+  setSelectedRetreat: (retreatId: string) => void;
   isDisabled?: boolean;
 };
 
-export const ChapterDropdown = ({
-  chapters,
-  selectedChapter,
-  setSelectedChapter,
+export const RetreatDropdown = ({
+  retreats,
+  selectedRetreat,
+  setSelectedRetreat,
   isDisabled,
 }: Props) => {
   let Options = useMemo(
     () =>
-      chapters.map((chapter) => (
+      retreats.map((retreat) => (
         <Radio
-          colorScheme={chapter.name === "Uncategorized" ? "red" : "red"}
-          key={chapter.id}
-          value={chapter.id}
+          colorScheme={retreat.name === "Uncategorized" ? "red" : "red"}
+          key={retreat.id}
+          value={retreat.id}
           variant="customRadio"
         >
-          {chapter.name}
+          {retreat.name}
         </Radio>
       )),
-    [chapters],
+    [retreats],
   );
 
   return (
@@ -55,10 +55,11 @@ export const ChapterDropdown = ({
         border="none"
         fontSize="16px"
         lineHeight="24px"
-        value={selectedChapter}
+        value={selectedRetreat}
         isDisabled={isDisabled ?? false}
       >
-        {chapters.find((chapter) => chapter.id === selectedChapter)?.name}
+        {retreats.find((retreat) => retreat.id === selectedRetreat)?.name ??
+          "Uncategorized"}
       </MenuButton>
       <MenuList
         borderRadius="none"
@@ -70,8 +71,8 @@ export const ChapterDropdown = ({
         lineHeight="24px"
       >
         <RadioGroup
-          onChange={setSelectedChapter}
-          value={selectedChapter}
+          onChange={setSelectedRetreat}
+          value={selectedRetreat}
           isDisabled={isDisabled ?? false}
         >
           <Stack direction="column" justify="center" spacing="11px">

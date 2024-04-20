@@ -183,7 +183,7 @@ export const formDonationSchema = z.object({
   referenceNumber: z.string(),
   name: z.string(),
   amount: z.number(),
-  chapterId: z.string().optional(),
+  retreatId: z.string().optional(),
   date: z.date(),
   note: z.string().optional(),
 });

@@ -15,18 +15,14 @@ import {
 } from "@chakra-ui/react";
 import Image from "next/image";
 import { TriangleDownIcon } from "@chakra-ui/icons";
-import { useEffect, useMemo, useRef, useState } from "react";
-import UserList from "~/components/users/UserList";
-import { User } from "~/common/types";
+import { useMemo, useState, useCallback } from "react";
 import logo from "public/hoplogo.png";
 import fonts from "src/common/theme/fonts";
-import { NewUserModal } from "~/components/NewUserModal";
 import { trpc } from "~/utils/api";
 
 //Adding
 import Link from "next/link";
 import FormDonationEntry from "~/components/FormDonations/FormDonationEntry";
-import { ChapterDropdown } from "~/components/FormDonations/ChapterDropdown";
 
 type Filter = "TODO";
 
@@ -52,7 +48,7 @@ export default function FormDonations() {
 
   // Get user data from the backend and populate the frontend afterwards
   const formDonations = trpc.formDonations.getDonations.useQuery().data;
-  const chapters = trpc.chapter.getChapters.useQuery().data;
+  const retreats = trpc.retreat.getLatestRetreats.useQuery().data;
   const trpcUtils = trpc.useUtils();
 
   const updateDonation = trpc.formDonations.updateDonation.useMutation({
@@ -61,15 +57,26 @@ export default function FormDonations() {
     },
   });
 
-  const chapterOptions = useMemo(() => {
-    return [
-      { name: "Uncategorized", id: "Uncategorized" },
-      ...(chapters?.map((chapter) => ({
-        name: chapter.name,
-        id: chapter.id,
-      })) ?? []),
-    ];
-  }, [chapters]);
+  const latestRetreats = trpc.retreat.getLatestRetreats.useQuery().data;
+
+  const retreatOptions = useMemo(() => {
+    return (
+      latestRetreats?.map((retreat) => ({
+        name: retreat.name,
+        id: retreat.id,
+      })) ?? []
+    );
+  }, [latestRetreats]);
+
+  const updateRetreat = useCallback(
+    async (referenceNumber: string, retreatId: string): Promise<void> => {
+      updateDonation.mutateAsync({
+        referenceNumber,
+        retreatId,
+      });
+    },
+    [updateDonation],
+  );
 
   if (!formDonations) return <Spinner />;
 
@@ -79,13 +86,9 @@ export default function FormDonations() {
         <FormDonationEntry
           key={donation.referenceNumber}
           formDonation={donation}
-          chapterOptions={chapterOptions}
-          updateChapter={function (chapterId: string): void {
-            updateDonation.mutate({
-              referenceNumber: donation.referenceNumber,
-              chapterId: chapterId,
-            });
-          }}
+          referenceNumber={donation.referenceNumber}
+          retreatOptions={retreatOptions}
+          updateRetreat={updateRetreat}
         />
       );
     });

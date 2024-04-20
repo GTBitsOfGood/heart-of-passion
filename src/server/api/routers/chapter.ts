@@ -127,6 +127,7 @@ async function processChapter(chapterModel: Chapter): Promise<Chapter> {
     fundsSum = funds?.reduce((acc, fund) => {
       return acc + fund.amount;
     }, 0);
+    // TODO: add transactions here as well
   }
 
   return {

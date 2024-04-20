@@ -14,6 +14,7 @@ import { Event, eventsByYearSchema } from "~/common/types";
 import { Fundraiser, fundraisersByYearSchema } from "~/common/types";
 import { FundraiserModel } from "~/server/models/Fundraiser";
 import { FundModel } from "~/server/models/Fund";
+import { ChapterModel } from "~/server/models/Chapter";
 
 export const retreatRouter = createTRPCRouter({
   createRetreat: mentorProcedure
@@ -154,5 +155,40 @@ export const retreatRouter = createTRPCRouter({
       await FundModel.deleteMany({ retreatId: input }).exec();
       await FundraiserModel.deleteMany({ retreatId: input }).exec();
       await RetreatModel.findByIdAndDelete(input).exec();
+    }),
+
+  getLatestRetreats: studentProcedure
+    .output(
+      z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+        }),
+      ),
+    )
+    .query(async () => {
+      const chapters = await ChapterModel.find().exec();
+      const latestRetreats = await Promise.all(
+        chapters.map(async (chapter) => {
+          const latestRetreat = await RetreatModel.findOne({
+            chapterId: chapter._id,
+          })
+            .sort({ year: -1 })
+            .exec();
+
+          if (!latestRetreat) {
+            return null;
+          }
+
+          return {
+            id: `${latestRetreat._id}`,
+            name: `${chapter.name} ${latestRetreat.year}`,
+          };
+        }),
+      );
+
+      return latestRetreats.filter(
+        (retreat): retreat is { id: string; name: string } => retreat !== null,
+      );
     }),
 });

@@ -30,8 +30,8 @@ const DonationSchema = new Schema<FormDonation>({
     required: true,
   },
 
-  chapterId: {
-    ref: "Chapter",
+  retreatId: {
+    ref: "Retreat",
     type: String,
     required: false,
   },

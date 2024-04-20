@@ -75,7 +75,7 @@ export const formDonationsRouter = createTRPCRouter({
     .input(
       z.object({
         referenceNumber: z.string(),
-        chapterId: z.string(),
+        retreatId: z.string(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -84,16 +84,9 @@ export const formDonationsRouter = createTRPCRouter({
         throw new Error("Form donation not found");
       }
 
-      console.log("Updating donation", input.referenceNumber, input.chapterId);
-
       formDonation.donations.forEach((donation) => {
         if (donation.referenceNumber === input.referenceNumber) {
-          console.log(
-            "Updating donation",
-            donation.referenceNumber,
-            input.chapterId,
-          );
-          donation.chapterId = input.chapterId;
+          donation.retreatId = input.retreatId;
         }
       });
 
