@@ -173,20 +173,8 @@ const Sidebar = ({
                 {chapter.name.toUpperCase()}
               </Text>
             </GridItem>
-            <GridItem>
-              <IconButton
-                mt="10px"
-                icon={
-                  <IoIosLogOut
-                    size="30px"
-                    onClick={() => {
-                      router.push("/logout");
-                    }}
-                  />
-                }
-                aria-label={"logout"}
-              />
-            </GridItem>
+            <GridItem></GridItem>
+
             <GridItem>
               {year && (
                 <Select
@@ -366,6 +354,18 @@ const Sidebar = ({
           </Button>
 
           <HStack>
+            <IconButton
+              mt={"20px"}
+              icon={
+                <IoIosLogOut
+                  size="30px"
+                  onClick={() => {
+                    router.push("/logout");
+                  }}
+                />
+              }
+              aria-label={"logout"}
+            />
             <Button
               hidden={!isAdmin}
               fontFamily="nunito"
