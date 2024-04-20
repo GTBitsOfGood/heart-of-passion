@@ -24,9 +24,6 @@ export const fundRouter = createTRPCRouter({
 
   getFunds: studentProcedure.input(z.string()).query(async (opts) => {
     const funds = await FundModel.find({ retreatId: opts.input }).exec();
-    const formDonations = await FormDonationsModel.find({
-      retreatId: opts.input,
-    }).exec();
 
     return funds.map((f) => {
       return {

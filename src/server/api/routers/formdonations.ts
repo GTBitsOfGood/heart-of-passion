@@ -7,6 +7,7 @@ import {
   IFormDonations,
   FormDonationsModel,
 } from "~/server/models/FormDonations";
+import { FundModel } from "~/server/models/Fund"; // Import the FundModel
 
 async function getRecentFormDonations(): Promise<FormDonation[]> {
   const recentSubmissions = await formsiteClient.getRecentSubmissions();
@@ -79,18 +80,42 @@ export const formDonationsRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input }) => {
+      const DONATION_SOURCE = "HoP Website Donation";
+
       const formDonation = await FormDonationsModel.findOne({});
       if (!formDonation) {
         throw new Error("Form donation not found");
       }
 
-      formDonation.donations.forEach((donation) => {
-        if (donation.referenceNumber === input.referenceNumber) {
-          donation.retreatId = input.retreatId;
-        }
+      const donation = formDonation.donations.find(
+        (d) => d.referenceNumber === input.referenceNumber,
+      );
+      if (!donation) {
+        throw new Error("Donation with the given reference number not found");
+      }
+
+      const oldRetreatId = donation.retreatId;
+      donation.retreatId = input.retreatId;
+
+      if (oldRetreatId) {
+        await FundModel.deleteOne({
+          name: donation.name,
+          source: DONATION_SOURCE,
+          retreatId: oldRetreatId,
+        });
+      }
+
+      // Create a new fund
+      const newFund = new FundModel({
+        retreatId: input.retreatId,
+        name: donation.name,
+        date: donation.date.toISOString().split("T")[0],
+        amount: donation.amount,
+        source: DONATION_SOURCE,
       });
 
       await formDonation.save();
+      await newFund.save();
     }),
 });
 
