@@ -13,9 +13,8 @@ interface ChapterCardProps {
   chapter: Chapter;
 }
 const ChapterCard = ({ chapter }: ChapterCardProps) => {
-  const progress = Math.floor(
-    (chapter.fundActual / chapter.fundExpected) * 100,
-  );
+  let progress = Math.floor((chapter.fundActual / chapter.fundExpected) * 100);
+  progress = Math.min(progress, 100);
 
   const {
     isOpen: isOpenAddChapterModal,
