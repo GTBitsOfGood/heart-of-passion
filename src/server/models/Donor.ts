@@ -40,7 +40,7 @@ const DonorSchema = new Schema<IDonor>({
   },
   donorEmail: {
     type: String,
-    required: true,
+    required: false,
     unique: true,
   },
   source: {

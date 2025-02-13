@@ -173,7 +173,7 @@ export const NewDonorModal = ({
 
   // Adjusted handleDelete function for DeleteConfirmation
   const handleDelete = () => {
-    deleteDonor.mutate(donorData.donorEmail);
+    deleteDonor.mutate(donorData.donorEmail ?? "");
     onCloseModal(); // Close the NewDonorModal
     onDeleteConfirmationClose(); // Close the DeleteConfirmation modal
   };
@@ -201,12 +201,17 @@ export const NewDonorModal = ({
       }
     } else {
       updateDonor.mutate({
-        donorEmail: donorData.donorEmail,
+        donorEmail: donorData.donorEmail ?? "",
         updatedDonor: donor,
       });
     }
     onCloseModal();
     return true;
+  };
+
+  const isValidEmail = (email: string): boolean => {
+    const regex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
+    return regex.test(email);
   };
 
   const validateFields = () => {
@@ -226,8 +231,12 @@ export const NewDonorModal = ({
     setStudentError(
       studentName === "" ? StudentError.Empty : StudentError.None,
     );
-    setEmailError(donorEmail === "" ? EmailError.Empty : EmailError.None);
-
+    if (donorEmail && !isValidEmail(donorEmail)) {
+      setEmailError(EmailError.Invalid)
+    } else {
+      setEmailError(EmailError.None)
+    }
+    
     const result = donorSchema.safeParse(donor);
     if (!result.success) {
       toast({
@@ -330,11 +339,11 @@ export const NewDonorModal = ({
                     value={donorEmail}
                     onChange={handleDonorEmailChange}
                     type="email"
-                    required
+                    // required
                   />
                   <Box minHeight="20px" mt={2}>
                     <FormErrorMessage mt={0}>
-                      {emailError === EmailError.Empty && "Email is required"}
+                      {/* {emailError === EmailError.Empty && "Email is required"} */}
                       {emailError === EmailError.Invalid && "Invalid email"}
                       {emailError === EmailError.Exists &&
                         "Email already exists"}
