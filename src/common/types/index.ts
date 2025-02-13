@@ -146,6 +146,7 @@ export const fundraiserSchema = z.object({
   profit: z.number().nonnegative(),
   expenses: z.array(expenseSchema),
   notes: z.string().optional(),
+  actualProfit: z.number().nonnegative().optional(),
 });
 
 export const savedFundraiserSchema = fundraiserSchema.extend({
