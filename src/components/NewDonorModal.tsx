@@ -210,8 +210,8 @@ export const NewDonorModal = ({
   };
 
   const isValidEmail = (email: string): boolean => {
-    const regex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
-    return regex.test(email);
+    const emailRegex: RegExp = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+    return emailRegex.test(email);
   };
 
   const validateFields = () => {
@@ -231,12 +231,12 @@ export const NewDonorModal = ({
     setStudentError(
       studentName === "" ? StudentError.Empty : StudentError.None,
     );
+
     if (donorEmail && !isValidEmail(donorEmail)) {
       setEmailError(EmailError.Invalid)
     } else {
       setEmailError(EmailError.None)
     }
-    
     const result = donorSchema.safeParse(donor);
     if (!result.success) {
       toast({
@@ -339,7 +339,7 @@ export const NewDonorModal = ({
                     value={donorEmail}
                     onChange={handleDonorEmailChange}
                     type="email"
-                    // required
+                  // required
                   />
                   <Box minHeight="20px" mt={2}>
                     <FormErrorMessage mt={0}>
