@@ -31,6 +31,7 @@ export const donorSchema = z.object({
   sponsorLevel: sponsorLevelSchema,
   status: statusDonorSchema,
   notes: z.string().optional(),
+  address: z.string().optional(),
 });
 export type Donor = z.infer<typeof donorSchema>;
 

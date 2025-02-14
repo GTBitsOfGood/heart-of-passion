@@ -248,6 +248,7 @@ export default function Donors() {
                 status: "",
                 source: "",
                 sponsorLevel: "",
+                address: "",
               }}
               create={true}
             />

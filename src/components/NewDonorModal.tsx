@@ -78,6 +78,7 @@ export const NewDonorModal = ({
     donorData.sponsorLevel,
   );
   const [notes, setNotes] = useState(donorData.notes ?? "");
+  const [address, setAddress] = useState(donorData.address);
 
   // Options
   const SponsorLevelOptions = Object.values(sponsorLevelSchema.enum);
@@ -135,6 +136,7 @@ export const NewDonorModal = ({
         setStudentName("");
         setDonorEmail("");
         setNotes("");
+        setAddress("");
       } else {
         // Set existing values when editing
         setDonorName(donorData.donorName);
@@ -144,6 +146,7 @@ export const NewDonorModal = ({
         setSource(donorData.source);
         setSponsorLevel(donorData.sponsorLevel);
         setNotes(donorData.notes ?? "");
+        setAddress(donorData.address);
       }
     }
   }, [isOpen, create, donorData]);
@@ -157,6 +160,7 @@ export const NewDonorModal = ({
       setStudentName("");
       setDonorEmail("");
       setNotes("");
+      setAddress("");
     }
     setNameError(DonorError.None);
     setStudentError(StudentError.None);
@@ -190,8 +194,9 @@ export const NewDonorModal = ({
       sponsorLevel,
       status,
       notes,
+      address,
     };
-    if (create) {
+    if (create && donorEmail) {
       try {
         await createDonor.mutateAsync(donor);
       } catch (e) {
@@ -199,9 +204,11 @@ export const NewDonorModal = ({
         onOpenError();
         return;
       }
+    } else if (create && donorEmail == "") {
+        await createDonor.mutateAsync(donor);
     } else {
       updateDonor.mutate({
-        donorEmail: donorData.donorEmail ?? "",
+        donorEmail: donorData.donorEmail,
         updatedDonor: donor,
       });
     }
@@ -223,6 +230,7 @@ export const NewDonorModal = ({
       source,
       sponsorLevel,
       notes,
+      address,
     };
     setSourceError(
       source === "Select Source" ? SourceError.Empty : SourceError.None,
@@ -231,7 +239,6 @@ export const NewDonorModal = ({
     setStudentError(
       studentName === "" ? StudentError.Empty : StudentError.None,
     );
-
     if (donorEmail && !isValidEmail(donorEmail)) {
       setEmailError(EmailError.Invalid)
     } else {
@@ -267,6 +274,9 @@ export const NewDonorModal = ({
 
   const handleNotesChange = (event: ChangeEvent<HTMLTextAreaElement>) =>
     setNotes(event.currentTarget.value);
+
+  const handleAddressChange = (event: React.FormEvent<HTMLInputElement>) =>
+    setAddress(event.currentTarget.value);
 
   const sourceOptions = ["Other"].concat(
     trpc.event.getEvents
@@ -374,6 +384,24 @@ export const NewDonorModal = ({
                     </FormErrorMessage>
                   </Box>
                 </FormControl>
+                <FormControl>
+                  <FormLabel textColor="black" fontWeight="600" mb="4px">
+                    Physical Address
+                  </FormLabel>
+                  <Input
+                    placeholder="1 Jane St"
+                    color="black"
+                    _placeholder={{ color: "#666666" }}
+                    border="1px solid #D9D9D9"
+                    borderRadius="0px"
+                    width="240px"
+                    height="30px"
+                    value={address}
+                    onChange={handleAddressChange}
+                  />
+                </FormControl>
+              </HStack>
+              <HStack align="start" spacing="22px">
                 <FormControl isInvalid={sourceError !== SourceError.None}>
                   <FormLabel
                     fontFamily="body"
@@ -394,14 +422,13 @@ export const NewDonorModal = ({
                     </FormErrorMessage>
                   </Box>
                 </FormControl>
-              </HStack>
-              <HStack align="start" spacing="150px">
                 <FormControl>
                   <FormLabel
                     fontFamily="body"
                     fontSize="16px"
                     fontWeight="600"
                     mb="4px"
+                    minWidth="132px"
                   >
                     Sponsorship Level
                   </FormLabel>
