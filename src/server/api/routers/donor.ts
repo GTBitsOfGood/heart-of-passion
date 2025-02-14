@@ -16,19 +16,14 @@ export const donorRouter = createTRPCRouter({
     .input(donorSchema)
     .mutation(async ({ input }) => {
       const donor = new DonorModel(input);
-
-      if (input.donorEmail === "") {
-        donor.save()
-      } else {
-        await donor.save().catch((error) => {
-          if (error.code === 11000) {
-            throw new TRPCError({
-              code: "CONFLICT",
-              message: "Email already exists",
-            });
-          }
+      if (input.donorEmail && await DonorModel.exists({ donorEmail: input.donorEmail })) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "Email already exists",
         });
       }
+
+      await donor.save()
     }),
 
   deleteDonor: studentProcedure

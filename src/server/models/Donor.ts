@@ -43,7 +43,7 @@ const DonorSchema = new Schema<IDonor>({
     type: String,
     required: false,
     // unique: false,
-    sparse: true
+    // sparse: true
   },
   source: {
     type: String,
