@@ -13,6 +13,7 @@ export interface IDonor extends z.infer<typeof donorSchema> {
   sponsorLevel: SponsorLevel;
   status: Status;
   notes: string;
+  address: string;
 }
 
 export const sponsorLevelOptions = [
@@ -40,8 +41,9 @@ const DonorSchema = new Schema<IDonor>({
   },
   donorEmail: {
     type: String,
-    required: true,
-    unique: true,
+    required: false,
+    // unique: false,
+    // sparse: true
   },
   source: {
     type: String,
@@ -58,6 +60,9 @@ const DonorSchema = new Schema<IDonor>({
     required: true,
   },
   notes: {
+    type: String,
+  },
+  address: {
     type: String,
   },
 });

@@ -41,7 +41,8 @@ export default function DonorList({
                   donor.studentName +
                   donor.status +
                   donor.sponsorLevel +
-                  donor.source
+                  donor.source +
+                  donor.address
                 }
                 {...donor}
                 // width=
