@@ -18,7 +18,10 @@ export type Status = z.infer<typeof statusDonorSchema>;
 export const donorSchema = z.object({
   studentName: z.string().min(1, "Student name is required"),
   donorName: z.string().min(1, "Donor name is required"),
-  donorEmail: z.string().email(),
+  donorEmail: z.union([
+    z.literal(''),
+    z.string().email(),
+  ]),
   source: z
     .string()
     .min(1, "Source is required")
@@ -28,6 +31,7 @@ export const donorSchema = z.object({
   sponsorLevel: sponsorLevelSchema,
   status: statusDonorSchema,
   notes: z.string().optional(),
+  address: z.string().optional(),
 });
 export type Donor = z.infer<typeof donorSchema>;
 

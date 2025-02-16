@@ -15,6 +15,7 @@ import fonts from "~/common/theme/fonts";
 import { NewDonorModal } from "../NewDonorModal";
 import { useRef } from "react";
 import { useRouter } from "next/router";
+import { addRequestMeta } from "next/dist/server/request-meta";
 
 interface DonorsProps extends Donor {
   retreatId: string;
@@ -29,6 +30,7 @@ export default function Donors({
   sponsorLevel,
   retreatId,
   notes,
+  address,
 }: DonorsProps) {
   const {
     isOpen: isOpenAddDonorModal,
@@ -101,7 +103,11 @@ export default function Donors({
           fontSize="20px"
           marginBottom="0px"
         >
+        {donorEmail ? (
           <a href={`mailto:${donorEmail}`}>EMAIL</a>
+        ) : 
+          <p>NO EMAIL</p>
+        } 
         </Button>
       </HStack>
 
@@ -116,6 +122,7 @@ export default function Donors({
           source: source,
           status: status,
           notes: notes,
+          address: address,
         }}
         create={false}
         retreatId={retreatId}
