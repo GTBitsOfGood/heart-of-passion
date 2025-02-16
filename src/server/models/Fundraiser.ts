@@ -45,6 +45,10 @@ const FundraiserSchema = new Schema<IFundraiser>({
     required: false,
   },
   expenses: [ExpenseSchema],
+  actualProfit: {
+    type: Number,
+    required: false,
+  },
 });
 
 export const FundraiserModel =

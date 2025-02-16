@@ -145,6 +145,7 @@ function processEvent(fundraiser: IFundraiser) {
     email: fundraiser.email,
     profit: fundraiser.profit,
     notes: fundraiser.notes,
+    actualProfit: fundraiser.actualProfit,
 
     expenses: fundraiser.expenses.map(processExpense),
     _id: fundraiser._id.toString(),

@@ -242,6 +242,7 @@ export default function RaisedFunds() {
             handleSelectFund={handleSelectFund}
             key={gr.title}
             {...gr}
+            retreatId={retreatId!}
           />
         ))}
         <Flex borderBottom="1px #AEAEAE solid"></Flex>
