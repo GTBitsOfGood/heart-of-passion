@@ -34,13 +34,10 @@ export default function PlanningCard({
           Projected:<br></br> 
           ${fundraiser.profit}
         </Text>
-        {fundraiser.actualProfit ? 
-          <Text fontFamily={"nunito"} fontWeight={500} fontSize={20} marginRight={10}>
-            Actual:<br></br>
-            ${fundraiser.actualProfit}
-          </Text> :
-          <></>
-        }
+        <Text fontFamily={"nunito"} fontWeight={500} fontSize={20} marginRight={10}>
+          Actual:<br></br>
+          ${fundraiser.actualProfit ? fundraiser.actualProfit : " ---"}
+        </Text> 
       </Box>
     </Box>
   );

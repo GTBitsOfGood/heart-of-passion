@@ -95,6 +95,12 @@ export const NewFundModal = ({
     enabled: !!retreatId,
   }).data;
 
+  const updateFundraiser = trpc.fundraiser.updateFundraiser.useMutation({
+    onSuccess: () => {
+      trpcUtils.fundraiser.invalidate();
+    },
+  });
+
   const sourceOptions = useMemo(
     () => ["Other"].concat(fundraiserData?.map((f) => f.name) ?? []),
     [fundraiserData],
@@ -140,6 +146,16 @@ export const NewFundModal = ({
         fundId: fund?._id!,
         updates: { name: name, date: date, amount: amount, source: source },
       });
+
+    //update fundraiser actualProfits
+    const fundraiser = fundraiserData?.find((f) => f.name === source);
+
+    if (fundraiser) {
+      updateFundraiser.mutate({
+        fundraiserId: fundraiser._id,
+        fundraiser: {...fundraiser, actualProfit: amount},
+      });
+    }
 
     onCloseModal();
     onCloseModal();
