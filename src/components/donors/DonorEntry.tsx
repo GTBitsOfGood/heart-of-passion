@@ -103,11 +103,11 @@ export default function Donors({
           fontSize="20px"
           marginBottom="0px"
         >
-        {donorEmail ? (
-          <a href={`mailto:${donorEmail}`}>EMAIL</a>
-        ) : 
-          <p>NO EMAIL</p>
-        } 
+          {donorEmail ? (
+            <a href={`mailto:${donorEmail}`}>EMAIL</a>
+          ) : (
+            <p>NO EMAIL</p>
+          )}
         </Button>
       </HStack>
 

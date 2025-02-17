@@ -87,7 +87,7 @@ export default function Backlog() {
         {eventsByYear && (
           <Box display={"flex"}>
             <Box>
-              {(chapter && retreat) ? (
+              {chapter && retreat ? (
                 <Sidebar
                   chapter={chapter}
                   year={retreat.year}

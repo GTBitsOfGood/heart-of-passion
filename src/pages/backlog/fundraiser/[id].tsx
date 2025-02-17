@@ -7,7 +7,12 @@ import Sidebar from "~/components/Sidebar";
 import Select from "react-select";
 import FundraisingHandler from "~/components/FundraisingBacklog/FundraisingHandler";
 import FundraisingCopyModal from "~/components/FundraisingBacklog/FundrasingCopyModal";
-import { Event, EventsByYear, Fundraiser, FundraisersByYear} from "~/common/types";
+import {
+  Event,
+  EventsByYear,
+  Fundraiser,
+  FundraisersByYear,
+} from "~/common/types";
 
 export enum BacklogSort {
   ViewByDate = "View by Date",
@@ -74,7 +79,9 @@ export default function Backlog() {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const [eventToCopy, setEventToCopy] = useState<Fundraiser | undefined>(undefined);
+  const [eventToCopy, setEventToCopy] = useState<Fundraiser | undefined>(
+    undefined,
+  );
 
   const openCopyModal = (event: Fundraiser) => {
     setEventToCopy(event);
@@ -82,7 +89,7 @@ export default function Backlog() {
   };
 
   const trpcUtils = trpc.useUtils();
-  const createFundraiserInLatestRetreat = 
+  const createFundraiserInLatestRetreat =
     trpc.fundraiser.createFundraiserInLatestRetreat.useMutation({
       onSuccess: () => {
         trpcUtils.fundraiser.invalidate();

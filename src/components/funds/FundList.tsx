@@ -7,7 +7,7 @@ import { trpc } from "~/utils/api";
 
 interface FundListProps extends FundListType {
   handleSelectFund: (fund: Fund) => void;
-  retreatId: string
+  retreatId: string;
 }
 
 // export default function FundList({ title, funds }: FundListType) {
@@ -40,22 +40,22 @@ export default function FundList({
   });
   const updateActualProfits = () => {
     fundraiserData?.forEach((fundraiser) => {
-      let totalProfit = 0
+      let totalProfit = 0;
       funds.forEach((fund) => {
         if (fund.source == fundraiser.name) {
-          totalProfit+=fund.amount
+          totalProfit += fund.amount;
         }
-      })
+      });
       updateFundraiser.mutate({
         fundraiserId: fundraiser?._id,
-        fundraiser: {...fundraiser, actualProfit: totalProfit},
+        fundraiser: { ...fundraiser, actualProfit: totalProfit },
       });
-    })
-  }
+    });
+  };
 
   useEffect(() => {
-    updateActualProfits()
-  }, [funds])
+    updateActualProfits();
+  }, [funds]);
 
   return (
     <>

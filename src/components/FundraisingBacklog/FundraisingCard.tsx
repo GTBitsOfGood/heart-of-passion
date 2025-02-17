@@ -1,5 +1,10 @@
 import { Box, Text } from "@chakra-ui/react";
-import { DateObject, Event, Fundraiser, fundraiserSchema } from "~/common/types";
+import {
+  DateObject,
+  Event,
+  Fundraiser,
+  fundraiserSchema,
+} from "~/common/types";
 
 export default function BacklogCard({
   event,

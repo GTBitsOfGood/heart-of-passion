@@ -109,28 +109,30 @@ export const eventRouter = createTRPCRouter({
       const event = new EventModel({ retreatId, ...eventDetails });
       await event.save();
     }),
-  deleteExpenseByEvent: mentorProcedure.input(
-    z.object({
-      expenseId: z.string(),
-      eventId: z.string(),
+  deleteExpenseByEvent: mentorProcedure
+    .input(
+      z.object({
+        expenseId: z.string(),
+        eventId: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const { expenseId, eventId } = input;
+      const event = await EventModel.findById(eventId).exec();
+      if (!event) {
+        throw new Error("Event not found: " + event);
+      }
+      const updatedExpenses = event.expenses.filter(
+        (e) => e._id?.toString() !== expenseId,
+      );
+      event.expenses = updatedExpenses;
+      await event.save();
     }),
-  ).mutation(async ({ input }) => {
-    const { expenseId, eventId } = input;
-    const event = await EventModel.findById(eventId).exec();
-    if (!event) {
-      throw new Error("Event not found: " + event);
-    }
-    const updatedExpenses = event.expenses.filter(
-      (e) => e._id?.toString() !== expenseId,
-    );
-    event.expenses = updatedExpenses;
-    await event.save();
-  }),
-  deleteExpense: mentorProcedure.input(
-    z.string(),
-  ).mutation(async ({ input }) => {
-    await ExpenseModel.findByIdAndDelete(input).exec();
-  }),
+  deleteExpense: mentorProcedure
+    .input(z.string())
+    .mutation(async ({ input }) => {
+      await ExpenseModel.findByIdAndDelete(input).exec();
+    }),
   deleteEvent: mentorProcedure.input(z.string()).mutation(async ({ input }) => {
     await EventModel.findByIdAndDelete(input).exec();
   }),

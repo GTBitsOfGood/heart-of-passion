@@ -205,7 +205,7 @@ export const NewDonorModal = ({
         return;
       }
     } else if (create && donorEmail == "") {
-        await createDonor.mutateAsync(donor);
+      await createDonor.mutateAsync(donor);
     } else {
       updateDonor.mutate({
         donorEmail: donorData.donorEmail,
@@ -217,7 +217,9 @@ export const NewDonorModal = ({
   };
 
   const isValidEmail = (email: string): boolean => {
-    const emailRegex: RegExp = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+    const emailRegex: RegExp = new RegExp(
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+    );
     return emailRegex.test(email);
   };
 
@@ -240,9 +242,9 @@ export const NewDonorModal = ({
       studentName === "" ? StudentError.Empty : StudentError.None,
     );
     if (donorEmail && !isValidEmail(donorEmail)) {
-      setEmailError(EmailError.Invalid)
+      setEmailError(EmailError.Invalid);
     } else {
-      setEmailError(EmailError.None)
+      setEmailError(EmailError.None);
     }
     const result = donorSchema.safeParse(donor);
     if (!result.success) {
@@ -349,7 +351,7 @@ export const NewDonorModal = ({
                     value={donorEmail}
                     onChange={handleDonorEmailChange}
                     type="email"
-                  // required
+                    // required
                   />
                   <Box minHeight="20px" mt={2}>
                     <FormErrorMessage mt={0}>
