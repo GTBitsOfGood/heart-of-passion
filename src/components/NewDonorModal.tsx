@@ -206,7 +206,7 @@ export const NewDonorModal = ({
         onOpenError();
         return;
       }
-    }
+    } 
     onCloseModal();
     return true;
   };
