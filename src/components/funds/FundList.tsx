@@ -1,6 +1,6 @@
 import { Heading, Stack, Flex } from "@chakra-ui/react";
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import FundEntry from "./FundEntry";
 import { Fund, FundList as FundListType, Fundraiser } from "src/common/types";
 import { trpc } from "~/utils/api";
@@ -38,7 +38,8 @@ export default function FundList({
       trpcUtils.fundraiser.invalidate();
     },
   });
-  const updateActualProfits = () => {
+
+  const updateActualProfits = useCallback(() => {
     fundraiserData?.forEach((fundraiser) => {
       let totalProfit = 0;
       funds.forEach((fund) => {
@@ -51,11 +52,11 @@ export default function FundList({
         fundraiser: { ...fundraiser, actualProfit: totalProfit },
       });
     });
-  };
+  }, [fundraiserData, funds, updateFundraiser]);
 
   useEffect(() => {
     updateActualProfits();
-  }, [funds]);
+  }, [funds, updateActualProfits]);
 
   return (
     <>
