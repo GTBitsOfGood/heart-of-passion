@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { sponsorLevelOptions, statusOptions } from "~/server/models/Donor";
+import { SPONSOR_LEVEL_OPTIONS, STATUS_OPTIONS } from "~/server/models/Donor";
 
 // Role
 export const roleSchema = z.enum(["student", "mentor", "admin"]);
@@ -8,20 +8,20 @@ export type Role = z.infer<typeof roleSchema>;
 // Donor
 
 export const sponsorLevelSchema = z.enum(
-  sponsorLevelOptions as [string, ...string[]],
+  SPONSOR_LEVEL_OPTIONS as [string, ...string[]],
 );
 export type SponsorLevel = z.infer<typeof sponsorLevelSchema>;
 
-export const statusDonorSchema = z.enum(statusOptions as [string, ...string[]]);
+export const statusDonorSchema = z.enum(
+  STATUS_OPTIONS as [string, ...string[]],
+);
 export type Status = z.infer<typeof statusDonorSchema>;
 
 export const donorSchema = z.object({
+  _id: z.string().optional(),
   studentName: z.string().min(1, "Student name is required"),
   donorName: z.string().min(1, "Donor name is required"),
-  donorEmail: z.union([
-    z.literal(''),
-    z.string().email(),
-  ]),
+  donorEmail: z.string().email().optional(),
   source: z
     .string()
     .min(1, "Source is required")
@@ -34,13 +34,6 @@ export const donorSchema = z.object({
   address: z.string().optional(),
 });
 export type Donor = z.infer<typeof donorSchema>;
-
-//DonorList
-export const donorListSchema = z.object({
-  title: z.string(),
-  donors: z.array(donorSchema),
-});
-export type DonorList = z.infer<typeof donorListSchema>;
 
 // User
 export const userSchema = z
@@ -150,6 +143,7 @@ export const fundraiserSchema = z.object({
   profit: z.number().nonnegative(),
   expenses: z.array(expenseSchema),
   notes: z.string().optional(),
+  actualProfit: z.number().nonnegative().optional(),
 });
 
 export const savedFundraiserSchema = fundraiserSchema.extend({
