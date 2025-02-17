@@ -15,14 +15,17 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Switch,
+  Textarea,
   VStack,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useReducer, ChangeEvent } from "react";
 import { RadioDropdown } from "./RadioDropdown";
-import { Fund } from "~/common/types";
+import { Donor, Fund, fundSchema, donorSchema } from "~/common/types";
 import { trpc } from "~/utils/api";
+import { SPONSOR_LEVEL_OPTIONS, STATUS_OPTIONS } from "~/server/models/Donor";
 
 type NewFundProps = {
   isOpen: boolean;
@@ -32,10 +35,72 @@ type NewFundProps = {
   retreatId: string;
 };
 
-enum Error {
-  None, // No error
-  Empty, // Empty user
-}
+type State = {
+  fund: Partial<Fund> & { source: string }; // We require a default source to set a default option in the dropdown
+  trackDonor: boolean;
+  donor: Partial<Donor> & { sponsorLevel: string; status: string }; // We require a default sponsor level and status to set default options in the dropdowns
+
+  errors: ErrorState<keyof Fund, keyof Donor>;
+};
+
+type ErrorState<F extends keyof Fund, D extends keyof Donor> = {
+  fund: {
+    [key in F]?: string[];
+  };
+
+  donor: {
+    [key in D]?: string[];
+  };
+};
+
+type Action =
+  | {
+      type: "TOGGLE_TRACK_DONOR";
+    }
+  | {
+      type: "UPDATE_FUND";
+      value: Partial<Fund>;
+    }
+  | {
+      type: "UPDATE_DONOR";
+      value: Partial<Donor>;
+    }
+  | {
+      type: "UPDATE_ERRORS";
+      errors: Partial<ErrorState<keyof Fund, keyof Donor>>;
+    }
+  | { type: "RESET"; payload?: Partial<State> };
+
+const INITIAL_STATE: State = {
+  fund: {
+    source: "Other",
+  },
+  donor: {
+    sponsorLevel: SPONSOR_LEVEL_OPTIONS[0]!,
+    status: STATUS_OPTIONS[0]!,
+  },
+  errors: {
+    fund: {},
+    donor: {},
+  },
+
+  trackDonor: false,
+};
+
+const reducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case "TOGGLE_TRACK_DONOR":
+      return { ...state, trackDonor: !state.trackDonor };
+    case "UPDATE_FUND":
+      return { ...state, fund: { ...state.fund, ...action.value } };
+    case "UPDATE_DONOR":
+      return { ...state, donor: { ...state.donor, ...action.value } };
+    case "RESET":
+      return { ...INITIAL_STATE, ...action.payload };
+    default:
+      return state;
+  }
+};
 
 export const NewFundModal = ({
   isOpen,
@@ -44,25 +109,22 @@ export const NewFundModal = ({
   create,
   retreatId,
 }: NewFundProps) => {
-  // form data
-  const [name, setName] = useState(fund ? fund.name : "");
-  const [date, setDate] = useState(fund ? fund.date : "");
-  const [amount, setAmount] = useState(fund ? fund.amount : 0);
-  const [source, setSource] = useState(fund ? fund.source : "Select Source");
+  const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
 
   useEffect(() => {
-    // clear funds so it doesn't add every time the page is re-rendered
-    setName(fund ? fund.name : "");
-    setDate(fund ? fund.date : "");
-    setAmount(fund ? fund.amount : 0);
-    setSource(fund ? fund.source : "Select Source");
+    if (!fund) return;
+    dispatch({
+      type: "RESET",
+      payload: {
+        fund: {
+          name: fund.name,
+          date: fund.date,
+          amount: fund.amount,
+          source: fund.source,
+        },
+      },
+    });
   }, [fund]);
-
-  // Error
-  const [nameError, setNameError] = useState<Error>(Error.None);
-  const [dateError, setDateError] = useState<Error>(Error.None);
-  const [amountError, setAmountError] = useState<Error>(Error.None);
-  const [sourceError, setSourceError] = useState<Error>(Error.None);
 
   const {
     isOpen: isError,
@@ -70,15 +132,16 @@ export const NewFundModal = ({
     onOpen: onOpenError,
   } = useDisclosure({ defaultIsOpen: false });
 
-  const trpcUtils = trpc.useUtils();
   const toast = useToast();
-  const updateFund = trpc.fund.updateFund.useMutation({
+  const trpcUtils = trpc.useUtils();
+
+  const createFund = trpc.fund.createFund.useMutation({
     onSuccess: () => {
       trpcUtils.fund.invalidate();
       trpcUtils.chapter.invalidate();
     },
   });
-  const createFund = trpc.fund.createFund.useMutation({
+  const updateFund = trpc.fund.updateFund.useMutation({
     onSuccess: () => {
       trpcUtils.fund.invalidate();
       trpcUtils.chapter.invalidate();
@@ -90,96 +153,149 @@ export const NewFundModal = ({
       trpcUtils.chapter.invalidate();
     },
   });
+  const createDonor = trpc.donor.createDonor.useMutation({
+    onSuccess: () => {
+      trpcUtils.donor.invalidate();
+    },
+  });
 
+  // For the fund's "Source" dropdown
   const fundraiserData = trpc.fundraiser.getFundraisers.useQuery(retreatId, {
     enabled: !!retreatId,
   }).data;
-
   const sourceOptions = useMemo(
     () => ["Other"].concat(fundraiserData?.map((f) => f.name) ?? []),
     [fundraiserData],
   );
 
   const onCloseModal = () => {
-    setNameError(Error.None);
-    setDateError(Error.None);
-    setAmountError(Error.None);
-    setSourceError(Error.None);
+    dispatch({
+      type: "RESET",
+    });
+
+    onCloseError();
     onClose();
   };
 
-  const validateFields = () => {
-    setNameError(name === "" ? Error.Empty : Error.None);
-    setDateError(date === "" ? Error.Empty : Error.None);
-    setAmountError(amount === 0 ? Error.Empty : Error.None);
-    setSourceError(source === "Select Source" ? Error.Empty : Error.None);
-    return (
-      name !== "" && date !== "" && amount !== 0 && source !== "Select Source"
-    );
-  };
+  const handleSave = async () => {
+    const fundResult = fundSchema.safeParse(state.fund);
+    if (!fundResult.success) {
+      const fundErrors = fundResult.error.flatten().fieldErrors;
+      const errorMsg = fundResult.error.issues
+        .map((issue) => issue.message)
+        .join("\n");
 
-  const handleSave = () => {
-    if (!validateFields()) {
+      dispatch({
+        type: "UPDATE_ERRORS",
+        errors: {
+          fund: fundErrors,
+        },
+      });
       toast({
-        title: "ERROR INCOMPLETE FIELDS",
-        description: "Fill in the incomplete fields that are outlined in red!",
+        title: "ERROR IN FUND FIELDS",
+        description: errorMsg,
         status: "error",
-        duration: 3000,
+        duration: 5000,
         isClosable: true,
       });
-      return false; // Return false to prevent saving
+      return;
     }
 
-    if (create)
+    let donor: Donor | null = null;
+
+    if (state.trackDonor) {
+      const unvalidatedDonor = {
+        donorName: state.fund.name,
+        source: state.fund.source,
+        ...state.donor,
+      };
+
+      const donorResult = donorSchema.safeParse(unvalidatedDonor);
+      if (!donorResult.success) {
+        const donorErrors = donorResult.error.flatten().fieldErrors;
+        const errorMsg = donorResult.error.issues
+          .map((issue) => issue.message)
+          .join("\n");
+
+        dispatch({
+          type: "UPDATE_ERRORS",
+          errors: {
+            donor: donorErrors,
+          },
+        });
+        toast({
+          title: "ERROR IN DONOR FIELDS",
+          description: errorMsg,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
+
+      donor = donorResult.data;
+    }
+
+    // Create or update the fund
+    if (create) {
       createFund.mutate({
-        retreatId: retreatId,
-        fundDetails: { name: name, date: date, amount: amount, source: source },
-      });
-    else
-      updateFund.mutate({
-        fundId: fund?._id!,
-        updates: { name: name, date: date, amount: amount, source: source },
+        retreatId,
+        fundDetails: fundResult.data,
       });
 
+      if (state.trackDonor && donor) {
+        createDonor.mutate(donor);
+      }
+    } else {
+      updateFund.mutate({
+        fundId: fund?._id!,
+        updates: {
+          name: fundResult.data.name,
+          date: fundResult.data.date,
+          amount: fundResult.data.amount,
+          source: fundResult.data.source,
+        },
+      });
+    }
+
     onCloseModal();
-    onCloseModal();
-    return true;
   };
 
   const handleDelete = () => {
-    deleteFund.mutate(fund?._id!);
+    if (create || !fund?._id) return;
+    deleteFund.mutate(fund._id);
     onCloseModal();
-    onCloseError();
-    return true;
   };
 
-  const handleNameChange = (event: React.FormEvent<HTMLInputElement>) =>
-    setName(event.currentTarget.value);
-  const handleDateChange = (event: React.FormEvent<HTMLInputElement>) =>
-    setDate(event.currentTarget.value);
-  const handleSourceChange = (selectedOption: string) =>
-    setSource(selectedOption);
-  const handleAmountChange = (event: React.FormEvent<HTMLInputElement>) => {
-    const inputValue = event.currentTarget.value;
-    setAmount(Number(inputValue));
+  const handleFundChange = <T extends keyof Fund>(field: T, value: Fund[T]) => {
+    dispatch({
+      type: "UPDATE_FUND",
+      value: {
+        [field]: value,
+      },
+    });
+  };
 
-    // Validate the input and update the error state
-    if (!inputValue) {
-      setAmountError(Error.Empty);
-    } else {
-      setAmountError(Error.None);
-    }
+  const handleDonorChange = <T extends keyof Donor>(
+    field: T,
+    value: Donor[T],
+  ) => {
+    dispatch({
+      type: "UPDATE_DONOR",
+      value: {
+        [field]: value,
+      },
+    });
   };
 
   return (
     <Modal isOpen={isOpen} onClose={onCloseModal} isCentered>
       <ModalOverlay />
       <ModalContent
-        width="515px"
-        height="332px"
-        maxWidth="515px"
+        width="550px"
+        maxWidth="550px"
         borderRadius="none"
-        boxShadow={"0px 4px 29px 0px #00000040"}
+        boxShadow="0px 4px 29px 0px #00000040"
       >
         <ModalHeader />
         <ModalCloseButton
@@ -188,7 +304,7 @@ export const NewFundModal = ({
           width="28px"
           height="28px"
         />
-        <ModalBody pl="33px" pr="33px" lineHeight="24px">
+        <ModalBody pl="30px" pr="30px" lineHeight="24px">
           <VStack
             fontFamily="body"
             fontSize="16px"
@@ -197,8 +313,8 @@ export const NewFundModal = ({
             spacing="5px"
             mt="24px"
           >
-            <HStack align="start" spacing="55px">
-              <FormControl isRequired isInvalid={nameError !== Error.None}>
+            <HStack align="start" spacing="35px">
+              <FormControl isRequired isInvalid={!!state.errors.fund.name}>
                 <FormLabel textColor="black" fontWeight="600" mb="4px">
                   Name
                 </FormLabel>
@@ -208,99 +324,236 @@ export const NewFundModal = ({
                   _placeholder={{ color: "#666666" }}
                   border="1px solid #D9D9D9"
                   borderRadius="0px"
-                  width="182px"
+                  width="180px"
                   height="30px"
-                  value={name}
-                  onChange={handleNameChange}
-                  required
+                  value={state.fund.name}
+                  onChange={(e) => handleFundChange("name", e.target.value)}
                 />
                 <Box minHeight="20px" mt={2}>
-                  <FormErrorMessage mt={0}>Name is required</FormErrorMessage>
+                  <FormErrorMessage>Name is required</FormErrorMessage>
                 </Box>
               </FormControl>
-              <FormControl isRequired isInvalid={sourceError !== Error.None}>
-                <FormLabel
-                  fontFamily="body"
-                  fontSize="16px"
-                  fontWeight="600"
-                  mb="4px"
-                >
+
+              <FormControl isRequired isInvalid={!!state.errors.fund.source}>
+                <FormLabel fontWeight="600" mb="4px">
                   Source
                 </FormLabel>
                 <RadioDropdown
                   options={sourceOptions}
-                  selectedOption={source}
-                  setSelectedOption={handleSourceChange}
+                  selectedOption={state.fund.source}
+                  setSelectedOption={(value) =>
+                    handleFundChange("source", value)
+                  }
                 />
                 <Box minHeight="20px" mt={2}>
-                  <FormErrorMessage mt={0}>Source is required</FormErrorMessage>
+                  <FormErrorMessage>
+                    {state.errors.fund.source?.join("\n")}
+                  </FormErrorMessage>
                 </Box>
               </FormControl>
             </HStack>
-            <HStack align="start" spacing="55px">
-              <FormControl isRequired isInvalid={dateError !== Error.None}>
+
+            <HStack align="start" spacing="35px">
+              <FormControl isRequired isInvalid={!!state.errors.fund.date}>
                 <FormLabel textColor="black" fontWeight="600" mb="4px">
                   Date
                 </FormLabel>
                 <Input
                   placeholder="2/24/2022"
-                  color="#black"
+                  color="black"
                   _placeholder={{ color: "#666666" }}
                   border="1px solid #D9D9D9"
                   borderRadius="0px"
-                  width="182px"
+                  width="180px"
                   height="30px"
-                  value={date}
-                  onChange={handleDateChange}
                   type="date"
-                  required
+                  value={state.fund.date}
+                  onChange={(e) => handleFundChange("date", e.target.value)}
                 />
                 <Box minHeight="20px" mt={2}>
-                  <FormErrorMessage mt={0}>Date is required</FormErrorMessage>
+                  <FormErrorMessage>
+                    {state.errors.fund.date?.join("\n")}
+                  </FormErrorMessage>
                 </Box>
               </FormControl>
-              <FormControl isRequired isInvalid={amountError !== Error.None}>
-                <FormLabel
-                  fontFamily="body"
-                  fontSize="16px"
-                  fontWeight="600"
-                  mb="4px"
-                >
+
+              <FormControl isRequired isInvalid={!!state.errors.fund.amount}>
+                <FormLabel fontWeight="600" mb="4px">
                   Amount
                 </FormLabel>
-                <InputGroup width="182px" height="30px">
-                  <InputLeftAddon height="30px">$</InputLeftAddon>
+                <InputGroup width="180px">
+                  <InputLeftAddon width="40px" height="30px" borderRadius="0px">
+                    $
+                  </InputLeftAddon>
                   <Input
-                    width="182px"
+                    type="number"
                     height="30px"
-                    placeholder="$150"
-                    color="#black"
-                    _placeholder={{ color: "#666666" }}
-                    border="1px solid #D9D9D9"
                     borderRadius="0px"
-                    value={amount}
-                    onChange={handleAmountChange}
-                    type="text"
-                    required
+                    border="1px solid #D9D9D9"
+                    placeholder="150"
+                    value={state.fund.amount}
+                    onChange={(e) =>
+                      handleFundChange("amount", Number(e.target.value))
+                    }
                   />
                 </InputGroup>
                 <Box minHeight="20px" mt={2}>
-                  <FormErrorMessage mt={0}>Amount is required</FormErrorMessage>
+                  <FormErrorMessage>
+                    {state.errors.fund.amount?.join("\n")}
+                  </FormErrorMessage>
                 </Box>
               </FormControl>
             </HStack>
           </VStack>
+
+          <Box mt="20px">
+            <FormControl display="flex" alignItems="center">
+              <FormLabel fontWeight="600" mb="0">
+                Also track Donor?
+              </FormLabel>
+              <Switch
+                isChecked={state.trackDonor}
+                onChange={() =>
+                  dispatch({
+                    type: "TOGGLE_TRACK_DONOR",
+                  })
+                }
+              />
+            </FormControl>
+          </Box>
+
+          {state.trackDonor && (
+            <Box
+              mt="15px"
+              border="1px solid #D9D9D9"
+              padding="15px"
+              width="100%"
+            >
+              <VStack align="start" spacing="15px" width="100%">
+                {/* Student Name + Email (one row) */}
+                <HStack width="100%" align="start" spacing="15px">
+                  <FormControl
+                    flex="1"
+                    isRequired
+                    isInvalid={!!state.errors.donor.studentName}
+                  >
+                    <FormLabel fontWeight="600">Student Name</FormLabel>
+                    <Input
+                      placeholder="Emily Doe"
+                      borderRadius="0"
+                      border="1px solid #D9D9D9"
+                      height="30px"
+                      value={state.donor.studentName}
+                      onChange={(e) =>
+                        handleDonorChange("studentName", e.target.value)
+                      }
+                    />
+                    <FormErrorMessage>
+                      {state.errors.donor.studentName?.join("\n")}
+                    </FormErrorMessage>
+                  </FormControl>
+
+                  <FormControl
+                    flex="1"
+                    isInvalid={!!state.errors.donor.donorEmail}
+                  >
+                    <FormLabel fontWeight="600">Donor Email</FormLabel>
+                    <Input
+                      placeholder="jdoe@example.com"
+                      borderRadius="0"
+                      border="1px solid #D9D9D9"
+                      height="30px"
+                      type="email"
+                      value={state.donor.donorEmail}
+                      onChange={(e) =>
+                        handleDonorChange("donorEmail", e.target.value)
+                      }
+                    />
+                    <FormErrorMessage>
+                      {state.errors.donor.donorEmail?.join("\n")}
+                    </FormErrorMessage>
+                  </FormControl>
+                </HStack>
+
+                {/* Address (full width) */}
+                <FormControl>
+                  <FormLabel fontWeight="600">Address</FormLabel>
+                  <Input
+                    placeholder="123 Jane St"
+                    borderRadius="0"
+                    border="1px solid #D9D9D9"
+                    width="100%"
+                    height="30px"
+                    value={state.donor.address}
+                    onChange={(e) =>
+                      handleDonorChange("address", e.target.value)
+                    }
+                  />
+                </FormControl>
+
+                {/* Sponsor Level + Status (one row) */}
+                <HStack width="100%" align="start" spacing="15px">
+                  <FormControl
+                    flex="1"
+                    isRequired
+                    isInvalid={!!state.errors.donor.sponsorLevel}
+                  >
+                    <FormLabel fontWeight="600">Sponsorship Level</FormLabel>
+                    <RadioDropdown
+                      options={SPONSOR_LEVEL_OPTIONS}
+                      selectedOption={state.donor.sponsorLevel}
+                      setSelectedOption={(value) =>
+                        handleDonorChange("sponsorLevel", value)
+                      }
+                    />
+                    <FormErrorMessage>
+                      {state.errors.donor.sponsorLevel?.join("\n")}
+                    </FormErrorMessage>
+                  </FormControl>
+
+                  <FormControl
+                    flex="1"
+                    isRequired
+                    isInvalid={!!state.errors.donor.status}
+                  >
+                    <FormLabel fontWeight="600">Status</FormLabel>
+                    <RadioDropdown
+                      options={STATUS_OPTIONS}
+                      selectedOption={state.donor.status}
+                      setSelectedOption={(value) =>
+                        handleDonorChange("status", value)
+                      }
+                    />
+                    <FormErrorMessage>
+                      {state.errors.donor.status?.join("\n")}
+                    </FormErrorMessage>
+                  </FormControl>
+                </HStack>
+
+                {/* Notes (full width) */}
+                <FormControl>
+                  <FormLabel fontWeight="600">Notes</FormLabel>
+                  <Textarea
+                    border="1px solid #D9D9D9"
+                    borderRadius="0"
+                    resize="none"
+                    height="60px"
+                    value={state.donor.notes}
+                    onChange={(e) => handleDonorChange("notes", e.target.value)}
+                  />
+                </FormControl>
+              </VStack>
+            </Box>
+          )}
         </ModalBody>
 
-        <ModalFooter pr="14px" pb="30px" pt="0px">
+        <ModalFooter pr="20px" pb="20px">
           <Button
-            fontSize="20px"
+            fontSize="16px"
             fontWeight="400"
             colorScheme="red"
-            color="hop_red.500"
             variant="outline"
             mr="15px"
-            fontFamily="oswald"
             onClick={handleDelete}
             isDisabled={create}
           >
@@ -308,11 +561,9 @@ export const NewFundModal = ({
           </Button>
           <Button
             colorScheme="twitter"
-            bg="hop_blue.500"
             onClick={handleSave}
-            fontSize="20px"
+            fontSize="16px"
             fontWeight="400"
-            fontFamily="oswald"
             mr="15px"
           >
             APPLY

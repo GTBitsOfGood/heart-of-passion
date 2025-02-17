@@ -12,8 +12,7 @@ import {
   Text,
   Spinner,
 } from "@chakra-ui/react";
-import Image from "next/image";
-import { TriangleDownIcon, SettingsIcon } from "@chakra-ui/icons";
+import { TriangleDownIcon } from "@chakra-ui/icons";
 import { useEffect, useRef, useState } from "react";
 import DonorList from "~/components/donors/DonorList";
 import { Donor } from "~/common/types";
@@ -22,9 +21,6 @@ import { NewDonorModal } from "~/components/NewDonorModal";
 import { useRouter } from "next/router";
 import { trpc } from "~/utils/api";
 import Sidebar from "~/components/Sidebar";
-
-//Adding
-import Link from "next/link";
 
 export default function Donors() {
   const router = useRouter();
@@ -250,7 +246,6 @@ export default function Donors() {
                 sponsorLevel: "",
                 address: "",
               }}
-              create={true}
             />
           </Box>
         </Flex>

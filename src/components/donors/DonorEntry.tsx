@@ -1,44 +1,31 @@
 import {
-  Flex,
   Image,
   Box,
   Button,
   Grid,
   GridItem,
-  IconButton,
   useDisclosure,
   HStack,
 } from "@chakra-ui/react";
-import { EditIcon } from "@chakra-ui/icons";
 import { Donor } from "~/common/types";
 import fonts from "~/common/theme/fonts";
 import { NewDonorModal } from "../NewDonorModal";
 import { useRef } from "react";
 import { useRouter } from "next/router";
-import { addRequestMeta } from "next/dist/server/request-meta";
 
-interface DonorsProps extends Donor {
+interface DonorsProps {
+  donor: Donor;
   retreatId: string;
 }
 
-export default function Donors({
-  donorName,
-  studentName,
-  donorEmail,
-  status,
-  source,
-  sponsorLevel,
-  retreatId,
-  notes,
-  address,
-}: DonorsProps) {
+export default function DonorEntry({ donor, retreatId }: DonorsProps) {
   const {
     isOpen: isOpenAddDonorModal,
     onOpen: onOpenAddDonorModal,
     onClose: onCloseAddDonorModal,
   } = useDisclosure();
-  const finalRef = useRef(null);
-  const router = useRouter();
+
+  const { donorName, donorEmail, studentName } = donor;
 
   return (
     <>
@@ -89,9 +76,6 @@ export default function Donors({
               {status}
             </Box>
           </GridItem>
-          {/* <GridItem colSpan={2} display="flex" justifyContent="end">
-          
-        </GridItem> */}
         </Grid>
         <Button
           colorScheme="twitter"
@@ -114,17 +98,7 @@ export default function Donors({
       <NewDonorModal
         isOpen={isOpenAddDonorModal}
         onClose={onCloseAddDonorModal}
-        donorData={{
-          donorName: donorName,
-          studentName: studentName,
-          donorEmail: donorEmail,
-          sponsorLevel: sponsorLevel,
-          source: source,
-          status: status,
-          notes: notes,
-          address: address,
-        }}
-        create={false}
+        donorData={donor}
         retreatId={retreatId}
       />
     </>

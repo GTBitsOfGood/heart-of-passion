@@ -38,16 +38,13 @@ export const donorRouter = createTRPCRouter({
   updateDonor: studentProcedure
     .input(
       z.object({
-        donorEmail: z.string(),
+        donorId: z.string(),
         updatedDonor: donorSchema,
       }),
     )
     .mutation(async ({ input }) => {
-      const { donorEmail, updatedDonor } = input;
-      await DonorModel.findOneAndUpdate(
-        { donorEmail: donorEmail },
-        updatedDonor,
-      ).exec();
+      const { donorId, updatedDonor } = input;
+      await DonorModel.findOneAndUpdate({ _id: donorId }, updatedDonor).exec();
     }),
   getDonor: studentProcedure
     .input(z.string())
@@ -63,6 +60,7 @@ export const donorRouter = createTRPCRouter({
 
 function processDonor(obj: any): Donor {
   return {
+    _id: obj._id,
     donorName: obj.donorName ?? "",
     studentName: obj.studentName ?? "",
     donorEmail: obj.donorEmail,

@@ -29,13 +29,11 @@ import {
   sponsorLevelSchema,
 } from "~/common/types";
 import { trpc } from "~/utils/api";
-import { TRPCError } from "@trpc/server";
 
 type NewDonorProps = {
   isOpen: boolean;
   onClose: () => void;
   donorData: Donor;
-  create: boolean;
   retreatId: string;
 };
 
@@ -66,7 +64,6 @@ export const NewDonorModal = ({
   onClose,
   donorData,
   retreatId,
-  create,
 }: NewDonorProps) => {
   // Form Data
   const [donorName, setDonorName] = useState(donorData.donorName);
@@ -128,7 +125,7 @@ export const NewDonorModal = ({
   useEffect(() => {
     if (isOpen) {
       // Set default values when the modal opens
-      if (create) {
+      if (donorData._id === undefined) {
         setSponsorLevel("Platinum");
         setStatus("Waiting for Reply");
         setSource("Select Source");
@@ -149,10 +146,10 @@ export const NewDonorModal = ({
         setAddress(donorData.address);
       }
     }
-  }, [isOpen, create, donorData]);
+  }, [isOpen, donorData]);
 
   const onCloseModal = () => {
-    if (create) {
+    if (donorData._id === undefined) {
       setSponsorLevel("Platinum");
       setStatus("Waiting for Reply");
       setSource("Select Source");
@@ -196,7 +193,12 @@ export const NewDonorModal = ({
       notes,
       address,
     };
-    if (create && donorEmail) {
+    if (!!donorData._id) {
+      updateDonor.mutate({
+        donorId: donorData._id,
+        updatedDonor: donor,
+      });
+    } else {
       try {
         await createDonor.mutateAsync(donor);
       } catch (e) {
@@ -204,14 +206,7 @@ export const NewDonorModal = ({
         onOpenError();
         return;
       }
-    } else if (create && donorEmail == "") {
-      await createDonor.mutateAsync(donor);
-    } else {
-      updateDonor.mutate({
-        donorEmail: donorData.donorEmail,
-        updatedDonor: donor,
-      });
-    }
+    } 
     onCloseModal();
     return true;
   };
@@ -488,7 +483,7 @@ export const NewDonorModal = ({
               mr="15px"
               fontFamily="oswald"
               onClick={handleDeleteOpen} // Use handleDeleteOpen to open confirmation modal
-              isDisabled={create}
+              isDisabled={donorData._id === undefined}
             >
               DELETE
             </Button>

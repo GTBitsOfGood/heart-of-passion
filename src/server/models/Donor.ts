@@ -16,14 +16,14 @@ export interface IDonor extends z.infer<typeof donorSchema> {
   address: string;
 }
 
-export const sponsorLevelOptions = [
+export const SPONSOR_LEVEL_OPTIONS = [
+  "Bronze",
   "Platinum",
   "Gold",
   "Silver",
   "Star",
-  "Bronze",
 ];
-export const statusOptions = [
+export const STATUS_OPTIONS = [
   "Waiting for Reply",
   "Send Thank You Note",
   "Note Sent",
@@ -51,12 +51,12 @@ const DonorSchema = new Schema<IDonor>({
   },
   sponsorLevel: {
     type: String,
-    enum: sponsorLevelOptions,
+    enum: SPONSOR_LEVEL_OPTIONS,
     required: true,
   },
   status: {
     type: String,
-    enum: statusOptions,
+    enum: STATUS_OPTIONS,
     required: true,
   },
   notes: {
