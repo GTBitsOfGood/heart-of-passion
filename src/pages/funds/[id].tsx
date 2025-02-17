@@ -73,13 +73,14 @@ export default function RaisedFunds() {
         const emap: Map<string, Fund[]> = new Map(
           uniqueSources.map((e) => [e, new Array()]),
         ); // map of val to empty array
-        funds.forEach((e) =>
-          emap.get(e.source)?.push({
-            name: e.name,
-            date: e.date,
-            amount: e.amount,
-            source: e.source,
-          }),
+        funds.forEach(
+          (e) =>
+            emap.get(e.source)?.push({
+              name: e.name,
+              date: e.date,
+              amount: e.amount,
+              source: e.source,
+            }),
         );
 
         return uniqueSources
@@ -156,10 +157,10 @@ export default function RaisedFunds() {
                     {filter == "date"
                       ? "View by Date"
                       : filter == "source"
-                        ? "View by Source"
-                        : filter == "highest amount"
-                          ? "View by Highest Amount"
-                          : "View by Lowest Amount"}
+                      ? "View by Source"
+                      : filter == "highest amount"
+                      ? "View by Highest Amount"
+                      : "View by Lowest Amount"}
                   </Text>
                   <TriangleDownIcon />
                 </Button>

@@ -239,10 +239,10 @@ export default function RetreatExpenses() {
                     {filter == "date"
                       ? "View by Date"
                       : filter == "category"
-                        ? "View by Category"
-                        : filter == "lowest cost"
-                          ? "View by Lowest Cost"
-                          : "View by Highest Cost"}
+                      ? "View by Category"
+                      : filter == "lowest cost"
+                      ? "View by Lowest Cost"
+                      : "View by Highest Cost"}
                   </Text>
                   <TriangleDownIcon />
                 </Button>

@@ -151,12 +151,12 @@ export default function Donors() {
                     {filter == "donorName"
                       ? "View by Donor Name"
                       : filter == "studentName"
-                        ? "View by Student Name"
-                        : filter == "status"
-                          ? "View by Status"
-                          : filter == "sponsorLevel"
-                            ? "View by Sponsorship Level"
-                            : "View by Source"}
+                      ? "View by Student Name"
+                      : filter == "status"
+                      ? "View by Status"
+                      : filter == "sponsorLevel"
+                      ? "View by Sponsorship Level"
+                      : "View by Source"}
                   </Text>
                   <TriangleDownIcon />
                 </Button>
