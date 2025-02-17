@@ -16,14 +16,17 @@ export const donorRouter = createTRPCRouter({
     .input(donorSchema)
     .mutation(async ({ input }) => {
       const donor = new DonorModel(input);
-      if (input.donorEmail && await DonorModel.exists({ donorEmail: input.donorEmail })) {
+      if (
+        input.donorEmail &&
+        (await DonorModel.exists({ donorEmail: input.donorEmail }))
+      ) {
         throw new TRPCError({
           code: "CONFLICT",
           message: "Email already exists",
         });
       }
 
-      await donor.save()
+      await donor.save();
     }),
 
   deleteDonor: studentProcedure
@@ -35,16 +38,13 @@ export const donorRouter = createTRPCRouter({
   updateDonor: studentProcedure
     .input(
       z.object({
-        donorEmail: z.string(),
+        donorId: z.string(),
         updatedDonor: donorSchema,
       }),
     )
     .mutation(async ({ input }) => {
-      const { donorEmail, updatedDonor } = input;
-      await DonorModel.findOneAndUpdate(
-        { donorEmail: donorEmail },
-        updatedDonor,
-      ).exec();
+      const { donorId, updatedDonor } = input;
+      await DonorModel.findOneAndUpdate({ _id: donorId }, updatedDonor).exec();
     }),
   getDonor: studentProcedure
     .input(z.string())

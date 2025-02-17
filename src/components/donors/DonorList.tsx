@@ -2,9 +2,12 @@ import { Heading, Stack, Flex } from "@chakra-ui/react";
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import DonorEntry from "./DonorEntry";
-import { Donor, DonorList } from "src/common/types";
+import { Donor } from "src/common/types";
 
-interface DonorListProps extends DonorList {
+interface DonorListProps {
+  title: string;
+  donors: Donor[];
+
   retreatId: string;
 }
 
@@ -44,8 +47,7 @@ export default function DonorList({
                   donor.source +
                   donor.address
                 }
-                {...donor}
-                // width=
+                donor={donor}
               />
             ))
           ) : (
