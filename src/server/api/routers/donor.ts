@@ -60,6 +60,7 @@ export const donorRouter = createTRPCRouter({
 
 function processDonor(obj: any): Donor {
   return {
+    _id: obj._id,
     donorName: obj.donorName ?? "",
     studentName: obj.studentName ?? "",
     donorEmail: obj.donorEmail,
