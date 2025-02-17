@@ -186,7 +186,7 @@ export const NewDonorModal = ({
     const donor: Donor = {
       donorName,
       studentName,
-      donorEmail,
+      donorEmail: donorEmail === "" ? undefined : donorEmail,
       source,
       sponsorLevel,
       status,
@@ -206,7 +206,7 @@ export const NewDonorModal = ({
         onOpenError();
         return;
       }
-    } 
+    }
     onCloseModal();
     return true;
   };
@@ -222,7 +222,7 @@ export const NewDonorModal = ({
     let donor: Donor = {
       donorName,
       studentName,
-      donorEmail,
+      donorEmail: donorEmail === "" ? undefined : donorEmail,
       status,
       source,
       sponsorLevel,
@@ -236,6 +236,7 @@ export const NewDonorModal = ({
     setStudentError(
       studentName === "" ? StudentError.Empty : StudentError.None,
     );
+
     if (donorEmail && !isValidEmail(donorEmail)) {
       setEmailError(EmailError.Invalid);
     } else {
@@ -346,7 +347,7 @@ export const NewDonorModal = ({
                     value={donorEmail}
                     onChange={handleDonorEmailChange}
                     type="email"
-                    // required
+                  // required
                   />
                   <Box minHeight="20px" mt={2}>
                     <FormErrorMessage mt={0}>
