@@ -13,15 +13,13 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { trpc } from "~/utils/api";
-import React, { useMemo } from "react";
+import React from "react";
 import { TriangleDownIcon } from "@chakra-ui/icons";
 import fonts from "src/common/theme/fonts";
 import Sidebar from "~/components/Sidebar";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import FundList from "~/components/funds/FundList";
 import { Fund } from "~/common/types";
-import { IRetreat } from "~/server/models/Retreat";
-import { IChapter } from "~/server/models/Chapter";
 import { NewFundModal } from "~/components/NewFundModal";
 
 export default function RaisedFunds() {
