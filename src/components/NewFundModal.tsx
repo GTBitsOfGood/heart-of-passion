@@ -36,9 +36,9 @@ type NewFundProps = {
 };
 
 type State = {
-  fund: Omit<Partial<Fund>, "source"> & { source: string };
+  fund: Partial<Fund> & { source: string }; // We require a default source to set a default option in the dropdown
   trackDonor: boolean;
-  donor: Partial<Donor> & { sponsorLevel: string; status: string };
+  donor: Partial<Donor> & { sponsorLevel: string; status: string }; // We require a default sponsor level and status to set default options in the dropdowns
 
   errors: ErrorState<keyof Fund, keyof Donor>;
 };
@@ -53,7 +53,7 @@ type ErrorState<F extends keyof Fund, D extends keyof Donor> = {
   };
 };
 
-type Action<T extends keyof State = keyof State> =
+type Action =
   | {
       type: "TOGGLE_TRACK_DONOR";
     }
