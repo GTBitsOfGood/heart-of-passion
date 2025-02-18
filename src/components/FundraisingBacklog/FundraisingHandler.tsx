@@ -4,7 +4,12 @@ import "@fontsource/oswald/700.css";
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 
 import FundraisingCard from "~/components/FundraisingBacklog/FundraisingCard";
-import { Event, EventsByYear, Fundraiser, FundraisersByYear } from "~/common/types";
+import {
+  Event,
+  EventsByYear,
+  Fundraiser,
+  FundraisersByYear,
+} from "~/common/types";
 import { BacklogSort } from "~/pages/backlog/[id]";
 
 export default function BacklogHandler({

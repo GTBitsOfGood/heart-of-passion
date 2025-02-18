@@ -17,21 +17,30 @@ export default function PlanningCard({
       onClick={onClick}
       cursor="pointer"
     >
-      <Text
-        fontFamily={"nunito"}
-        fontWeight={700}
-        fontSize={20}
-        height={70}
-        marginBottom={49}
-      >
+      <Text fontFamily={"nunito"} fontWeight={700} fontSize={20} height={30}>
         {fundraiser.name}
       </Text>
+      <Text
+        fontFamily={"nunito"}
+        fontWeight={500}
+        fontSize={20}
+        marginBottom={49}
+      >
+        {new Date(fundraiser.date).toLocaleDateString("en-US")}
+      </Text>
+
       <Box display={"flex"} justifyContent={"space-between"}>
         <Text fontFamily={"nunito"} fontWeight={500} fontSize={20}>
-          {new Date(fundraiser.date).toLocaleDateString("en-US")}
+          Projected:<br></br>${fundraiser.profit}
         </Text>
-        <Text fontFamily={"nunito"} fontWeight={500} fontSize={20}>
-          ${fundraiser.profit}
+        <Text
+          fontFamily={"nunito"}
+          fontWeight={500}
+          fontSize={20}
+          marginRight={10}
+        >
+          Actual:<br></br>$
+          {fundraiser.actualProfit ? fundraiser.actualProfit : " ---"}
         </Text>
       </Box>
     </Box>

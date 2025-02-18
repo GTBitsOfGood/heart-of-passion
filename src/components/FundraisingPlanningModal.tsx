@@ -92,6 +92,7 @@ const initialState: State = {
     profit: 0,
     expenses: [],
     notes: "",
+    actualProfit: undefined,
   },
   fundraiserId: undefined,
   expenseFormOpen: false,
@@ -185,7 +186,7 @@ export const FundraisingPlanningModal = ({
     } else {
       await createFundraiser.mutate({
         retreatId,
-        fundraiserDetails: state.fundraiser,
+        fundraiserDetails: { ...state.fundraiser },
       });
     }
 

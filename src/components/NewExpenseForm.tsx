@@ -104,7 +104,7 @@ export const NewExpenseForm = ({
       });
     }
   };
-  
+
   const trpcUtils = trpc.useContext();
   const updateExpense = trpc.event.updateExpense.useMutation({
     onSuccess: () => {
@@ -124,13 +124,13 @@ export const NewExpenseForm = ({
   const deleteExpenseByEvent = trpc.event.deleteExpenseByEvent.useMutation({
     onSuccess: () => {
       trpcUtils.event.invalidate();
-    }
-  })
+    },
+  });
   const deleteExpense = trpc.event.deleteExpense.useMutation({
     onSuccess: () => {
       trpcUtils.event.invalidate();
-    }
-  })
+    },
+  });
 
   const handleUnitsChange = (event: React.FormEvent<HTMLInputElement>) => {
     if (parseInt(event.currentTarget.value) > 0) {
@@ -139,13 +139,15 @@ export const NewExpenseForm = ({
         field: "numUnits",
         value: parseInt(event.currentTarget.value),
       });
-    } 
-  }
+    }
+  };
   const handleNotesChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     dispatch({ type: "UPDATE_EXPENSE", field: "notes", value: e.target.value });
   };
 
-  const [costType, setCostType] = useState(create || selectedExpense.numUnits === 1 ? "flat" : "unit")
+  const [costType, setCostType] = useState(
+    create || selectedExpense.numUnits === 1 ? "flat" : "unit",
+  );
 
   const validateFields = () => {
     try {
@@ -154,7 +156,7 @@ export const NewExpenseForm = ({
     } catch (e) {
       let errorDesc = "Unknown Error";
       if (e instanceof z.ZodError) {
-        errorDesc = e.issues.map((issue) => issue.message).join("; ")
+        errorDesc = e.issues.map((issue) => issue.message).join("; ");
         errorDesc += `; please fill all fields marked by asterisk`;
       }
       onOpenError();
@@ -173,21 +175,24 @@ export const NewExpenseForm = ({
     if (onCloseSide) {
       onCloseSide();
     }
-    console.log('a');
+    console.log("a");
     if (!create) {
-      console.log('b');
+      console.log("b");
       const updatedExpenses = (expenses ?? []).filter(
         (e) => e !== selectedExpense,
       );
       if (setExpenses) {
-        console.log('c');
+        console.log("c");
         setExpenses(updatedExpenses);
       } else if (selectedExpense._id) {
-        console.log('d');
+        console.log("d");
         if (thisEvent) {
-          deleteExpenseByEvent.mutate({ eventId: thisEvent, expenseId: selectedExpense._id })
+          deleteExpenseByEvent.mutate({
+            eventId: thisEvent,
+            expenseId: selectedExpense._id,
+          });
         } else {
-          deleteExpense.mutate(selectedExpense._id)
+          deleteExpense.mutate(selectedExpense._id);
         }
       }
     }
@@ -197,7 +202,6 @@ export const NewExpenseForm = ({
     dispatch({ type: "RESET" });
     return;
   };
-  
 
   const handleApply = async () => {
     if (!validateFields()) {
@@ -328,12 +332,12 @@ export const NewExpenseForm = ({
           </FormLabel>
           <RadioGroup
             onChange={(e) => {
-              setCostType(e)
+              setCostType(e);
               let numUnits;
               if (e === "unit") {
                 numUnits = state.numUnits ?? 1;
-              }
-              else { // e === "flat"
+              } else {
+                // e === "flat"
                 numUnits = 1;
               }
               dispatch({

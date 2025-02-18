@@ -29,13 +29,11 @@ import {
   sponsorLevelSchema,
 } from "~/common/types";
 import { trpc } from "~/utils/api";
-import { TRPCError } from "@trpc/server";
 
 type NewDonorProps = {
   isOpen: boolean;
   onClose: () => void;
   donorData: Donor;
-  create: boolean;
   retreatId: string;
 };
 
@@ -66,7 +64,6 @@ export const NewDonorModal = ({
   onClose,
   donorData,
   retreatId,
-  create,
 }: NewDonorProps) => {
   // Form Data
   const [donorName, setDonorName] = useState(donorData.donorName);
@@ -128,7 +125,7 @@ export const NewDonorModal = ({
   useEffect(() => {
     if (isOpen) {
       // Set default values when the modal opens
-      if (create) {
+      if (donorData._id === undefined) {
         setSponsorLevel("Platinum");
         setStatus("Waiting for Reply");
         setSource("Select Source");
@@ -149,10 +146,10 @@ export const NewDonorModal = ({
         setAddress(donorData.address);
       }
     }
-  }, [isOpen, create, donorData]);
+  }, [isOpen, donorData]);
 
   const onCloseModal = () => {
-    if (create) {
+    if (donorData._id === undefined) {
       setSponsorLevel("Platinum");
       setStatus("Waiting for Reply");
       setSource("Select Source");
@@ -189,14 +186,19 @@ export const NewDonorModal = ({
     const donor: Donor = {
       donorName,
       studentName,
-      donorEmail,
+      donorEmail: donorEmail === "" ? undefined : donorEmail,
       source,
       sponsorLevel,
       status,
       notes,
       address,
     };
-    if (create && donorEmail) {
+    if (!!donorData._id) {
+      updateDonor.mutate({
+        donorId: donorData._id,
+        updatedDonor: donor,
+      });
+    } else {
       try {
         await createDonor.mutateAsync(donor);
       } catch (e) {
@@ -204,20 +206,15 @@ export const NewDonorModal = ({
         onOpenError();
         return;
       }
-    } else if (create && donorEmail == "") {
-        await createDonor.mutateAsync(donor);
-    } else {
-      updateDonor.mutate({
-        donorEmail: donorData.donorEmail,
-        updatedDonor: donor,
-      });
     }
     onCloseModal();
     return true;
   };
 
   const isValidEmail = (email: string): boolean => {
-    const emailRegex: RegExp = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+    const emailRegex: RegExp = new RegExp(
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+    );
     return emailRegex.test(email);
   };
 
@@ -225,7 +222,7 @@ export const NewDonorModal = ({
     let donor: Donor = {
       donorName,
       studentName,
-      donorEmail,
+      donorEmail: donorEmail === "" ? undefined : donorEmail,
       status,
       source,
       sponsorLevel,
@@ -239,10 +236,11 @@ export const NewDonorModal = ({
     setStudentError(
       studentName === "" ? StudentError.Empty : StudentError.None,
     );
+
     if (donorEmail && !isValidEmail(donorEmail)) {
-      setEmailError(EmailError.Invalid)
+      setEmailError(EmailError.Invalid);
     } else {
-      setEmailError(EmailError.None)
+      setEmailError(EmailError.None);
     }
     const result = donorSchema.safeParse(donor);
     if (!result.success) {
@@ -349,7 +347,7 @@ export const NewDonorModal = ({
                     value={donorEmail}
                     onChange={handleDonorEmailChange}
                     type="email"
-                  // required
+                    // required
                   />
                   <Box minHeight="20px" mt={2}>
                     <FormErrorMessage mt={0}>
@@ -486,7 +484,7 @@ export const NewDonorModal = ({
               mr="15px"
               fontFamily="oswald"
               onClick={handleDeleteOpen} // Use handleDeleteOpen to open confirmation modal
-              isDisabled={create}
+              isDisabled={donorData._id === undefined}
             >
               DELETE
             </Button>
