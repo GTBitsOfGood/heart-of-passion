@@ -16,14 +16,17 @@ export const donorRouter = createTRPCRouter({
     .input(donorSchema)
     .mutation(async ({ input }) => {
       const donor = new DonorModel(input);
-      if (input.donorEmail && await DonorModel.exists({ donorEmail: input.donorEmail })) {
+      if (
+        input.donorEmail &&
+        (await DonorModel.exists({ donorEmail: input.donorEmail }))
+      ) {
         throw new TRPCError({
           code: "CONFLICT",
           message: "Email already exists",
         });
       }
 
-      await donor.save()
+      await donor.save();
     }),
 
   deleteDonor: studentProcedure
@@ -56,6 +59,16 @@ export const donorRouter = createTRPCRouter({
     const donors = await DonorModel.find().exec();
     return donors.map(processDonor);
   }),
+  getDonorsByYear: studentProcedure
+    .input(z.number())
+    .query(async ({ input }): Promise<Donor[]> => {
+      const startOfYear = new Date(`${input}-01-01T00:00:00.000Z`);
+      const endOfYear = new Date(`${input + 1}-01-01T00:00:00.000Z`);
+      const donors = await DonorModel.find({
+        createdAt: { $gte: startOfYear, $lt: endOfYear },
+      }).exec();
+      return donors.map(processDonor);
+    }),
 });
 
 function processDonor(obj: any): Donor {
@@ -68,5 +81,6 @@ function processDonor(obj: any): Donor {
     status: obj.status,
     notes: obj.notes ?? "",
     address: obj.address,
+    createdAt: obj.createdAt,
   };
 }

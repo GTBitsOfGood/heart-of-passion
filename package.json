@@ -9,7 +9,9 @@
     "start": "next start",
     "prettier-format": "prettier --config prettier.config.mjs \"src/**/*.{ts,tsx}\" --write",
     "generate-dummy-data": "tsx scripts/generate-dummy-data.ts",
-    "create-user": "tsx scripts/create-user.ts"
+    "create-user": "tsx scripts/create-user.ts",
+    "migrate-donor-timestamps": "tsx scripts/migrate-donor-timestamps.ts",
+    "rollback-donor-timestamps": "tsx scripts/rollback-donor-timestamps.ts"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",

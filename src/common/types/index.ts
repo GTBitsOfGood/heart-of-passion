@@ -32,6 +32,7 @@ export const donorSchema = z.object({
   status: statusDonorSchema,
   notes: z.string().optional(),
   address: z.string().optional(),
+  createdAt: z.string().datetime().optional(),
 });
 export type Donor = z.infer<typeof donorSchema>;
 
