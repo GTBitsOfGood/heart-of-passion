@@ -59,7 +59,7 @@ export const donorRouter = createTRPCRouter({
   getDonorsByYear: studentProcedure
     .input(z.number())
     .query(async ({ input }): Promise<Donor[]> => {
-      if(input < 1900) return [];
+      if (input < 1900) return [];
       const startOfYear = new Date(`${input}-01-01T00:00:00.000Z`);
       const endOfYear = new Date(`${input + 1}-01-01T00:00:00.000Z`);
       const donors = await DonorModel.find({

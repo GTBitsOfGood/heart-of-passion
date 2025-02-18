@@ -52,7 +52,9 @@ export default function Donors() {
   const finalRef = useRef(null);
 
   // Get donor data from the backend and populate the frontend afterwards
-  const donorData = trpc.donor.getDonorsByYear.useQuery(retreat?.year ?? 0).data;
+  const donorData = trpc.donor.getDonorsByYear.useQuery(
+    retreat?.year ?? 0,
+  ).data;
   const [donors, setDonors] = useState([] as Donor[]);
 
   // Wait for the data to get fetched and then update donors list
