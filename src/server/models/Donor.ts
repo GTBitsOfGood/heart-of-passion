@@ -1,3 +1,4 @@
+import { time } from "console";
 import mongoose from "mongoose";
 import { z } from "zod";
 import { donorSchema, SponsorLevel, Status } from "~/common/types";
@@ -30,42 +31,46 @@ export const STATUS_OPTIONS = [
   "Send Email",
 ];
 
-const DonorSchema = new Schema<IDonor>({
-  donorName: {
-    type: String,
-    required: true,
+const DonorSchema = new Schema<IDonor>(
+  {
+    donorName: {
+      type: String,
+      required: true,
+    },
+
+    studentName: {
+      type: String,
+      required: true,
+    },
+    donorEmail: {
+      type: String,
+      required: false,
+      // unique: false,
+      // sparse: true
+    },
+    source: {
+      type: String,
+      required: true,
+    },
+    sponsorLevel: {
+      type: String,
+      enum: SPONSOR_LEVEL_OPTIONS,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: STATUS_OPTIONS,
+      required: true,
+    },
+    notes: {
+      type: String,
+    },
+    address: {
+      type: String,
+    },
   },
-  studentName: {
-    type: String,
-    required: true,
-  },
-  donorEmail: {
-    type: String,
-    required: false,
-    // unique: false,
-    // sparse: true
-  },
-  source: {
-    type: String,
-    required: true,
-  },
-  sponsorLevel: {
-    type: String,
-    enum: SPONSOR_LEVEL_OPTIONS,
-    required: true,
-  },
-  status: {
-    type: String,
-    enum: STATUS_OPTIONS,
-    required: true,
-  },
-  notes: {
-    type: String,
-  },
-  address: {
-    type: String,
-  },
-});
+  { timestamps: true },
+);
 
 export const DonorModel =
   mongoose.models && mongoose.models.Donor
