@@ -26,6 +26,7 @@ import { IEvent } from "~/server/models/Event";
 import { z } from "zod";
 import { trpc } from "~/utils/api";
 import DeleteConfirmation from "./DeleteConfirmation";
+import { logEventCreationEvent, logEventDeleteEvent, logEventEditEvent } from "~/utils/analytics-logger";
 
 type NewEventProps = {
   isOpen: boolean;
@@ -143,8 +144,10 @@ export const NewEventModal = ({
 
     if (eventToEdit) {
       updateEvent.mutate({ event: state.event, eventId: eventToEdit._id });
+      logEventEditEvent(state.event.name);
     } else {
       createEvent.mutate({ eventDetails: state.event, retreatId });
+      logEventCreationEvent(state.event.name);
     }
   });
 
@@ -719,6 +722,7 @@ export const NewEventModal = ({
         handleDelete={() => {
           if (eventToEdit) {
             deleteEvent.mutate(eventToEdit._id);
+            logEventDeleteEvent(eventToEdit.name);
           }
           onDeleteConfirmationClose();
           onCloseModal();

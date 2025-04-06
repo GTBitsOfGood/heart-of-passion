@@ -29,6 +29,7 @@ import {
   sponsorLevelSchema,
 } from "~/common/types";
 import { trpc } from "~/utils/api";
+import { logDonorCreationEvent, logDonorDeleteEvent, logDonorEditEvent } from "~/utils/analytics-logger";
 
 type NewDonorProps = {
   isOpen: boolean;
@@ -175,6 +176,7 @@ export const NewDonorModal = ({
   // Adjusted handleDelete function for DeleteConfirmation
   const handleDelete = () => {
     deleteDonor.mutate(donorData.donorEmail ?? "");
+    logDonorDeleteEvent(donorData.donorName);
     onCloseModal(); // Close the NewDonorModal
     onDeleteConfirmationClose(); // Close the DeleteConfirmation modal
   };
@@ -198,6 +200,7 @@ export const NewDonorModal = ({
         donorId: donorData._id,
         updatedDonor: donor,
       });
+      logDonorEditEvent(donorData.donorName);
     } else {
       try {
         await createDonor.mutateAsync(donor);
@@ -206,6 +209,7 @@ export const NewDonorModal = ({
         onOpenError();
         return;
       }
+      logDonorCreationEvent(donor.donorName);
     }
     onCloseModal();
     return true;
