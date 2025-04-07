@@ -19,7 +19,11 @@ import { trpc } from "~/utils/api";
 import { useReducer } from "react";
 import { z } from "zod";
 import { log } from "console";
-import { logExpenseCreationEvent, logExpenseDeleteEvent, logExpenseEditEvent } from "~/utils/analytics-logger";
+import {
+  logExpenseCreationEvent,
+  logExpenseDeleteEvent,
+  logExpenseEditEvent,
+} from "~/utils/analytics-logger";
 
 type NewExpenseFormProps = {
   expenses?: Expense[];

@@ -22,7 +22,11 @@ import { NewExpenseForm } from "./NewExpenseForm";
 import { trpc } from "~/utils/api";
 import { IFundraiser } from "~/server/models/Fundraiser";
 import DeleteConfirmation from "./DeleteConfirmation";
-import { logFundraiserCreationEvent, logFundraiserDeleteEvent, logFundraiserEditEvent } from "~/utils/analytics-logger";
+import {
+  logFundraiserCreationEvent,
+  logFundraiserDeleteEvent,
+  logFundraiserEditEvent,
+} from "~/utils/analytics-logger";
 
 type FundraisingPlanningModalProps = {
   isOpen: boolean;

@@ -26,7 +26,11 @@ import { IEvent } from "~/server/models/Event";
 import { z } from "zod";
 import { trpc } from "~/utils/api";
 import DeleteConfirmation from "./DeleteConfirmation";
-import { logEventCreationEvent, logEventDeleteEvent, logEventEditEvent } from "~/utils/analytics-logger";
+import {
+  logEventCreationEvent,
+  logEventDeleteEvent,
+  logEventEditEvent,
+} from "~/utils/analytics-logger";
 
 type NewEventProps = {
   isOpen: boolean;
@@ -429,8 +433,8 @@ export const NewEventModal = ({
                             isHovered
                               ? "#E2E8F0"
                               : isSelected
-                              ? "hop_blue.500"
-                              : "white"
+                                ? "hop_blue.500"
+                                : "white"
                           }
                           padding="10px"
                         >
@@ -514,15 +518,15 @@ export const NewEventModal = ({
                               isHovered
                                 ? "black"
                                 : isSelected
-                                ? "white"
-                                : "black"
+                                  ? "white"
+                                  : "black"
                             }
                             bg={
                               isHovered
                                 ? "#E2E8F0"
                                 : isSelected
-                                ? "hop_blue.500"
-                                : "white"
+                                  ? "hop_blue.500"
+                                  : "white"
                             }
                             paddingLeft="10px"
                             paddingRight="10px"

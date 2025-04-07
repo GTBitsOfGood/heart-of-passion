@@ -51,8 +51,8 @@ export const NewTimeForm = ({
       period === "pm" && hours !== "12"
         ? String(Number(hours) + 12)
         : period === "am" && hours === "12"
-        ? "00"
-        : hours;
+          ? "00"
+          : hours;
     return `${hours}:${minutes}`;
   };
 
@@ -63,8 +63,8 @@ export const NewTimeForm = ({
       hours === "00"
         ? "12"
         : Number(hours) > 12
-        ? String(Number(hours) - 12)
-        : hours;
+          ? String(Number(hours) - 12)
+          : hours;
     return `${hours}:${minutes} ${period}`;
   };
 

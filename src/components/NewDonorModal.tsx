@@ -29,7 +29,11 @@ import {
   sponsorLevelSchema,
 } from "~/common/types";
 import { trpc } from "~/utils/api";
-import { logDonorCreationEvent, logDonorDeleteEvent, logDonorEditEvent } from "~/utils/analytics-logger";
+import {
+  logDonorCreationEvent,
+  logDonorDeleteEvent,
+  logDonorEditEvent,
+} from "~/utils/analytics-logger";
 
 type NewDonorProps = {
   isOpen: boolean;
