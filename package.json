@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
-    "@chakra-ui/next-js": "^2.1.5",
-    "@chakra-ui/react": "^2.8.0",
+    "@chakra-ui/next-js": "2.1.5",
+    "@chakra-ui/react": "2.8.0",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@fontsource/nunito": "^5.0.8",
@@ -29,6 +29,7 @@
     "@trpc/next": "^10.34.0",
     "@trpc/react-query": "^10.34.0",
     "@trpc/server": "^10.34.0",
+    "bog-analytics": "^1.0.11",
     "framer-motion": "^10.16.3",
     "lodash": "^4.17.21",
     "lucia": "^2.7.4",

@@ -22,6 +22,11 @@ import { NewExpenseForm } from "./NewExpenseForm";
 import { trpc } from "~/utils/api";
 import { IFundraiser } from "~/server/models/Fundraiser";
 import DeleteConfirmation from "./DeleteConfirmation";
+import {
+  logFundraiserCreationEvent,
+  logFundraiserDeleteEvent,
+  logFundraiserEditEvent,
+} from "~/utils/analytics-logger";
 
 type FundraisingPlanningModalProps = {
   isOpen: boolean;
@@ -172,6 +177,7 @@ export const FundraisingPlanningModal = ({
 
   const confirmDelete = async () => {
     if (fundraiser) await deleteFundraiser.mutate(fundraiser._id);
+    logFundraiserDeleteEvent(fundraiser?.name ?? "");
     onCloseModal();
   };
 
@@ -183,11 +189,13 @@ export const FundraisingPlanningModal = ({
         fundraiserId: fundraiser._id,
         fundraiser: state.fundraiser,
       });
+      logFundraiserEditEvent(state.fundraiser.name);
     } else {
       await createFundraiser.mutate({
         retreatId,
         fundraiserDetails: { ...state.fundraiser },
       });
+      logFundraiserCreationEvent(state.fundraiser.name);
     }
 
     onCloseModal();

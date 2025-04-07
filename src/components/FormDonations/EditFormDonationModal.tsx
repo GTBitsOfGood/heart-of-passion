@@ -13,6 +13,7 @@ import {
   Input,
   Textarea,
   NumberInput,
+  NumberInputField,
 } from "@chakra-ui/react";
 
 function EditFormDonationModal({
@@ -46,7 +47,9 @@ function EditFormDonationModal({
 
           <FormControl mt={4}>
             <FormLabel>Amount</FormLabel>
-            <NumberInput placeholder="Amount" />
+            <NumberInput>
+              <NumberInputField placeholder="Amount" />
+            </NumberInput>
           </FormControl>
 
           <FormControl mt={4}>
