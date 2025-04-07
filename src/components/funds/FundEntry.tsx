@@ -1,12 +1,12 @@
 import { Box, Grid, GridItem } from "@chakra-ui/react";
-import { Fund } from "~/common/types";
+import type { Fund } from "~/common/types";
 import fonts from "~/common/theme/fonts";
 
 type FundEntryProps = {
   handleSelectFund: (arg0: Fund) => void;
   fund: Fund;
 };
-export default function Fund({ handleSelectFund, fund }: FundEntryProps) {
+export default function FundEntry({ handleSelectFund, fund }: FundEntryProps) {
   return (
     <>
       <Grid
