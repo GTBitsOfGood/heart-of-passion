@@ -4,6 +4,7 @@ import { parseCookie } from "lucia/utils";
 
 import type { NextApiRequest, NextApiResponse } from "next";
 import { UserModel, IUser } from "~/server/models/User";
+import { logUserLoginEvent } from "~/utils/analytics-logger";
 
 async function getUser(email?: string): Promise<IUser | undefined> {
   if (!email) {
@@ -61,6 +62,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const authRequest = auth.handleRequest({ req, res });
     authRequest.setSession(session);
     res.status(302).setHeader("Location", "/").end();
+    logUserLoginEvent();
     return;
   } catch (e) {
     if (e instanceof OAuthRequestError) {

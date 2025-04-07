@@ -65,14 +65,13 @@ export default function Users() {
       ]; // array of unique vals}
       // group users by groupBy name into dictionary
       const umap = new Map(uniques.map((u: any) => [u, new Array()])); // map of val to empty array
-      users?.forEach(
-        (u: any) =>
-          umap.get(u[filter] ? u[filter] : "admin")?.push({
-            email: u["email"],
-            name: u["name"],
-            role: u["role"],
-            chapter: u["chapter"],
-          }),
+      users?.forEach((u: any) =>
+        umap.get(u[filter] ? u[filter] : "admin")?.push({
+          email: u["email"],
+          name: u["name"],
+          role: u["role"],
+          chapter: u["chapter"],
+        }),
       );
       let index = uniques.indexOf("admin");
       if (index !== -1) {

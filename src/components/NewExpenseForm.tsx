@@ -18,6 +18,12 @@ import { trpc } from "~/utils/api";
 
 import { useReducer } from "react";
 import { z } from "zod";
+import { log } from "console";
+import {
+  logExpenseCreationEvent,
+  logExpenseDeleteEvent,
+  logExpenseEditEvent,
+} from "~/utils/analytics-logger";
 
 type NewExpenseFormProps = {
   expenses?: Expense[];
@@ -200,6 +206,7 @@ export const NewExpenseForm = ({
       setSelectedExpense(undefined);
     }
     dispatch({ type: "RESET" });
+    logExpenseDeleteEvent(state.name);
     return;
   };
 
@@ -218,6 +225,7 @@ export const NewExpenseForm = ({
       } else {
         await createExpense.mutate({ expenseDetails: state });
       }
+      logExpenseCreationEvent(state.name);
     } else {
       if (setExpenses && expenses) {
         const updatedExpenses = expenses.map((e) =>
@@ -241,6 +249,7 @@ export const NewExpenseForm = ({
           expenseId: selectedExpense._id,
         });
       }
+      logExpenseEditEvent(state.name);
     }
     if (setExpenses && expenses) {
       setExpenses([...expenses, state]);

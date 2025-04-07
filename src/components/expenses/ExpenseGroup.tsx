@@ -3,7 +3,7 @@ import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import ExpenseEntry from "./ExpenseEntry";
 import { Expense } from "src/common/types";
-import { ExpenseGroup } from "~/pages/retreat-expenses/[id]";
+// import { ExpenseGroup } from "~/pages/retreat-expenses/[id]";
 
 export default function ExpenseGroup({
   title,
